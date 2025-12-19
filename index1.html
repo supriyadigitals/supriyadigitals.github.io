@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SUPRIYA DIGITALS STUDIO</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Photography, Videography, Studio, Mangalagiri" name="keywords">
+    <meta content="Supriya Digitals Studio - Professional Photography & Videography Services" name="description">
+
+    <link href="img/icon1.png" rel="icon">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"
+        rel="stylesheet">
+
+    <style>
+        /* --- GLOBAL VARIABLES & BASE STYLES --- */
+        :root {
+            --primary: #FDAC53;
+            --secondary: #131313;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: "Raleway", sans-serif;
+            color: #4A4A4A;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-color: var(--light);
+            font-size: 1rem;
+            scroll-padding-top: 70px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        a {
+            color: var(--primary);
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #fc8807;
+            text-decoration: none;
+        }
+
+        .text-primary { color: var(--primary) !important; }
+        .bg-secondary { background-color: var(--secondary) !important; }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #212529;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #fc8807;
+            border-color: #fc8807;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(253, 172, 83, 0.4);
+        }
+
+        /* --- NAVBAR & HEADER --- */
+        .navbar {
+            padding: 10px 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .navbar.scrolled {
+            background: var(--secondary);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .navbar-brand h1 {
+            color: #fff;
+            margin: 0;
+            line-height: 1.1;
+            font-size: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar-dark .navbar-nav .nav-link {
+            padding: 8px 12px;
+            color: #ffffff;
+            font-weight: 600;
+            outline: none;
+            transition: color 0.3s;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover,
+        .navbar-dark .navbar-nav .nav-link.active {
+            color: var(--primary);
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar {
+                background-color: var(--secondary);
+                position: sticky;
+                top: 0;
+                padding: 10px 0;
+            }
+
+            .navbar-collapse {
+                background-color: #1a1a1a;
+                padding: 10px;
+                border-radius: 0 0 8px 8px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .navbar {
+                background: rgba(0, 0, 0, 0.6);
+            }
+
+            .navbar-brand h1 {
+                font-size: 2rem;
+                flex-direction: row;
+                gap: 8px;
+            }
+        }
+
+        /* --- HERO SECTIONS & HEADERS --- */
+        .carousel-item {
+            height: 100vh;
+            min-height: 500px;
+            background: no-repeat center center scroll;
+            background-size: cover;
+            position: relative;
+        }
+
+        .carousel-caption {
+            padding-top: 100px;
+        }
+
+        .carousel-caption h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px !important;
+        }
+
+        .page-header {
+            height: 25vh;
+            min-height: 150px;
+            background: linear-gradient(to bottom, #eaeaea, var(--light));
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding-top: 70px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- COMPONENT STYLES (Dynamic/Static Sections) --- */
+        .section-padding {
+            padding: 40px 0;
+        }
+
+        /* About Section text and spacing */
+        #home .col-lg-7 p,
+        #about .col-lg-6 p {
+            font-size: 1.05rem !important;
+            line-height: 1.7;
+        }
+        
+        /* Stats Box */
+        .stats-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            border-bottom: 4px solid var(--primary);
+        }
+        
+        .stats-box h2 {
+            font-size: 2.5rem;
+        }
+
+        /* Service Item */
+        .service-item {
+            background: #fff;
+            padding: 30px 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            height: 100%;
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--secondary);
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* Works & Albums Grid (DYNAMIC) */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .gallery-grid.active {
+            opacity: 1;
+        }
+
+        .gallery-item {
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+            display: block;
+        }
+
+        .gallery-item img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Video Grid (DYNAMIC) */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .video-grid.active {
+            opacity: 1;
+        }
+
+        .video-item {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-item iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Pagination Styling */
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .pagination .page-item .page-link {
+            color: var(--secondary);
+            font-weight: 600;
+            border-radius: 0;
+            transition: all 0.3s;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--secondary);
+        }
+
+        .pagination .page-item:hover .page-link:not(.active) {
+            background-color: #eee;
+            color: var(--primary);
+        }
+
+        .pagination .page-item.control .page-link {
+            background-color: var(--light);
+            border-color: #ddd;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .pagination .page-item.control:hover .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        
+        /* Contact Form & Map */
+        .form-control {
+            border-radius: 5px;
+            padding: 10px !important;
+            font-size: 1rem !important;
+        }
+
+        .map-container {
+            height: 300px;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        
+        /* Footer (Corrected Background Color) */
+        .footer {
+            background-color: var(--secondary); 
+            color: white;
+            padding-top: 60px;
+            padding-bottom: 30px;
+        }
+        
+        .footer h2 {
+            font-size: 1.5rem;
+        }
+        
+        .footer h5 {
+            font-size: 1.2rem;
+        }
+
+
+        /* --- MODAL FIX --- */
+        .modal-dialog.modal-xl {
+            max-width: 95%;
+        }
+
+        #modalImage {
+            max-height: 80vh;
+            width: auto !important;
+            max-width: 100%;
+            display: block;
+            margin: auto;
+        }
+        
+        /* --- MOBILE-SPECIFIC COMPACTION --- */
+        @media (max-width: 767.98px) {
+            .gallery-grid, .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" id="main-navbar">
+        <div class="container-lg">
+            <a href="#home" class="navbar-brand">
+                <h1><span class="text-primary">SUPRIYA</span> DIGITALS <span class="text-primary">STUDIO</span></h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav ml-auto">
+                    <a href="#home" class="nav-item nav-link active" data-section="home">Home</a>
+                    <a href="#about" class="nav-item nav-link" data-section="about">About</a>
+                    <a href="#services" class="nav-item nav-link" data-section="services">Services</a>
+                    <a href="#works" class="nav-item nav-link" data-section="works">Works</a>
+                    <a href="#albums" class="nav-item nav-link" data-section="albums">Albums</a>
+                    <a href="#teasers" class="nav-item nav-link" data-section="teasers">Teasers</a>
+                    <a href="#live" class="nav-item nav-link" data-section="live">Live</a>
+                    <a href="#contact" class="nav-item nav-link" data-section="contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="main-content">
+        <section id="home" class="page-section">
+            <div id="header-carousel" class="carousel slide carousel-fade" data-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active" style="background-image: url('img/carousel-1.jpg');">
+                        <div class="carousel-caption">
+                            <div class="container">
+                                <h5 class="text-uppercase text-primary font-weight-bold">Welcome To</h5>
+                                <h1 class="display-3 text-white mb-4">Supriya Digitals Studio</h1>
+                                <p class="lead text-white mb-4 d-none d-md-block">Capturing life's best moments since
+                                    2001 with passion and perfection.</p>
+                                <a href="#contact" class="btn btn-primary mt-2">Contact Us</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item" style="background-image: url('img/carousel-2.jpg');">
+                        <div class="carousel-caption">
+                            <div class="container">
+                                <h5 class="text-uppercase text-primary font-weight-bold">Professional Team</h5>
+                                <h1 class="display-3 text-white mb-4">We Create Memories</h1>
+                                <a href="#works" class="btn btn-primary mt-2">View Portfolio</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a class="carousel-control-prev" href="#header-carousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </a>
+                <a class="carousel-control-next" href="#header-carousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </a>
+            </div>
+
+            <div class="container section-padding">
+                <div class="row align-items-center">
+                    <div class="col-lg-5 mb-4">
+                        <img class="img-fluid rounded w-100 about-img" src="img/dad.jpg" alt="About">
+                    </div>
+                    <div class="col-lg-7">
+                        <small class="text-primary font-weight-bold text-uppercase" style="font-size: 1.1rem;">Who We
+                            Are</small>
+                        <h1 class="mt-2 mb-3" style="font-size: 2.2rem;">20 Years of Excellence</h1>
+                        <p class="mb-4">Supriya Digitals is established in
+                            2001. Our team focuses on Marriage events, Birthday events, and Corporate conferences. We have
+                            our own Video Lab.</p>
+                        <a href="#about" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="page-section">
+            <div class="page-header">
+                <h1 class="display-4">About Us</h1>
+            </div>
+            <div class="container section-padding">
+                <div class="row">
+                    <div class="col-lg-6 mb-5">
+                        <h1 class="mb-4" style="font-size: 2rem;">Experts Behind The Lens</h1>
+                        <p>We are a dedicated team of photographers,
+                            videographers, and editors serving Andhra Pradesh & Telangana.</p>
+                        <div class="row mt-4">
+                            <div class="col-sm-6 mb-3">
+                                <div class="stats-box">
+                                    <h2 class="text-primary" data-toggle="counter-up">20</h2>
+                                    <h5 class="font-weight-bold">Years Experience</h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="stats-box">
+                                    <h2 class="text-primary" data-toggle="counter-up">10</h2>
+                                    <h5 class="font-weight-bold">Technicians</h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="stats-box">
+                                    <h2 class="text-primary" data-toggle="counter-up">1500</h2>
+                                    <h5 class="font-weight-bold">Happy Clients</h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="stats-box">
+                                    <h2 class="text-primary" data-toggle="counter-up">2500</h2>
+                                    <h5 class="font-weight-bold">Complete Projects</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="team-item text-center bg-white p-3">
+                                    <img src="img/dad.jpg" class="img-fluid rounded-circle mb-3"
+                                        alt="Founder Venkat Ganji" style="width: 120px; height: 120px; object-fit:cover;">
+                                    <h5>Venkat Ganji</h5>
+                                    <small class="text-muted">Founder</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="team-item text-center bg-white p-3">
+                                    <img src="img/mom.jpg" class="img-fluid rounded-circle mb-3"
+                                        alt="Designer Kalyani Ganji" style="width: 120px; height: 120px; object-fit:cover;">
+                                    <h5>Kalyani Ganji</h5>
+                                    <small class="text-muted">Designer</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="page-section">
+            <div class="page-header">
+                <h1 class="display-4">Our Services</h1>
+            </div>
+            <div class="container section-padding">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="service-item text-center">
+                            <div class="service-icon mx-auto"><i class="fa fa-camera"></i></div>
+                            <h4>Photography</h4>
+                            <p class="text-muted">Wedding & Event photography captured perfectly.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="service-item text-center">
+                            <div class="service-icon mx-auto"><i class="fa fa-film"></i></div>
+                            <h4>Cinematic Video</h4>
+                            <p class="text-muted">High quality cinematic teasers and wedding films.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="service-item text-center">
+                            <div class="service-icon mx-auto"><i class="fa fa-smile"></i></div>
+                            <h4>Candid Shots</h4>
+                            <p class="text-muted">Natural moments frozen in time forever.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="service-item text-center">
+                            <div class="service-icon mx-auto"><i class="fa fa-images"></i></div>
+                            <h4>Album Design</h4>
+                            <p class="text-muted">Custom designed albums printed in our lab.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="works" class="page-section">
+            <div class="page-header">
+                <h1 class="display-4">Our Works</h1>
+            </div>
+            <div class="container py-4">
+                <div class="text-center mb-4">
+                    <h2 class="text-uppercase" style="font-size: 2rem;"><span class="text-primary">#Our</span> Candid
+                        <span class="text-primary">Shots#</span></h2>
+                </div>
+                <div id="works-grid-container" class="grid-container">
+                    <p class="text-center text-muted loading-message"><i class="fas fa-spinner fa-spin mr-2"></i> Loading Works...</p>
+                </div>
+                <nav id="works-pagination-nav">
+                </nav>
+            </div>
+        </section>
+
+        <section id="albums" class="page-section">
+            <div class="page-header">
+                <h1 class="display-4">Our Albums</h1>
+            </div>
+            <div class="container py-4">
+                <div class="text-center mb-4">
+                    <h2 class="text-uppercase" style="font-size: 2rem;"><span class="text-primary">#Our</span> Album
+                        <span class="text-primary">Designs#</span></h2>
+                </div>
+                 <div id="albums-grid-container" class="grid-container">
+                    <p class="text-center text-muted loading-message"><i class="fas fa-spinner fa-spin mr-2"></i> Loading Albums...</p>
+                </div>
+                <nav id="albums-pagination-nav">
+                </nav>
+            </div>
+        </section>
+
+        <section id="teasers" class="page-section">
+            <div class="page-header">
+                <h1 class="display-4">Teasers</h1>
+            </div>
+            <div class="container py-4">
+                <div id="teasers-grid-container" class="grid-container">
+                    <p class="text-center text-muted loading-message"><i class="fas fa-spinner fa-spin mr-2"></i> Loading Teasers...</p>
+                </div>
+                 <nav id="teasers-pagination-nav">
+                </nav>
+            </div>
+        </section>
+
+        <section id="live" class="page-section">
+            <div class="page-header">
+                <h1 class="display-4">Live Events</h1>
+            </div>
+            <div class="container py-4">
+                 <div id="live-grid-container" class="grid-container">
+                    <p class="text-center text-muted loading-message"><i class="fas fa-spinner fa-spin mr-2"></i> Loading Live Events...</p>
+                </div>
+                 <nav id="live-pagination-nav">
+                </nav>
+            </div>
+        </section>
+
+        <section id="contact" class="page-section">
+            <div class="page-header">
+                <h1 class="display-4">Contact Us</h1>
+            </div>
+            <div class="container section-padding">
+                <div class="row">
+                    <div class="col-lg-6 mb-5">
+                        <h2 style="font-size: 2rem; margin-bottom: 25px;">Get In Touch</h2>
+                        <div class="d-flex mb-3">
+                            <div class="service-icon mr-3" style="width:45px; height:45px; font-size:20px; margin:0;"><i
+                                        class="fa fa-map-marker-alt"></i></div>
+                            <div class="pl-2">
+                                <h5 class="mb-1" style="font-size: 1.2rem;">Address</h5>
+                                <p class="text-muted" style="font-size: 1rem;">8-271 Bhargavpet, Mangalagiri, AP</p>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <div class="service-icon mr-3" style="width:45px; height:45px; font-size:20px; margin:0;"><i
+                                        class="fa fa-phone-alt"></i></div>
+                            <div class="pl-2">
+                                <h5 class="mb-1" style="font-size: 1.2rem;">Phone</h5>
+                                <p class="text-muted" style="font-size: 1rem;">+91 9246789966</p>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <div class="service-icon mr-3" style="width:45px; height:45px; font-size:20px; margin:0;"><i
+                                        class="fa fa-envelope"></i></div>
+                            <div class="pl-2">
+                                <h5 class="mb-1" style="font-size: 1.2rem;">Email</h5>
+                                <p class="text-muted" style="font-size: 1rem;">supriyadigitals73@gmail.com</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <form id="my-form" action="https://formspree.io/f/mqknwbbq" method="POST">
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" placeholder="Your Name" required="required"
+                                    title="Enter your full name" name="name" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="email" class="form-control" placeholder="Your Email" required="required"
+                                    title="Enter your email address" name="email" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" placeholder="Subject" required="required"
+                                    title="Enter the message subject" name="subject" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <textarea class="form-control" rows="4" placeholder="Message" required="required"
+                                    title="Enter your message" name="message"></textarea>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary py-2 px-4" type="submit">Send Message</button>
+                            </div>
+                            <p id="my-form-status" class="mt-3"></p>
+                        </form>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="map-container">
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1901.8398031358983!2d80.60100483863765!3d16.442252192770543!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4a159e4b6b6c07%3A0xc6a822005471d227!2sSupriya%20Digitals%20Studio!5e0!3m2!1sen!2sin!4v1709121908070!5m2!1sen!2sin"
+                                allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                                title="Map showing studio location"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+        aria-hidden="true" data-keyboard="true" data-backdrop="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-header border-0 p-0" style="position: absolute; width: 100%; z-index: 1050;">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <img id="modalImage" src="" alt="Full size image" class="img-fluid rounded">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid footer mt-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h2 class="text-white" style="margin-bottom: 20px;"><span class="text-primary">SUPRIYA</span>
+                        DIGITALS <span class="text-primary">STUDIO</span></h2>
+                    <div class="d-flex justify-content-start mt-3">
+                        <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                            style="width: 35px; height: 35px; font-size: 16px; display: flex; align-items: center; justify-content: center;"
+                            href="https://t.me/+G4ZWrc6xkvAxZTU1" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
+                        <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                            style="width: 35px; height: 35px; font-size: 16px; display: flex; align-items: center; justify-content: center;"
+                            href="https://www.facebook.com/venkat.ganji.7/" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                            style="width: 35px; height: 35px; font-size: 16px; display: flex; align-items: center; justify-content: center;"
+                            href="https://youtube.com/channel/UCXHQ5eKU_UMFv7tYCS1B0RQ" title="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                            style="width: 35px; height: 35px; font-size: 16px; display: flex; align-items: center; justify-content: center;"
+                            href="https://www.instagram.com/venkat.ganji.7/" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a class="btn btn-outline-primary rounded-circle text-center mr-2 px-0"
+                            style="width: 35px; height: 35px; font-size: 16px; display: flex; align-items: center; justify-content: center;"
+                            href="https://chat.whatsapp.com/GQGN0RG0coa8GvSW6jHey8" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="text-white mb-3 font-weight-bold">Quick Links</h5>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-white mb-2" href="#home"><i
+                                class="fa fa-angle-right text-primary mr-2"></i>Home</a>
+                        <a class="text-white mb-2" href="#about"><i
+                                class="fa fa-angle-right text-primary mr-2"></i>About Us</a>
+                        <a class="text-white mb-2" href="#services"><i
+                                class="fa fa-angle-right text-primary mr-2"></i>Services</a>
+                        <a class="text-white mb-2" href="#live"><i class="fa fa-angle-right text-primary mr-2"></i>Live</a>
+                        <a class="text-white" href="#contact"><i
+                                class="fa fa-angle-right text-primary mr-2"></i>Contact Us</a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="text-white mb-3 font-weight-bold">Get In Touch</h5>
+                    <p style="margin-bottom: 10px;"><i class="fa fa-map-marker-alt text-primary mr-2"></i>8-271
+                        Bhargavpet, Mangalagiri, AP</p>
+                    <p style="margin-bottom: 10px;"><i class="fa fa-phone-alt text-primary mr-2"></i>+91 9246789966</p>
+                    <p><i class="fa fa-envelope text-primary mr-2"></i>supriyadigitals73@gmail.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#home" class="btn btn-lg btn-primary back-to-top"
+        style="position: fixed; bottom: 20px; right: 20px; display: none; z-index: 99; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i
+            class="fa fa-angle-up"></i></a>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+    <script>
+        const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/";
+        //const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/";
+        const ITEMS_PER_PAGE = 8; // Define how many items fit nicely in your grid/carousel per page
+        
+        // Storage for all fetched media data
+        let mediaData = {}; 
+
+        // --- DYNAMIC CONTENT RENDERING FUNCTIONS ---
+        
+        // 1. Fetches all media for a given type ('work', 'album', etc.)
+        async function fetchMediaData(type) {
+            try {
+                const response = await fetch(API_BASE + 'fetch.php?type=' + type);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store the data, sorted by order_index from the server
+                    mediaData[type] = result.data;
+                    renderContent(type, 1); // Render the first page
+                } else {
+                    $(`#${type}-grid-container`).html(`<p class="text-center text-danger">Error loading ${type}: ${result.message}</p>`);
+                }
+            } catch (error) {
+                $(`#${type}-grid-container`).html(`<p class="text-center text-danger">Network error loading ${type}. Check Synology API connection.</p>`);
+            }
+        }
+        
+        // 2. Renders the content and pagination for a specific page number
+        function renderContent(type, page) {
+            const containerId = `#${type}-grid-container`;
+            const paginationId = `#${type}-pagination-nav`;
+            const data = mediaData[type] || [];
+            
+            // Calculate total pages and items for the current page
+            const totalItems = data.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            const startIndex = (page - 1) * ITEMS_PER_PAGE;
+            const endIndex = page * ITEMS_PER_PAGE;
+            const pageItems = data.slice(startIndex, endIndex);
+
+            // 3. Generate Grid HTML (Works/Albums = Gallery, Teasers/Live = Video)
+            let contentHtml = '';
+            const gridClass = (type === 'work' || type === 'album') ? 'gallery-grid' : 'video-grid';
+            
+            if (pageItems.length === 0) {
+                 contentHtml = `<p class="text-center text-muted">No items uploaded yet for ${type}.</p>`;
+            } else {
+                // Ensure correct grid class is used for the container
+                contentHtml = `<div class="${gridClass} active" data-page="${page}" data-total-pages="${totalPages}" id="${type}-page-${page}">`;
+                
+                pageItems.forEach(item => {
+                    if (type === 'work') {
+                        // Works (Image with Lightbox)
+                        contentHtml += `<div class="gallery-item"><img src="${item.file_path}" alt="${item.title || 'Work Image'}"></div>`;
+                    } else if (type === 'album') {
+                        // Albums (Image with PDF link for lightbox handler)
+                        contentHtml += `<div class="gallery-item" data-pdf-url="${item.pdf_link}"><img src="${item.file_path}" alt="${item.title || 'Album Cover'}"></div>`;
+                    } else if (type === 'teaser' || type === 'live') {
+                        // Videos (Embedded Iframe)
+                        contentHtml += `<div class="video-item"><iframe src="${item.file_path}" title="${item.title || 'Video Embed'}" allowfullscreen></iframe></div>`;
+                    }
+                });
+                contentHtml += `</div>`;
+            }
+            
+            // Insert content with a fade effect
+            const $container = $(containerId);
+            $container.css('opacity', 0).html(contentHtml);
+            $container.animate({opacity: 1}, 500);
+
+            // 4. Generate Pagination HTML
+            let paginationHtml = '';
+            if (totalPages > 1) {
+                paginationHtml = `<ul class="pagination" data-type="${type}" data-total-pages="${totalPages}">
+                    <li class="page-item control" data-action="prev"><a class="page-link" href="#">«</a></li>`;
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    const activeClass = i === page ? 'active' : '';
+                    paginationHtml += `<li class="page-item ${activeClass}" data-page="${i}"><a class="page-link" href="#">${i}</a></li>`;
+                }
+                
+                paginationHtml += `<li class="page-item control" data-action="next"><a class="page-link" href="#">»</a></li>
+                </ul>`;
+            }
+            $(paginationId).html(paginationHtml);
+        }
+
+        // 5. Handle Pagination Clicks 
+        $(document).on('click', '.pagination .page-item', function(e) {
+            e.preventDefault();
+            const $clickedItem = $(this);
+            const $pagination = $clickedItem.closest('.pagination');
+            const type = $pagination.data('type');
+            const totalPages = $pagination.data('totalPages');
+            const currentPage = parseInt($pagination.find('.page-item.active').data('page'));
+            let newPage = currentPage;
+            
+            if ($clickedItem.is('[data-action="prev"]')) {
+                newPage = Math.max(1, currentPage - 1);
+            } else if ($clickedItem.is('[data-action="next"]')) {
+                newPage = Math.min(totalPages, currentPage + 1);
+            } else {
+                newPage = parseInt($clickedItem.data('page'));
+            }
+
+            if (newPage && newPage !== currentPage) {
+                renderContent(type, newPage);
+            }
+        });
+        
+        // Function to manage the active link in the navbar
+        function setActiveNavLink(sectionId) {
+            $('.navbar-nav .nav-link').removeClass('active');
+            $(`.navbar-nav a[href="#${sectionId}"]`).addClass('active');
+        }
+
+        // --- MAIN DOCUMENT READY ---
+        $(document).ready(function () {
+            
+            // 1. Initial Data Load for Dynamic Sections
+            fetchMediaData('works');
+            fetchMediaData('albums');
+            fetchMediaData('teasers');
+            fetchMediaData('live');
+            
+            // 2. Initialize the carousel
+            $('#header-carousel').carousel({
+                interval: 5000,
+                pause: 'hover'
+            });
+
+            // 3. Hide mobile menu after clicking any nav link
+            $('.navbar-nav .nav-link').on('click', function () {
+                setActiveNavLink($(this).data('section'));
+                if ($('.navbar-toggler').is(':visible')) {
+                    $('.navbar-collapse').collapse('hide');
+                }
+            });
+
+            // 4. Back to top visibility & navbar sticky behavior
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 100) {
+                    $('.back-to-top').fadeIn('slow');
+                    $('#main-navbar').addClass('scrolled');
+                } else {
+                    $('.back-to-top').fadeOut('slow');
+                    $('#main-navbar').removeClass('scrolled');
+                }
+            });
+
+            // 5. Counter Up initialization
+            if ($('[data-toggle="counter-up"]').length) {
+                $('[data-toggle="counter-up"]').counterUp({ delay: 10, time: 2000 });
+            }
+            
+            // 6. Lightbox/PDF Click Handler
+            $(document).on('click', '.gallery-item', function() {
+                const $item = $(this);
+                const pdfUrl = $item.data('pdf-url');
+                const imgSrc = $item.find('img').attr('src');
+                
+                if (pdfUrl) {
+                    // Album item: open the PDF in a new tab
+                    window.open(pdfUrl, '_blank');
+                } else if (imgSrc) {
+                    // Work item: open the image in the modal
+                    $('#modalImage').attr('src', imgSrc);
+                    $('#imageModal').modal('show');
+                }
+            });
+
+            // 7. Active Navbar Link on Scroll (IntersectionObserver)
+            const sections = $('section.page-section');
+            const observerOptions = {
+                root: null,
+                rootMargin: '-30% 0px -70% 0px',
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const currentSectionId = entry.target.id;
+                        if (currentSectionId) { 
+                            setActiveNavLink(currentSectionId);
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            sections.each(function() {
+                observer.observe(this);
+            });
+
+            // Special handling for the 'home' section and top of page
+            $(window).on('scroll load', function() {
+                if ($(window).scrollTop() < $('#about').offset().top - 100) {
+                    setActiveNavLink('home');
+                }
+            });
+
+        });
+    </script>
+    
+    <script>
+        var form = document.getElementById("my-form");
+        
+        async function handleSubmit(event) {
+            event.preventDefault();
+            var status = document.getElementById("my-form-status");
+            var data = new FormData(event.target);
+            
+            // Using the working Formspree endpoint: https://formspree.io/f/mqknwbbq
+            fetch(event.target.action, {
+                method: form.method,
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    status.innerHTML = "Thanks for your submission!";
+                    form.reset()
+                } else {
+                    // Attempt to parse JSON error response
+                    response.json().then(data => {
+                        if (Object.hasOwn(data, 'errors')) {
+                            status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
+                        } else {
+                            status.innerHTML = "Oops! There was a problem submitting your form (Error: Check Formspree settings)"
+                        } 
+                    // This catch block handles the JSON parsing error 
+                    }).catch(err => {
+                        status.innerHTML = "Oops! There was a problem submitting your form (Error: Server response was invalid or method not allowed)";
+                    });
+                }
+            }).catch(error => {
+                status.innerHTML = "Oops! There was a problem submitting your form (Error: Check network connection)";
+            });
+        }
+
+        // Check if the form element exists before adding the listener
+        if (form) {
+            form.addEventListener("submit", handleSubmit);
+        }
+    </script>
+</body>
+</html>
