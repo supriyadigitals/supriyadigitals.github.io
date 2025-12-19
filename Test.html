@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; padding: 20px;">
+    <h2>Supriya Studio Connectivity Test</h2>
+    <button onclick="checkSync()" style="padding: 10px 20px;">Test API Now</button>
+    <div id="status" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;">
+        Waiting for test...
+    </div>
+
+    <script>
+        async function checkSync() {
+            const api = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/fetch.php?type=work";
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = "Connecting to Synology...";
+            
+            try {
+                const response = await fetch(api);
+                const result = await response.json();
+                if (result.success) {
+                    statusDiv.style.background = "#d4edda";
+                    statusDiv.innerHTML = "✅ <b>Success!</b> Your Synology responded with " + result.data.length + " items.";
+                } else {
+                    statusDiv.style.background = "#f8d7da";
+                    statusDiv.innerHTML = "❌ <b>API Error:</b> " + result.message;
+                }
+            } catch (err) {
+                statusDiv.style.background = "#f8d7da";
+                statusDiv.innerHTML = "❌ <b>Network Error:</b> Could not reach Ngrok. Is the tunnel running?";
+            }
+        }
+    </script>
+</body>
+</html>
