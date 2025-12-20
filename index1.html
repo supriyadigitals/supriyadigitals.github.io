@@ -784,19 +784,26 @@
         // --- DYNAMIC CONTENT RENDERING FUNCTIONS ---
         
         // 1. Fetches all media for a given type ('work', 'album', etc.)
+        // 1. Fetches all media for a given type ('work', 'album', etc.)
         async function fetchMediaData(type) {
             try {
-                const response = await fetch(API_BASE + 'fetch.php?type=' + type);
+                // We add a special header to skip the Ngrok warning page
+                const response = await fetch(API_BASE + 'fetch.php?type=' + type, {
+                    headers: {
+                        "ngrok-skip-browser-warning": "69420"
+                    }
+                });
+                
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Store the data, sorted by order_index from the server
                     mediaData[type] = result.data;
-                    renderContent(type, 1); // Render the first page
+                    renderContent(type, 1); 
                 } else {
                     $(`#${type}-grid-container`).html(`<p class="text-center text-danger">Error loading ${type}: ${result.message}</p>`);
                 }
             } catch (error) {
+                console.error("Fetch Error Details:", error); // See the real error in Console
                 $(`#${type}-grid-container`).html(`<p class="text-center text-danger">Network error loading ${type}. Check Synology API connection.</p>`);
             }
         }
