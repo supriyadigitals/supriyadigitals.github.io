@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Supriya Digitals | Client Gallery</title>
+    <title>Supriya Digitals | Private Gallery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="img/icon1.png" rel="icon">
     
@@ -11,10 +11,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        /* --- PREMIUM WHITE & GOLD THEME --- */
         :root {
-            --primary: #D4AF37; /* Gold */
-            --text: #333;
-            --bg: #fdfdfd;
+            --primary: #D4AF37; /* Classic Gold */
+            --text: #2c2c2c;
+            --bg: #ffffff;
+            --overlay: rgba(255, 255, 255, 0.98);
         }
 
         body {
@@ -33,7 +35,7 @@
             justify-content: space-between;
             align-items: center;
             background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -41,29 +43,31 @@
 
         .brand-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: #000;
             margin: 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
         .brand-title span { color: var(--primary); }
 
         .btn-back {
+            background: transparent;
             border: 1px solid #ddd;
             color: #555;
-            border-radius: 30px;
-            padding: 8px 20px;
-            font-size: 0.9rem;
+            border-radius: 50px;
+            padding: 8px 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
             transition: all 0.3s;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
         }
         .btn-back:hover {
-            background: var(--primary);
             border-color: var(--primary);
-            color: #fff;
+            color: var(--primary);
             text-decoration: none;
         }
 
@@ -71,29 +75,33 @@
         .container-fluid { padding: 40px; }
         
         .gallery-grid {
-            column-count: 4; /* 4 Columns for wide screens */
+            column-count: 4;
             column-gap: 20px;
         }
 
-        @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { 
+        @media (max-width: 1400px) { .gallery-grid { column-count: 3; } }
+        @media (max-width: 900px) { .gallery-grid { column-count: 2; } }
+        @media (max-width: 600px) { 
             .gallery-grid { column-count: 1; } 
             .container-fluid { padding: 20px; }
-            .gallery-header { padding: 15px 20px; }
+            .gallery-header { padding: 15px 20px; flex-direction: column-reverse; gap: 15px; }
         }
 
         .gallery-item {
             break-inside: avoid;
             margin-bottom: 20px;
             position: relative;
-            border-radius: 8px;
+            border-radius: 4px;
             overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
+            cursor: zoom-in;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-item:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
 
         .gallery-item img {
             width: 100%;
@@ -101,11 +109,14 @@
             display: block;
         }
 
-        /* --- LIGHTBOX (FULL SCREEN) --- */
+        /* --- FULL SCREEN LIGHTBOX --- */
+        .modal { padding-right: 0 !important; }
+        
         .modal-content {
             background-color: transparent;
             border: none;
-            height: 100vh; /* Full viewport height */
+            height: 100vh;
+            width: 100vw;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -119,63 +130,82 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(0,0,0,0.9); /* Dark background for better viewing */
         }
 
         #lightboxImage {
             max-height: 90vh;
-            max-width: 90vw;
+            max-width: 85vw;
             object-fit: contain;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            border-radius: 4px;
+            animation: fadeIn 0.3s ease-out;
         }
 
-        /* Controls */
-        .lb-control {
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* Navigation Buttons (White Circles) */
+        .lb-nav-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 2.5rem;
-            color: rgba(255,255,255,0.7);
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             z-index: 1060;
-            transition: 0.3s;
-            padding: 20px;
+            transition: all 0.2s;
+            color: #333;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+            user-select: none;
         }
-        .lb-control:hover { color: var(--primary); transform: translateY(-50%) scale(1.2); }
-        .lb-prev { left: 20px; }
-        .lb-next { right: 20px; }
+        .lb-nav-btn:hover { 
+            background: var(--primary); 
+            color: white; 
+            transform: translateY(-50%) scale(1.1);
+        }
+        .lb-prev { left: 30px; }
+        .lb-next { right: 30px; }
 
         .lb-close {
             position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 2rem;
+            top: 30px;
+            right: 40px;
+            font-size: 2.5rem;
             color: #fff;
             cursor: pointer;
-            z-index: 1060;
-            opacity: 0.8;
+            z-index: 1070;
+            opacity: 0.7;
+            transition: 0.3s;
+            line-height: 1;
         }
-        .lb-close:hover { opacity: 1; color: var(--primary); }
+        .lb-close:hover { opacity: 1; color: var(--primary); transform: rotate(90deg); }
 
         .lb-caption {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 0; 
             width: 100%;
             text-align: center;
             color: #fff;
             font-size: 1rem;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+            text-shadow: 1px 1px 10px rgba(0,0,0,0.8);
             letter-spacing: 1px;
+            font-family: 'Playfair Display', serif;
         }
         
-        /* Loading & Error */
-        .status-msg {
-            text-align: center;
-            margin-top: 100px;
-            font-size: 1.2rem;
-            color: #999;
+        /* Mobile Adjustments for Lightbox */
+        @media (max-width: 768px) {
+            .lb-prev { left: 10px; width: 40px; height: 40px; }
+            .lb-next { right: 10px; width: 40px; height: 40px; }
+            .lb-close { top: 20px; right: 20px; font-size: 2rem; }
         }
+
+        .status-msg { text-align: center; margin-top: 100px; font-size: 1.2rem; color: #999; }
     </style>
 </head>
 <body>
@@ -183,7 +213,8 @@
     <div class="gallery-header">
         <a href="index1.html" class="btn-back"><i class="fas fa-arrow-left mr-2"></i> Back to Home</a>
         <h1 class="brand-title"><span>Supriya</span> Studio</h1>
-        <div style="width: 100px;"></div> </div>
+        <div style="width: 100px;"></div>
+    </div>
 
     <div class="container-fluid">
         <div id="gallery" class="gallery-grid">
@@ -193,17 +224,21 @@
         </div>
     </div>
 
-    <div class="modal fade" id="lightboxModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal fade" id="lightboxModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
             <div class="modal-content">
-                <div class="modal-body">
-                    <span class="lb-close" data-dismiss="modal">&times;</span>
+                <div class="modal-body" id="modalBody">
+                    <div class="lb-close" onclick="$('#lightboxModal').modal('hide')">&times;</div>
                     
-                    <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
+                    <div class="lb-nav-btn lb-prev" onclick="changeImage(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
                     
-                    <img id="lightboxImage" src="" alt="">
+                    <img id="lightboxImage" src="" alt="Full View">
                     
-                    <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
+                    <div class="lb-nav-btn lb-next" onclick="changeImage(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                     
                     <div id="lightboxCaption" class="lb-caption"></div>
                 </div>
@@ -223,8 +258,8 @@
         const id = params.get('id');
 
         // State
-        let galleryData = []; // Store all images here
-        let currentIndex = 0; // Track which image is open
+        let galleryData = []; 
+        let currentIndex = 0; 
 
         // 1. Load Data
         async function loadSharedMedia() {
@@ -241,7 +276,7 @@
 
                 if (result.success && result.data.length > 0) {
                     status.style.display = 'none';
-                    galleryData = result.data; // Save data to global variable
+                    galleryData = result.data; 
                     
                     let html = '';
                     galleryData.forEach((item, index) => {
@@ -263,7 +298,7 @@
         }
 
         // 2. Open Lightbox
-        function openLightbox(index) {
+        window.openLightbox = function(index) {
             currentIndex = index;
             updateLightbox();
             $('#lightboxModal').modal('show');
@@ -275,27 +310,41 @@
             const img = document.getElementById('lightboxImage');
             const caption = document.getElementById('lightboxCaption');
             
-            // Fade effect
+            // Hide arrows if only 1 image
+            if(galleryData.length <= 1) {
+                $('.lb-nav-btn').hide();
+            } else {
+                $('.lb-nav-btn').show();
+            }
+
             img.style.opacity = 0;
             setTimeout(() => {
                 img.src = item.file_path;
                 caption.innerText = item.title_from_filename || item.title;
                 img.style.opacity = 1;
-            }, 200);
+            }, 100);
         }
 
-        // 4. Navigation Logic (Prev/Next)
-        function changeImage(direction) {
+        // 4. Navigation Logic (With LOOPING Fix)
+        window.changeImage = function(direction) {
+            // Stop event bubbling just in case
+            if(event) event.stopPropagation();
+
             currentIndex += direction;
             
-            // Loop around if at end or start
-            if (currentIndex >= galleryData.length) currentIndex = 0;
-            if (currentIndex < 0) currentIndex = galleryData.length - 1;
+            // Handle Start -> End Loop
+            if (currentIndex < 0) {
+                currentIndex = galleryData.length - 1;
+            }
+            // Handle End -> Start Loop
+            else if (currentIndex >= galleryData.length) {
+                currentIndex = 0;
+            }
             
             updateLightbox();
         }
 
-        // 5. Keyboard Support (Left/Right Keys)
+        // 5. Keyboard & Touch Support
         document.addEventListener('keydown', function(event) {
             if ($('#lightboxModal').is(':visible')) {
                 if (event.key === "ArrowLeft") changeImage(-1);
