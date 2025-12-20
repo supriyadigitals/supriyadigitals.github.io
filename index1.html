@@ -784,27 +784,37 @@
         // --- DYNAMIC CONTENT RENDERING FUNCTIONS ---
         
         // 1. Fetches all media for a given type ('work', 'album', etc.)
-        // 1. Fetches all media for a given type ('work', 'album', etc.)
-        async function fetchMediaData(type) {
+        async function fetchMediaData(sectionId) {
+            // --- FIX: Translate Plural (Website) to Singular (Database) ---
+            let dbType = sectionId;
+            if (sectionId === 'works') dbType = 'work';
+            if (sectionId === 'albums') dbType = 'album';
+            if (sectionId === 'teasers') dbType = 'teaser';
+            // 'live' stays 'live'
+            // -------------------------------------------------------------
+
             try {
-                // We add a special header to skip the Ngrok warning page
-                const response = await fetch(API_BASE + 'fetch.php?type=' + type, {
+                // We use 'dbType' to talk to the API
+                const response = await fetch(API_BASE + 'fetch.php?type=' + dbType, {
+                    method: "GET",
                     headers: {
-                        "ngrok-skip-browser-warning": "69420"
+                        "ngrok-skip-browser-warning": "69420",
+                        "Content-Type": "application/json"
                     }
                 });
                 
                 const result = await response.json();
                 
+                // We use 'sectionId' to update the HTML on the page
                 if (result.success) {
-                    mediaData[type] = result.data;
-                    renderContent(type, 1); 
+                    mediaData[sectionId] = result.data;
+                    renderContent(sectionId, 1); 
                 } else {
-                    $(`#${type}-grid-container`).html(`<p class="text-center text-danger">Error loading ${type}: ${result.message}</p>`);
+                    $(`#${sectionId}-grid-container`).html(`<p class="text-center text-danger">Error loading ${sectionId}: ${result.message}</p>`);
                 }
             } catch (error) {
-                console.error("Fetch Error Details:", error); // See the real error in Console
-                $(`#${type}-grid-container`).html(`<p class="text-center text-danger">Network error loading ${type}. Check Synology API connection.</p>`);
+                console.error("Fetch Error:", error);
+                $(`#${sectionId}-grid-container`).html(`<p class="text-center text-danger">Network error loading ${sectionId}. Check Synology API connection.</p>`);
             }
         }
         
