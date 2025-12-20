@@ -741,7 +741,7 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="text-white mb-3 font-weight-bold">Quick Links</h5>
                     <div class="d-flex flex-column justify-content-start">
-                        <a class="text-white mb-2" href="Test.html"><i
+                        <a class="text-white mb-2" href="#home"><i
                                 class="fa fa-angle-right text-primary mr-2"></i>Home</a>
                         <a class="text-white mb-2" href="#about"><i
                                 class="fa fa-angle-right text-primary mr-2"></i>About Us</a>
@@ -775,15 +775,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
     <script>
-        const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/";
-        const ITEMS_PER_PAGE = 8; // Define how many items fit nicely in your grid/carousel per page
+        // ✅ CORRECT API BASE FOR GITHUB
+        const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/"; 
+        const ITEMS_PER_PAGE = 8; 
         
-        // Storage for all fetched media data
         let mediaData = {}; 
 
-        // --- DYNAMIC CONTENT RENDERING FUNCTIONS ---
-        
-        // 1. Fetches all media for a given type ('work', 'album', etc.)
+        // 1. Fetches all media for a given type ('works', 'albums', etc.)
         async function fetchMediaData(sectionId) {
             // --- FIX: Translate Plural (Website) to Singular (Database) ---
             let dbType = sectionId;
@@ -794,7 +792,7 @@
             // -------------------------------------------------------------
 
             try {
-                // We use 'dbType' to talk to the API
+                // We add headers to skip Ngrok warning
                 const response = await fetch(API_BASE + 'fetch.php?type=' + dbType, {
                     method: "GET",
                     headers: {
@@ -805,7 +803,6 @@
                 
                 const result = await response.json();
                 
-                // We use 'sectionId' to update the HTML on the page
                 if (result.success) {
                     mediaData[sectionId] = result.data;
                     renderContent(sectionId, 1); 
@@ -818,7 +815,7 @@
             }
         }
         
-        // 2. Renders the content and pagination for a specific page number
+        // 2. Renders the content and pagination
         function renderContent(sectionId, page) {
             const containerId = `#${sectionId}-grid-container`;
             const paginationId = `#${sectionId}-pagination-nav`;
@@ -831,27 +828,28 @@
             const endIndex = page * ITEMS_PER_PAGE;
             const pageItems = data.slice(startIndex, endIndex);
 
-            // --- LOGIC FIX: Check for Plural Names ("works", "teasers") ---
+            // --- FIX: Logic to handle Plural Names ---
+            // 'works' and 'albums' use the gallery grid
             const isImageSection = (sectionId === 'works' || sectionId === 'albums');
             const gridClass = isImageSection ? 'gallery-grid' : 'video-grid';
             
             let contentHtml = '';
             
             if (pageItems.length === 0) {
-                contentHtml = `<p class="text-center text-muted">No items uploaded yet for ${sectionId}.</p>`;
+                 contentHtml = `<p class="text-center text-muted">No items uploaded yet for ${sectionId}.</p>`;
             } else {
                 contentHtml = `<div class="${gridClass} active" data-page="${page}" data-total-pages="${totalPages}" id="${sectionId}-page-${page}">`;
                 
                 pageItems.forEach(item => {
-                    // Updated Checks: Matches 'works', 'albums', 'teasers', and 'live'
+                    // --- FIX: Lazy Loading added to img tags ---
                     if (sectionId === 'works') {
-                        // Works (Images)
-                        contentHtml += `<div class="gallery-item"><img src="${item.file_path}" alt="${item.title || 'Work Image'}"></div>`;
+                        // Works (Image with Lightbox)
+                        contentHtml += `<div class="gallery-item"><img loading="lazy" src="${item.file_path}" alt="${item.title || 'Work Image'}"></div>`;
                     } else if (sectionId === 'albums') {
-                        // Albums (Images + PDF)
-                        contentHtml += `<div class="gallery-item" data-pdf-url="${item.pdf_link}"><img src="${item.file_path}" alt="${item.title || 'Album Cover'}"></div>`;
+                        // Albums (Image with PDF link)
+                        contentHtml += `<div class="gallery-item" data-pdf-url="${item.pdf_link}"><img loading="lazy" src="${item.file_path}" alt="${item.title || 'Album Cover'}"></div>`;
                     } else if (sectionId === 'teasers' || sectionId === 'live') {
-                        // Videos (Teasers & Live)
+                        // Videos (Teasers & Live use Iframe)
                         contentHtml += `<div class="video-item"><iframe src="${item.file_path}" title="${item.title || 'Video Embed'}" allowfullscreen></iframe></div>`;
                     }
                 });
@@ -863,21 +861,24 @@
             $container.css('opacity', 0).html(contentHtml);
             $container.animate({opacity: 1}, 500);
 
-            // Generate Pagination (Same as before)
+            // Generate Pagination
             let paginationHtml = '';
             if (totalPages > 1) {
                 paginationHtml = `<ul class="pagination" data-type="${sectionId}" data-total-pages="${totalPages}">
                     <li class="page-item control" data-action="prev"><a class="page-link" href="#">«</a></li>`;
+                
                 for (let i = 1; i <= totalPages; i++) {
                     const activeClass = i === page ? 'active' : '';
                     paginationHtml += `<li class="page-item ${activeClass}" data-page="${i}"><a class="page-link" href="#">${i}</a></li>`;
                 }
-                paginationHtml += `<li class="page-item control" data-action="next"><a class="page-link" href="#">»</a></li></ul>`;
+                
+                paginationHtml += `<li class="page-item control" data-action="next"><a class="page-link" href="#">»</a></li>
+                </ul>`;
             }
             $(paginationId).html(paginationHtml);
         }
 
-        // 5. Handle Pagination Clicks 
+        // 3. Handle Pagination Clicks 
         $(document).on('click', '.pagination .page-item', function(e) {
             e.preventDefault();
             const $clickedItem = $(this);
@@ -900,7 +901,6 @@
             }
         });
         
-        // Function to manage the active link in the navbar
         function setActiveNavLink(sectionId) {
             $('.navbar-nav .nav-link').removeClass('active');
             $(`.navbar-nav a[href="#${sectionId}"]`).addClass('active');
@@ -909,19 +909,17 @@
         // --- MAIN DOCUMENT READY ---
         $(document).ready(function () {
             
-            // 1. Initial Data Load for Dynamic Sections
+            // Load all sections
             fetchMediaData('works');
             fetchMediaData('albums');
             fetchMediaData('teasers');
             fetchMediaData('live');
             
-            // 2. Initialize the carousel
             $('#header-carousel').carousel({
                 interval: 5000,
                 pause: 'hover'
             });
 
-            // 3. Hide mobile menu after clicking any nav link
             $('.navbar-nav .nav-link').on('click', function () {
                 setActiveNavLink($(this).data('section'));
                 if ($('.navbar-toggler').is(':visible')) {
@@ -929,7 +927,6 @@
                 }
             });
 
-            // 4. Back to top visibility & navbar sticky behavior
             $(window).scroll(function () {
                 if ($(this).scrollTop() > 100) {
                     $('.back-to-top').fadeIn('slow');
@@ -940,28 +937,23 @@
                 }
             });
 
-            // 5. Counter Up initialization
             if ($('[data-toggle="counter-up"]').length) {
                 $('[data-toggle="counter-up"]').counterUp({ delay: 10, time: 2000 });
             }
             
-            // 6. Lightbox/PDF Click Handler
             $(document).on('click', '.gallery-item', function() {
                 const $item = $(this);
                 const pdfUrl = $item.data('pdf-url');
                 const imgSrc = $item.find('img').attr('src');
                 
                 if (pdfUrl) {
-                    // Album item: open the PDF in a new tab
                     window.open(pdfUrl, '_blank');
                 } else if (imgSrc) {
-                    // Work item: open the image in the modal
                     $('#modalImage').attr('src', imgSrc);
                     $('#imageModal').modal('show');
                 }
             });
 
-            // 7. Active Navbar Link on Scroll (IntersectionObserver)
             const sections = $('section.page-section');
             const observerOptions = {
                 root: null,
@@ -984,7 +976,6 @@
                 observer.observe(this);
             });
 
-            // Special handling for the 'home' section and top of page
             $(window).on('scroll load', function() {
                 if ($(window).scrollTop() < $('#about').offset().top - 100) {
                     setActiveNavLink('home');
@@ -1002,7 +993,6 @@
             var status = document.getElementById("my-form-status");
             var data = new FormData(event.target);
             
-            // Using the working Formspree endpoint: https://formspree.io/f/mqknwbbq
             fetch(event.target.action, {
                 method: form.method,
                 body: data,
@@ -1014,16 +1004,14 @@
                     status.innerHTML = "Thanks for your submission!";
                     form.reset()
                 } else {
-                    // Attempt to parse JSON error response
                     response.json().then(data => {
                         if (Object.hasOwn(data, 'errors')) {
                             status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
                         } else {
                             status.innerHTML = "Oops! There was a problem submitting your form (Error: Check Formspree settings)"
                         } 
-                    // This catch block handles the JSON parsing error 
                     }).catch(err => {
-                        status.innerHTML = "Oops! There was a problem submitting your form (Error: Server response was invalid or method not allowed)";
+                        status.innerHTML = "Oops! There was a problem submitting your form (Error: Server response was invalid)";
                     });
                 }
             }).catch(error => {
@@ -1031,7 +1019,6 @@
             });
         }
 
-        // Check if the form element exists before adding the listener
         if (form) {
             form.addEventListener("submit", handleSubmit);
         }
