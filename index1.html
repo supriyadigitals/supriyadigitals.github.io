@@ -819,61 +819,60 @@
         }
         
         // 2. Renders the content and pagination for a specific page number
-        function renderContent(type, page) {
-            const containerId = `#${type}-grid-container`;
-            const paginationId = `#${type}-pagination-nav`;
-            const data = mediaData[type] || [];
+        function renderContent(sectionId, page) {
+            const containerId = `#${sectionId}-grid-container`;
+            const paginationId = `#${sectionId}-pagination-nav`;
+            const data = mediaData[sectionId] || [];
             
-            // Calculate total pages and items for the current page
+            // Calculate total pages
             const totalItems = data.length;
             const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
             const startIndex = (page - 1) * ITEMS_PER_PAGE;
             const endIndex = page * ITEMS_PER_PAGE;
             const pageItems = data.slice(startIndex, endIndex);
 
-            // 3. Generate Grid HTML (Works/Albums = Gallery, Teasers/Live = Video)
+            // --- LOGIC FIX: Check for Plural Names ("works", "teasers") ---
+            const isImageSection = (sectionId === 'works' || sectionId === 'albums');
+            const gridClass = isImageSection ? 'gallery-grid' : 'video-grid';
+            
             let contentHtml = '';
-            const gridClass = (type === 'work' || type === 'album') ? 'gallery-grid' : 'video-grid';
             
             if (pageItems.length === 0) {
-                 contentHtml = `<p class="text-center text-muted">No items uploaded yet for ${type}.</p>`;
+                contentHtml = `<p class="text-center text-muted">No items uploaded yet for ${sectionId}.</p>`;
             } else {
-                // Ensure correct grid class is used for the container
-                contentHtml = `<div class="${gridClass} active" data-page="${page}" data-total-pages="${totalPages}" id="${type}-page-${page}">`;
+                contentHtml = `<div class="${gridClass} active" data-page="${page}" data-total-pages="${totalPages}" id="${sectionId}-page-${page}">`;
                 
                 pageItems.forEach(item => {
-                    if (type === 'work') {
-                        // Works (Image with Lightbox)
+                    // Updated Checks: Matches 'works', 'albums', 'teasers', and 'live'
+                    if (sectionId === 'works') {
+                        // Works (Images)
                         contentHtml += `<div class="gallery-item"><img src="${item.file_path}" alt="${item.title || 'Work Image'}"></div>`;
-                    } else if (type === 'album') {
-                        // Albums (Image with PDF link for lightbox handler)
+                    } else if (sectionId === 'albums') {
+                        // Albums (Images + PDF)
                         contentHtml += `<div class="gallery-item" data-pdf-url="${item.pdf_link}"><img src="${item.file_path}" alt="${item.title || 'Album Cover'}"></div>`;
-                    } else if (type === 'teaser' || type === 'live') {
-                        // Videos (Embedded Iframe)
+                    } else if (sectionId === 'teasers' || sectionId === 'live') {
+                        // Videos (Teasers & Live)
                         contentHtml += `<div class="video-item"><iframe src="${item.file_path}" title="${item.title || 'Video Embed'}" allowfullscreen></iframe></div>`;
                     }
                 });
                 contentHtml += `</div>`;
             }
             
-            // Insert content with a fade effect
+            // Insert content with fade effect
             const $container = $(containerId);
             $container.css('opacity', 0).html(contentHtml);
             $container.animate({opacity: 1}, 500);
 
-            // 4. Generate Pagination HTML
+            // Generate Pagination (Same as before)
             let paginationHtml = '';
             if (totalPages > 1) {
-                paginationHtml = `<ul class="pagination" data-type="${type}" data-total-pages="${totalPages}">
+                paginationHtml = `<ul class="pagination" data-type="${sectionId}" data-total-pages="${totalPages}">
                     <li class="page-item control" data-action="prev"><a class="page-link" href="#">«</a></li>`;
-                
                 for (let i = 1; i <= totalPages; i++) {
                     const activeClass = i === page ? 'active' : '';
                     paginationHtml += `<li class="page-item ${activeClass}" data-page="${i}"><a class="page-link" href="#">${i}</a></li>`;
                 }
-                
-                paginationHtml += `<li class="page-item control" data-action="next"><a class="page-link" href="#">»</a></li>
-                </ul>`;
+                paginationHtml += `<li class="page-item control" data-action="next"><a class="page-link" href="#">»</a></li></ul>`;
             }
             $(paginationId).html(paginationHtml);
         }
