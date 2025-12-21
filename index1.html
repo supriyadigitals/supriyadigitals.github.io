@@ -180,19 +180,17 @@
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* --- COMPONENT STYLES (Dynamic/Static Sections) --- */
+        /* --- COMPONENT STYLES --- */
         .section-padding {
             padding: 40px 0;
         }
 
-        /* About Section text and spacing */
         #home .col-lg-7 p,
         #about .col-lg-6 p {
             font-size: 1.05rem !important;
             line-height: 1.7;
         }
         
-        /* Stats Box */
         .stats-box {
             background: #fff;
             padding: 20px;
@@ -207,7 +205,6 @@
             font-size: 2.5rem;
         }
 
-        /* Service Item */
         .service-item {
             background: #fff;
             padding: 30px 15px;
@@ -230,13 +227,13 @@
             margin-bottom: 20px;
         }
 
-        /* Works & Albums Grid (DYNAMIC) */
+        /* --- 5. MASONRY GALLERY (Pinterest Style - NO CROPPING) --- */
+        /* This replaces the grid so images are not cut in half */
         .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            column-count: 3; /* 3 Columns like Pinterest */
+            column-gap: 20px;
             opacity: 0;
-            transition: opacity 0.5s;
+            transition: opacity 0.5s ease-in-out;
         }
         
         .gallery-grid.active {
@@ -244,26 +241,32 @@
         }
 
         .gallery-item {
+            break-inside: avoid; /* Don't cut images in half */
+            margin-bottom: 20px;
+            position: relative;
             overflow: hidden;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             cursor: pointer;
-            position: relative;
+            background: #000;
+            display: inline-block; /* Required for Masonry */
+            width: 100%;
         }
 
         .gallery-item img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
+            height: auto !important; /* SHOW FULL IMAGE (No Cropping) */
             display: block;
+            transition: transform 0.5s ease;
+            opacity: 0.95;
         }
 
-        .gallery-item img:hover {
+        .gallery-item:hover img {
             transform: scale(1.05);
+            opacity: 1;
         }
 
-        /* Video Grid (DYNAMIC) */
+        /* Video Grid (Standard Grid for YouTube) */
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -278,7 +281,7 @@
 
         .video-item {
             position: relative;
-            padding-bottom: 56.25%;
+            padding-bottom: 56.25%; /* 16:9 */
             height: 0;
             overflow: hidden;
             border-radius: 8px;
@@ -352,7 +355,7 @@
             border: 0;
         }
         
-        /* Footer (Corrected Background Color) */
+        /* Footer */
         .footer {
             background-color: var(--secondary); 
             color: white;
@@ -368,7 +371,6 @@
             font-size: 1.2rem;
         }
 
-
         /* --- MODAL FIX --- */
         .modal-dialog.modal-xl {
             max-width: 95%;
@@ -382,10 +384,52 @@
             margin: auto;
         }
         
-        /* --- MOBILE-SPECIFIC COMPACTION --- */
-        @media (max-width: 767.98px) {
-            .gallery-grid, .video-grid {
+        /* --- MOBILE & RESPONSIVE FIXES --- */
+        @media (max-width: 768px) {
+            /* 1. Add breathing room to sides */
+            .container, .container-fluid {
+                padding-left: 25px !important;
+                padding-right: 25px !important;
+            }
+
+            /* 2. Fix Section Padding */
+            .section-padding {
+                padding: 30px 15px !important; 
+            }
+
+            /* 3. Responsive Headlines */
+            h1.display-3, .display-4 {
+                font-size: 2.2rem !important;
+            }
+            h1 {
+                font-size: 1.8rem !important;
+            }
+            p.lead {
+                font-size: 1rem !important;
+            }
+
+            /* 4. Fix Carousel Text */
+            .carousel-caption {
+                padding-left: 20px;
+                padding-right: 20px;
+                right: 0;
+                left: 0;
+            }
+
+            /* 5. Mobile Grid - 1 Column */
+            .gallery-grid {
+                column-count: 1;
+            }
+            .video-grid {
                 grid-template-columns: 1fr;
+            }
+
+            /* 6. Spacing */
+            .col-lg-7, .col-lg-5, .col-lg-6 {
+                margin-bottom: 20px;
+            }
+            .about-img {
+                margin-bottom: 25px;
             }
         }
     </style>
@@ -635,7 +679,7 @@
                         <h2 style="font-size: 2rem; margin-bottom: 25px;">Get In Touch</h2>
                         <div class="d-flex mb-3">
                             <div class="service-icon mr-3" style="width:45px; height:45px; font-size:20px; margin:0;"><i
-                                        class="fa fa-map-marker-alt"></i></div>
+                                    class="fa fa-map-marker-alt"></i></div>
                             <div class="pl-2">
                                 <h5 class="mb-1" style="font-size: 1.2rem;">Address</h5>
                                 <p class="text-muted" style="font-size: 1rem;">8-271 Bhargavpet, Mangalagiri, AP</p>
@@ -643,7 +687,7 @@
                         </div>
                         <div class="d-flex mb-3">
                             <div class="service-icon mr-3" style="width:45px; height:45px; font-size:20px; margin:0;"><i
-                                        class="fa fa-phone-alt"></i></div>
+                                    class="fa fa-phone-alt"></i></div>
                             <div class="pl-2">
                                 <h5 class="mb-1" style="font-size: 1.2rem;">Phone</h5>
                                 <p class="text-muted" style="font-size: 1rem;">+91 9246789966</p>
@@ -651,7 +695,7 @@
                         </div>
                         <div class="d-flex mb-3">
                             <div class="service-icon mr-3" style="width:45px; height:45px; font-size:20px; margin:0;"><i
-                                        class="fa fa-envelope"></i></div>
+                                    class="fa fa-envelope"></i></div>
                             <div class="pl-2">
                                 <h5 class="mb-1" style="font-size: 1.2rem;">Email</h5>
                                 <p class="text-muted" style="font-size: 1rem;">supriyadigitals73@gmail.com</p>
