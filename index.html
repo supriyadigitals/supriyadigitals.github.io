@@ -4,6 +4,24 @@
 <head>
     <meta charset="utf-8">
     <title>SUPRIYA DIGITALS STUDIO | Professional Photography</title>
+    <script>
+        /**
+         * This script runs immediately to "unlock" the ngrok session for this browser.
+         * It sends the required skip header in the background.
+         */
+        (async function() {
+            const ngrokUrl = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/";
+            try {
+                await fetch(ngrokUrl, {
+                    method: "GET",
+                    headers: { "ngrok-skip-browser-warning": "69420" }
+                });
+                console.log("Ngrok Session Unlocked: Images should now display correctly.");
+            } catch (err) {
+                console.error("Bypass failed. You may need to click 'Visit Site' manually once.", err);
+            }
+        })();
+    </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Photography, Videography, Studio, Mangalagiri, Wedding" name="keywords">
     <meta content="Supriya Digitals Studio - Capturing life's best moments since 2001." name="description">
@@ -288,6 +306,21 @@
             margin: 20px auto;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* MODAL FIX: Ensures images fit the screen */
+        #modalImage {
+            max-height: 85vh; /* Limits image height to 85% of the screen */
+            width: auto;      /* Maintains correct width ratio */
+            max-width: 100%;  /* Prevents image from being wider than the screen */
+            object-fit: contain; /* Keeps the photo from stretching */
+            border-radius: 8px;
+            border: 2px solid var(--primary); /* Optional: adds a gold border */
+        }
+
+        /* Centers the modal content properly */
+        .modal-dialog {
+            max-width: 90%; /* Allows the modal to be wide but not full-width */
+            margin: 1.75rem auto;
+        }
 
     </style>
 </head>
