@@ -4,24 +4,6 @@
 <head>
     <meta charset="utf-8">
     <title>SUPRIYA DIGITALS STUDIO | Professional Photography</title>
-    <script>
-        /**
-         * This script runs immediately to "unlock" the ngrok session for this browser.
-         * It sends the required skip header in the background.
-         */
-        (async function() {
-            const ngrokUrl = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/";
-            try {
-                await fetch(ngrokUrl, {
-                    method: "GET",
-                    headers: { "ngrok-skip-browser-warning": "69420" }
-                });
-                console.log("Ngrok Session Unlocked: Images should now display correctly.");
-            } catch (err) {
-                console.error("Bypass failed. You may need to click 'Visit Site' manually once.", err);
-            }
-        })();
-    </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Photography, Videography, Studio, Mangalagiri, Wedding" name="keywords">
     <meta content="Supriya Digitals Studio - Capturing life's best moments since 2001." name="description">
@@ -623,38 +605,59 @@
         const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/"; 
         const ITEMS_PER_PAGE = 8; 
         
-        let mediaData = {}; 
+        // Data buckets for the 4 sections
+        let mediaData = { works: [], albums: [], teasers: [], live: [] };
 
-        // 1. Fetch Media 
-        async function fetchMediaData(sectionId) {
-            let dbType = sectionId;
-            if (sectionId === 'works') dbType = 'work';
-            if (sectionId === 'albums') dbType = 'album';
-            if (sectionId === 'teasers') dbType = 'teaser';
+        // 1. ONE-TIME FETCH (Optimization: Fetch all data at once)
+        async function fetchAllMediaData() {
+            const cacheKey = "supriya_full_media_cache";
+            const cachedData = sessionStorage.getItem(cacheKey);
+
+            // Use browser cache if available (0 requests!)
+            if (cachedData) {
+                console.log("Loaded all data from cache.");
+                distributeData(JSON.parse(cachedData));
+                return;
+            }
 
             try {
-                const response = await fetch(API_BASE + 'fetch.php?type=' + dbType, {
+                console.log("Fetching ALL media data in one request...");
+                const response = await fetch(`${API_BASE}fetch.php?mode=public&type=all`, {
                     method: "GET",
-                    headers: {
-                        "ngrok-skip-browser-warning": "69420",
-                        "Content-Type": "application/json"
-                    }
+                    headers: { "ngrok-skip-browser-warning": "69420", "Content-Type": "application/json" }
                 });
+                
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
                 const result = await response.json();
                 
-                if (result.success) {
-                    mediaData[sectionId] = result.data;
-                    renderContent(sectionId, 1); 
+                if (result.success && Array.isArray(result.data)) {
+                    sessionStorage.setItem(cacheKey, JSON.stringify(result.data));
+                    distributeData(result.data);
                 } else {
-                    $(`#${sectionId}-grid-container`).html(`<p class="text-center text-muted">No items found.</p>`);
+                    console.error("No data found or error in response.");
                 }
             } catch (error) {
                 console.error("Fetch Error:", error);
-                $(`#${sectionId}-grid-container`).html(`<p class="text-center text-danger">Network Error. Check Server.</p>`);
             }
         }
+
+        // Helper to sort the big list into the 4 smaller categories
+        function distributeData(allData) {
+            allData.forEach(item => {
+                if (item.type === 'work') mediaData.works.push(item);
+                if (item.type === 'album') mediaData.albums.push(item);
+                if (item.type === 'teaser') mediaData.teasers.push(item);
+                if (item.type === 'live') mediaData.live.push(item);
+            });
+
+            // Render all 4 sections immediately
+            renderContent('works', 1);
+            renderContent('albums', 1);
+            renderContent('teasers', 1);
+            renderContent('live', 1);
+        }
         
-        // 2. Render Content 
+        // 2. Render Content
         function renderContent(sectionId, page) {
             const containerId = `#${sectionId}-grid-container`;
             const paginationId = `#${sectionId}-pagination-nav`;
@@ -666,35 +669,47 @@
             const endIndex = page * ITEMS_PER_PAGE;
             const pageItems = data.slice(startIndex, endIndex);
 
-            const isImageSection = (sectionId === 'works' || sectionId === 'albums');
-            const gridClass = isImageSection ? 'gallery-grid' : 'video-grid';
-            
-            let contentHtml = '';
+            const placeholder = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+            let contentHtml = '<div class="row">'; 
             
             if (pageItems.length === 0) {
-                 contentHtml = `<p class="text-center text-muted">Coming Soon...</p>`;
+                contentHtml = `<div class="col-12"><p class="text-center text-muted">Coming Soon...</p></div>`;
             } else {
-                contentHtml = `<div class="${gridClass} active" data-page="${page}">`;
-                
                 pageItems.forEach(item => {
-                    if (sectionId === 'works') {
-                        contentHtml += `<div class="gallery-item"><img loading="lazy" src="${item.file_path}" alt="${item.title}"></div>`;
-                    } else if (sectionId === 'albums') {
-                        contentHtml += `<div class="gallery-item" data-pdf-url="${item.pdf_link}"><img loading="lazy" src="${item.file_path}" alt="${item.title}"></div>`;
-                    } else if (sectionId === 'teasers' || sectionId === 'live') {
-                        contentHtml += `<div class="video-item"><iframe src="${item.file_path}" title="${item.title}" allowfullscreen></iframe></div>`;
+                    const filename = item.clean_name || item.file_path.split('/').pop();
+
+                    if (item.type === 'work' || sectionId === 'works' || item.type === 'album' || sectionId === 'albums') {
+                        contentHtml += `
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="gallery-item">
+                                    <img class="img-fluid w-100 batch-target" 
+                                        src="${placeholder}" 
+                                        data-f-name="${filename}" 
+                                        alt="${item.title || 'Photo'}"
+                                        style="object-fit: cover; height: 250px; background: #eee;">
+                                </div>
+                            </div>`;
+                    } else {
+                        contentHtml += `
+                            <div class="col-lg-6 col-md-12 mb-4">
+                                <div class="video-item"><iframe src="${item.file_path}" allowfullscreen></iframe></div>
+                            </div>`;
                     }
                 });
-                contentHtml += `</div>`;
             }
+            contentHtml += '</div>';
             
             const $container = $(containerId);
             $container.css('opacity', 0).html(contentHtml);
             $container.animate({opacity: 1}, 500);
 
+            // TRIGGER BATCH LOAD
+            loadBatchImages(containerId);
+
+            // Pagination
             let paginationHtml = '';
             if (totalPages > 1) {
-                paginationHtml = `<ul class="pagination">`;
+                paginationHtml = `<ul class="pagination justify-content-center">`;
                 paginationHtml += `<li class="page-item ${page === 1 ? 'disabled' : ''}" data-action="prev"><a class="page-link" href="#">«</a></li>`;
                 for (let i = 1; i <= totalPages; i++) {
                     const activeClass = i === page ? 'active' : '';
@@ -705,64 +720,87 @@
             $(paginationId).html(paginationHtml);
         }
 
-        // 3. MAIN INTERACTIVE LOGIC
+        // 3. UPDATED BATCH IMAGE LOADER (Non-blocking, Cache with limits, Fade-in)
+        async function loadBatchImages(containerId) {
+            const images = $(containerId).find('.batch-target');
+            const toFetch = [];
+
+            images.each(function() {
+                const fname = $(this).data('f-name');
+                const cached = sessionStorage.getItem(`img_${fname}`);
+                if (cached) {
+                    $(this).attr('src', cached).removeClass('batch-target').css('opacity', 1);
+                } else {
+                    toFetch.push(fname);
+                }
+            });
+
+            const unique = [...new Set(toFetch)];
+            if (unique.length === 0) return;
+
+            // We don't "await" the fetch here so the rest of the page stays fast
+            fetch(`${API_BASE}batch_proxy.php`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420" },
+                body: JSON.stringify({ files: unique })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    images.filter('.batch-target').each(function() {
+                        const f = $(this).data('f-name');
+                        if (result.images[f]) {
+                            $(this).hide().attr('src', result.images[f]).fadeIn(500).removeClass('batch-target');
+                            try {
+                                sessionStorage.setItem(`img_${f}`, result.images[f]);
+                            } catch (e) {
+                                console.warn("Storage full, skipping cache for this image.");
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(e => console.error("Image batch load failed", e));
+        }
+
+        // 4. Main Logic
         $(document).ready(function () {
-            // A. Initial Load
-            ['works', 'albums', 'teasers', 'live'].forEach(type => fetchMediaData(type));
+            fetchAllMediaData();
             
             $('#header-carousel').carousel({ interval: 5000, pause: 'hover' });
             $('[data-toggle="counter-up"]').counterUp({ delay: 10, time: 2000 });
 
-            // B. SCROLL EVENTS (Navbar Color & Active Link Highlighting)
             $(window).scroll(function () {
                 var scroll = $(this).scrollTop();
-                
-                // 1. Toggle Glass Effect
-                if (scroll > 50) {
-                    $('.navbar').addClass('scrolled');
-                } else {
-                    $('.navbar').removeClass('scrolled');
-                }
-
-                // 2. Active Link Highlighting (Scroll Spy)
-                // Loop through all sections to check which is on screen
+                if (scroll > 50) $('.navbar').addClass('scrolled'); else $('.navbar').removeClass('scrolled');
                 $('section').each(function() {
-                    var top = $(this).offset().top - 100; // Offset for navbar height
+                    var top = $(this).offset().top - 100;
                     var bottom = top + $(this).outerHeight();
                     var id = $(this).attr('id');
-
                     if (scroll >= top && scroll <= bottom) {
-                        $('.navbar-nav .nav-link').removeClass('active'); // Remove from all
-                        $('.navbar-nav').find('a[href="#' + id + '"]').addClass('active'); // Add to current
+                        $('.navbar-nav .nav-link').removeClass('active');
+                        $('.navbar-nav').find('a[href="#' + id + '"]').addClass('active');
                     }
                 });
             });
 
-            // C. Smooth Scroll on Click
-            // This prevents the "jump" and ensures the active class updates smoothly
             $('.navbar-nav a').on('click', function(event) {
                 if (this.hash !== "") {
                     event.preventDefault();
                     var hash = this.hash;
-                    $('html, body').animate({
-                        scrollTop: $(hash).offset().top
-                    }, 800, function(){
-                        window.location.hash = hash;
-                    });
+                    $('html, body').animate({ scrollTop: $(hash).offset().top }, 800, function(){ window.location.hash = hash; });
                 }
             });
 
-            // D. Pagination Click
             $(document).on('click', '.pagination .page-item:not(.disabled)', function(e) {
                 e.preventDefault();
                 const $btn = $(this);
                 const $nav = $btn.closest('nav');
                 const sectionId = $nav.attr('id').replace('-pagination-nav', '');
-                
                 const $active = $nav.find('.active');
                 let currentPage = parseInt($active.data('page'));
+                
                 let newPage = currentPage;
-
                 if ($btn.data('action') === 'prev') newPage--;
                 else if ($btn.data('action') === 'next') newPage++;
                 else newPage = $btn.data('page');
@@ -770,36 +808,23 @@
                 renderContent(sectionId, newPage);
             });
 
-            // E. Lightbox
             $(document).on('click', '.gallery-item', function() {
-                const pdf = $(this).data('pdf-url');
                 const src = $(this).find('img').attr('src');
-                if (pdf) window.open(pdf, '_blank');
-                else {
-                    $('#modalImage').attr('src', src);
-                    $('#imageModal').modal('show');
-                }
+                $('#modalImage').attr('src', src);
+                $('#imageModal').modal('show');
             });
             
-            // F. Mobile Menu Close
-            $('.nav-link').click(function() {
-                $('.navbar-collapse').collapse('hide');
-            });
+            $('.nav-link').click(function() { $('.navbar-collapse').collapse('hide'); });
         });
         
-        // Form Handling
         var form = document.getElementById("my-form");
-        async function handleSubmit(event) {
-            event.preventDefault();
+        if (form) form.addEventListener("submit", function(e) {
+            e.preventDefault();
             var status = document.getElementById("my-form-status");
-            var data = new FormData(event.target);
-            fetch(event.target.action, { method: form.method, body: data, headers: {'Accept': 'application/json'} })
-            .then(response => {
-                if (response.ok) { status.innerHTML = "Thanks! Message sent."; form.reset(); } 
-                else { status.innerHTML = "Error sending message."; }
-            }).catch(error => status.innerHTML = "Network error.");
-        }
-        if (form) form.addEventListener("submit", handleSubmit);
+            fetch(form.action, { method: form.method, body: new FormData(form), headers: {'Accept': 'application/json'} })
+            .then(r => { if(r.ok) { status.innerHTML = "Thanks! Message sent."; form.reset(); } else { status.innerHTML = "Error."; } })
+            .catch(e => status.innerHTML = "Network error.");
+        });
     </script>
 </body>
 </html>
