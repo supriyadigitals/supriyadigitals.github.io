@@ -21,7 +21,7 @@
     <style>
         /* --- 1. GLOBAL VARIABLES & RESET --- */
         :root {
-            --primary: #D4AF37; /* Gold/Premium Color */
+            --primary: #D4AF37; 
             --primary-hover: #b5952f;
             --dark: #1a1a1a;
             --light: #f8f9fa;
@@ -34,7 +34,7 @@
             color: var(--text-gray);
             background-color: #ffffff;
             overflow-x: hidden;
-            position: relative; /* Required for ScrollSpy */
+            position: relative; 
         }
 
         h1, h2, h3, h4, h5, h6 {
@@ -81,12 +81,11 @@
             transition: color 0.3s, transform 0.3s;
         }
 
-        /* ACTIVE STATE COLOR (GOLD) */
         .navbar-nav .nav-link:hover, 
         .navbar-nav .nav-link.active {
             color: var(--primary) !important;
             font-weight: 600;
-            transform: scale(1.1); /* Slight pop effect */
+            transform: scale(1.1); 
         }
 
         /* --- 3. HERO CAROUSEL --- */
@@ -151,14 +150,41 @@
             margin: 15px auto 0;
         }
 
-        /* --- 5. GRID SYSTEMS --- */
+        /* --- 5. GRID SYSTEMS & SKELETON LOADER --- */
         
-        /* A. Masonry for Images */
+        /* Skeleton Loading Animation */
+        .image-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            position: relative;
+            height: 250px; /* Match image height */
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .image-skeleton::after {
+            content: "\f110"; /* FontAwesome Spinner */
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .gallery-grid {
             column-count: 3;
             column-gap: 20px;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
         }
 
         .gallery-item {
@@ -176,29 +202,19 @@
 
         .gallery-item img {
             width: 100%;
-            height: auto !important;
+            height: 250px !important;
             display: block;
             transition: transform 0.5s ease;
-            opacity: 0.95;
+            object-fit: cover;
         }
 
         .gallery-item:hover img {
             transform: scale(1.05);
-            opacity: 1;
         }
 
-        /* B. Grid for Videos */
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        
         .video-item {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            padding-bottom: 56.25%; 
             height: 0;
             border-radius: 8px;
             overflow: hidden;
@@ -208,11 +224,6 @@
         .video-item iframe {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%; border: 0;
-        }
-
-        /* C. Visibility Toggle */
-        .active { 
-            opacity: 1 !important; 
         }
 
         /* --- 6. ABOUT & STATS --- */
@@ -274,33 +285,20 @@
             .display-4 { font-size: 2.2rem; }
             .carousel-caption h1 { font-size: 2rem; }
             .about-img { margin-bottom: 40px; box-shadow: 10px 10px 0px var(--primary); }
-            
-            .gallery-grid { column-count: 1; }
-            .video-grid { grid-template-columns: 1fr; }
         }
         
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 40px; height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* MODAL FIX: Ensures images fit the screen */
+        /* MODAL FIX */
         #modalImage {
-            max-height: 85vh; /* Limits image height to 85% of the screen */
-            width: auto;      /* Maintains correct width ratio */
-            max-width: 100%;  /* Prevents image from being wider than the screen */
-            object-fit: contain; /* Keeps the photo from stretching */
+            max-height: 85vh; 
+            width: auto;      
+            max-width: 100%;  
+            object-fit: contain; 
             border-radius: 8px;
-            border: 2px solid var(--primary); /* Optional: adds a gold border */
+            border: 2px solid var(--primary); 
         }
 
-        /* Centers the modal content properly */
         .modal-dialog {
-            max-width: 90%; /* Allows the modal to be wide but not full-width */
+            max-width: 90%; 
             margin: 1.75rem auto;
         }
 
@@ -440,9 +438,7 @@
                 <h1>Candid Shots</h1>
                 <p class="text-muted">A glimpse into our photography portfolio</p>
             </div>
-            <div id="works-grid-container">
-                <div class="loading-spinner"></div>
-            </div>
+            <div id="works-grid-container"></div>
             <nav id="works-pagination-nav" class="d-flex justify-content-center"></nav>
         </div>
     </section>
@@ -453,9 +449,7 @@
                 <h1>Album Designs</h1>
                 <p class="text-muted">Click cover to view full album PDF</p>
             </div>
-            <div id="albums-grid-container">
-                <div class="loading-spinner"></div>
-            </div>
+            <div id="albums-grid-container"></div>
             <nav id="albums-pagination-nav" class="d-flex justify-content-center"></nav>
         </div>
     </section>
@@ -466,9 +460,7 @@
                 <h1>Cinematic Teasers</h1>
                 <p class="text-muted">Highlights of our best films</p>
             </div>
-            <div id="teasers-grid-container">
-                <div class="loading-spinner"></div>
-            </div>
+            <div id="teasers-grid-container"></div>
             <nav id="teasers-pagination-nav" class="d-flex justify-content-center"></nav>
         </div>
     </section>
@@ -479,9 +471,7 @@
                 <h1>Live Events</h1>
                 <p class="text-muted">Full event coverage</p>
             </div>
-            <div id="live-grid-container">
-                <div class="loading-spinner"></div>
-            </div>
+            <div id="live-grid-container"></div>
             <nav id="live-pagination-nav" class="d-flex justify-content-center"></nav>
         </div>
     </section>
@@ -608,40 +598,19 @@
         // Data buckets for the 4 sections
         let mediaData = { works: [], albums: [], teasers: [], live: [] };
 
-        // 1. ONE-TIME FETCH (Optimization: Fetch all data at once)
+        // 1. FETCH ALL METADATA
         async function fetchAllMediaData() {
-            const cacheKey = "supriya_full_media_cache";
-            const cachedData = sessionStorage.getItem(cacheKey);
-
-            // Use browser cache if available (0 requests!)
-            if (cachedData) {
-                console.log("Loaded all data from cache.");
-                distributeData(JSON.parse(cachedData));
-                return;
-            }
-
             try {
-                console.log("Fetching ALL media data in one request...");
                 const response = await fetch(`${API_BASE}fetch.php?mode=public&type=all`, {
                     method: "GET",
                     headers: { "ngrok-skip-browser-warning": "69420", "Content-Type": "application/json" }
                 });
-                
-                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
                 const result = await response.json();
-                
-                if (result.success && Array.isArray(result.data)) {
-                    sessionStorage.setItem(cacheKey, JSON.stringify(result.data));
-                    distributeData(result.data);
-                } else {
-                    console.error("No data found or error in response.");
-                }
-            } catch (error) {
-                console.error("Fetch Error:", error);
-            }
+                if (result.success) distributeData(result.data);
+            } catch (error) { console.error("Fetch Error:", error); }
         }
 
-        // Helper to sort the big list into the 4 smaller categories
+        // 2. DISTRIBUTE DATA & RENDER SKELETONS
         function distributeData(allData) {
             allData.forEach(item => {
                 if (item.type === 'work') mediaData.works.push(item);
@@ -650,126 +619,105 @@
                 if (item.type === 'live') mediaData.live.push(item);
             });
 
-            // Render all 4 sections immediately
+            // Render the HTML for page 1 of all sections immediately
             renderContent('works', 1);
             renderContent('albums', 1);
             renderContent('teasers', 1);
             renderContent('live', 1);
+
+            // Fetch the actual images in ONE single Master Request
+            loadAllImagesAtOnce(); 
         }
-        
-        // 2. Render Content
+
+        // 3. RENDER CONTENT (Injects Skeleton Loaders)
         function renderContent(sectionId, page) {
             const containerId = `#${sectionId}-grid-container`;
             const paginationId = `#${sectionId}-pagination-nav`;
             const data = mediaData[sectionId] || [];
             
-            const totalItems = data.length;
-            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-            const startIndex = (page - 1) * ITEMS_PER_PAGE;
-            const endIndex = page * ITEMS_PER_PAGE;
-            const pageItems = data.slice(startIndex, endIndex);
+            const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+            const pageItems = data.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
             const placeholder = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
             let contentHtml = '<div class="row">'; 
-            
-            if (pageItems.length === 0) {
-                contentHtml = `<div class="col-12"><p class="text-center text-muted">Coming Soon...</p></div>`;
-            } else {
-                pageItems.forEach(item => {
-                    const filename = item.clean_name || item.file_path.split('/').pop();
 
-                    if (item.type === 'work' || sectionId === 'works' || item.type === 'album' || sectionId === 'albums') {
-                        contentHtml += `
-                            <div class="col-lg-4 col-md-6 mb-4">
-                                <div class="gallery-item">
-                                    <img class="img-fluid w-100 batch-target" 
-                                        src="${placeholder}" 
-                                        data-f-name="${filename}" 
-                                        alt="${item.title || 'Photo'}"
-                                        style="object-fit: cover; height: 250px; background: #eee;">
-                                </div>
-                            </div>`;
-                    } else {
-                        contentHtml += `
-                            <div class="col-lg-6 col-md-12 mb-4">
-                                <div class="video-item"><iframe src="${item.file_path}" allowfullscreen></iframe></div>
-                            </div>`;
-                    }
-                });
-            }
+            if (pageItems.length === 0) contentHtml = `<div class="col-12"><p class="text-center text-muted">Coming Soon...</p></div>`;
+
+            pageItems.forEach(item => {
+                const filename = item.clean_name || item.file_path.split('/').pop();
+
+                if (item.type === 'work' || sectionId === 'works' || item.type === 'album' || sectionId === 'albums') {
+                    contentHtml += `
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="gallery-item image-skeleton">
+                                <img class="img-fluid w-100 master-batch-target" 
+                                    src="${placeholder}" 
+                                    data-f-name="${filename}" 
+                                    alt="${item.title || 'Photo'}"
+                                    style="object-fit: cover; opacity: 0;">
+                            </div>
+                        </div>`;
+                } else {
+                    contentHtml += `
+                        <div class="col-lg-6 col-md-12 mb-4">
+                            <div class="video-item"><iframe src="${item.file_path}" allowfullscreen></iframe></div>
+                        </div>`;
+                }
+            });
             contentHtml += '</div>';
-            
-            const $container = $(containerId);
-            $container.css('opacity', 0).html(contentHtml);
-            $container.animate({opacity: 1}, 500);
+            $(containerId).html(contentHtml);
 
-            // TRIGGER BATCH LOAD
-            loadBatchImages(containerId);
-
-            // Pagination
+            // Render Pagination
             let paginationHtml = '';
             if (totalPages > 1) {
                 paginationHtml = `<ul class="pagination justify-content-center">`;
                 paginationHtml += `<li class="page-item ${page === 1 ? 'disabled' : ''}" data-action="prev"><a class="page-link" href="#">«</a></li>`;
                 for (let i = 1; i <= totalPages; i++) {
-                    const activeClass = i === page ? 'active' : '';
-                    paginationHtml += `<li class="page-item ${activeClass}" data-page="${i}"><a class="page-link" href="#">${i}</a></li>`;
+                    paginationHtml += `<li class="page-item ${i === page ? 'active' : ''}" data-page="${i}"><a class="page-link" href="#">${i}</a></li>`;
                 }
                 paginationHtml += `<li class="page-item ${page === totalPages ? 'disabled' : ''}" data-action="next"><a class="page-link" href="#">»</a></li></ul>`;
             }
             $(paginationId).html(paginationHtml);
         }
 
-        // 3. UPDATED BATCH IMAGE LOADER (Non-blocking, Cache with limits, Fade-in)
-        async function loadBatchImages(containerId) {
-            const images = $(containerId).find('.batch-target');
+        // 4. THE MASTER IMAGE LOADER (Collects all targets and makes 1 request)
+        function loadAllImagesAtOnce() {
+            const allImages = $('.master-batch-target');
             const toFetch = [];
 
-            images.each(function() {
-                const fname = $(this).data('f-name');
-                const cached = sessionStorage.getItem(`img_${fname}`);
-                if (cached) {
-                    $(this).attr('src', cached).removeClass('batch-target').css('opacity', 1);
-                } else {
-                    toFetch.push(fname);
-                }
-            });
+            allImages.each(function() { toFetch.push($(this).data('f-name')); });
+            const uniqueFiles = [...new Set(toFetch)];
+            if (uniqueFiles.length === 0) return;
 
-            const unique = [...new Set(toFetch)];
-            if (unique.length === 0) return;
-
-            // We don't "await" the fetch here so the rest of the page stays fast
             fetch(`${API_BASE}batch_proxy.php`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420" },
-                body: JSON.stringify({ files: unique })
+                body: JSON.stringify({ files: uniqueFiles })
             })
             .then(res => res.json())
             .then(result => {
                 if (result.success) {
-                    images.filter('.batch-target').each(function() {
+                    allImages.each(function() {
                         const f = $(this).data('f-name');
                         if (result.images[f]) {
-                            $(this).hide().attr('src', result.images[f]).fadeIn(500).removeClass('batch-target');
-                            try {
-                                sessionStorage.setItem(`img_${f}`, result.images[f]);
-                            } catch (e) {
-                                console.warn("Storage full, skipping cache for this image.");
-                            }
+                            $(this).attr('src', result.images[f])
+                                   .animate({opacity: 1}, 500)
+                                   .removeClass('master-batch-target')
+                                   .parent().removeClass('image-skeleton');
                         }
                     });
                 }
-            })
-            .catch(e => console.error("Image batch load failed", e));
+            }).catch(e => console.error("Image load failed:", e));
         }
 
-        // 4. Main Logic
+        // --- STANDARD UI LOGIC --- //
         $(document).ready(function () {
             fetchAllMediaData();
             
             $('#header-carousel').carousel({ interval: 5000, pause: 'hover' });
             $('[data-toggle="counter-up"]').counterUp({ delay: 10, time: 2000 });
 
+            // Navbar Scroll Effect
             $(window).scroll(function () {
                 var scroll = $(this).scrollTop();
                 if (scroll > 50) $('.navbar').addClass('scrolled'); else $('.navbar').removeClass('scrolled');
@@ -784,6 +732,7 @@
                 });
             });
 
+            // Smooth Scroll
             $('.navbar-nav a').on('click', function(event) {
                 if (this.hash !== "") {
                     event.preventDefault();
@@ -792,6 +741,7 @@
                 }
             });
 
+            // Pagination Click Handler
             $(document).on('click', '.pagination .page-item:not(.disabled)', function(e) {
                 e.preventDefault();
                 const $btn = $(this);
@@ -805,10 +755,13 @@
                 else if ($btn.data('action') === 'next') newPage++;
                 else newPage = $btn.data('page');
 
+                // Render new skeletons and fetch images just for the new page
                 renderContent(sectionId, newPage);
+                loadAllImagesAtOnce(); 
             });
 
-            $(document).on('click', '.gallery-item', function() {
+            // Modal Trigger
+            $(document).on('click', '.gallery-item:not(.image-skeleton)', function() {
                 const src = $(this).find('img').attr('src');
                 $('#modalImage').attr('src', src);
                 $('#imageModal').modal('show');
@@ -817,6 +770,7 @@
             $('.nav-link').click(function() { $('.navbar-collapse').collapse('hide'); });
         });
         
+        // Formspree Contact Form
         var form = document.getElementById("my-form");
         if (form) form.addEventListener("submit", function(e) {
             e.preventDefault();

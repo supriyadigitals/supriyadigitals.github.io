@@ -3,24 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Supriya Digitals | Client Gallery</title>
-    <script>
-        /**
-         * This script runs immediately to "unlock" the ngrok session for this browser.
-         * It sends the required skip header in the background.
-         */
-        (async function() {
-            const ngrokUrl = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/";
-            try {
-                await fetch(ngrokUrl, {
-                    method: "GET",
-                    headers: { "ngrok-skip-browser-warning": "69420" }
-                });
-                console.log("Ngrok Session Unlocked: Images should now display correctly.");
-            } catch (err) {
-                console.error("Bypass failed. You may need to click 'Visit Site' manually once.", err);
-            }
-        })();
-    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="img/icon1.png" rel="icon">
     
@@ -29,198 +11,110 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #D4AF37; /* Gold */
-            --text: #333;
-            --bg: #fdfdfd;
+        :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* --- 1. FULL SCREEN PREMIUM LOADER --- */
+        #main-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .loading-text { font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 2px; color: var(--primary); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        /* --- HEADER --- */
-        .gallery-header {
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .brand-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: #000;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        /* --- 2. HEADER & NAVIGATION --- */
+        .gallery-header { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #000; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
         .brand-title span { color: var(--primary); }
-
-        .btn-back {
-            border: 1px solid #ddd;
-            color: #555;
-            border-radius: 30px;
-            padding: 8px 20px;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-        }
-        .btn-back:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: #fff;
-            text-decoration: none;
-        }
-
-        /* --- MASONRY GRID --- */
+        
+        .btn-custom { border: 1px solid #ddd; color: #555; border-radius: 30px; padding: 8px 25px; font-size: 0.9rem; transition: all 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; }
+        .btn-custom:hover { background: var(--primary); border-color: var(--primary); color: #fff; text-decoration: none; transform: translateY(-2px); }
+        
+        /* --- 3. GALLERY GRID --- */
         .container-fluid { padding: 40px; }
-        
-        .gallery-grid {
-            column-count: 4; /* 4 Columns for wide screens */
-            column-gap: 20px;
-        }
-
+        .gallery-grid { column-count: 4; column-gap: 20px; opacity: 0; transition: opacity 0.8s ease-in-out; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { 
-            .gallery-grid { column-count: 1; } 
-            .container-fluid { padding: 20px; }
-            .gallery-header { padding: 15px 20px; }
-        }
-
-        .gallery-item {
-            break-inside: avoid;
-            margin-bottom: 20px;
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
-        }
-
-        .gallery-item:hover { transform: translateY(-5px); }
-
-        .gallery-item img {
-            width: 100%;
-            height: auto !important;
-            display: block;
-        }
-
-        /* --- LIGHTBOX (FULL SCREEN) --- */
-        .modal-content {
-            background-color: transparent;
-            border: none;
-            height: 100vh; /* Full viewport height */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        @media (max-width: 768px) { .gallery-grid { column-count: 1; } .container-fluid { padding: 20px; } .gallery-header { padding: 15px 20px; } }
         
-        .modal-body {
-            padding: 0;
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s; background: #eee; }
+        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-item img { width: 100%; display: block; transition: opacity 0.3s; }
+        
+        /* --- 4. LIGHTBOX MODAL --- */
+        .modal-content { background-color: rgba(0,0,0,0.95); border: none; height: 100vh; }
+        .modal-body { padding: 0; position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        
+        /* Control Bar */
+        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: flex-end; align-items: center; z-index: 1060; }
+        .lb-icon { font-size: 1.8rem; color: #fff; cursor: pointer; opacity: 0.7; transition: 0.3s; margin-left: 30px; }
+        .lb-icon:hover { opacity: 1; color: var(--primary); transform: scale(1.1); }
+        
+        #lightboxImage { max-height: 85vh; max-width: 90vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        
+        /* Dropdown Menu */
+        .dropdown-menu-dark { background-color: #222; border: 1px solid #444; margin-top: 10px; }
+        .dropdown-menu-dark .dropdown-item { color: #eee; font-size: 0.9rem; padding: 12px 20px; border-bottom: 1px solid #333; }
+        .dropdown-menu-dark .dropdown-item:hover { background-color: var(--primary); color: #fff; }
 
-        #lightboxImage {
-            max-height: 90vh;
-            max-width: 90vw;
-            object-fit: contain;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            border-radius: 4px;
-        }
-
-        /* Controls */
-        .lb-control {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2.5rem;
-            color: rgba(255,255,255,0.7);
-            cursor: pointer;
-            z-index: 1060;
-            transition: 0.3s;
-            padding: 20px;
-        }
-        .lb-control:hover { color: var(--primary); transform: translateY(-50%) scale(1.2); }
+        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2.5rem; color: rgba(255,255,255,0.7); cursor: pointer; z-index: 1060; padding: 20px; transition: 0.3s; }
+        .lb-control:hover { color: var(--primary); }
         .lb-prev { left: 20px; }
         .lb-next { right: 20px; }
+        .lb-caption { position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; color: #fff; font-size: 1.1rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
 
-        .lb-close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 2rem;
-            color: #fff;
-            cursor: pointer;
-            z-index: 1060;
-            opacity: 0.8;
-        }
-        .lb-close:hover { opacity: 1; color: var(--primary); }
-
-        .lb-caption {
-            position: absolute;
-            bottom: 20px;
-            left: 0; 
-            width: 100%;
-            text-align: center;
-            color: #fff;
-            font-size: 1rem;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
-            letter-spacing: 1px;
-        }
-        
-        /* Loading & Error */
-        .status-msg {
-            text-align: center;
-            margin-top: 100px;
-            font-size: 1.2rem;
-            color: #999;
-        }
     </style>
 </head>
 <body>
 
+    <div id="main-loader">
+        <div class="spinner"></div>
+        <div class="loading-text">SUPRIYA DIGITALS</div>
+        <p class="text-muted mt-2">Preparing your gallery...</p>
+    </div>
+
     <div class="gallery-header">
-        <a href="https://supriyadigitals.github.io/" class="btn-back"><i class="fas fa-arrow-left mr-2"></i> Back to Home</a>
+        <a href="index.html" class="btn-custom"><i class="fas fa-arrow-left mr-2"></i> Back to Home</a>
         <h1 class="brand-title"><span>Supriya</span> Studio</h1>
-        <div style="width: 100px;"></div> </div>
+        
+        <button class="btn-custom" onclick="downloadAllImages()">
+            <i class="fas fa-file-archive mr-2 text-warning"></i> Download All (.ZIP)
+        </button>
+    </div>
 
     <div class="container-fluid">
-        <div id="gallery" class="gallery-grid">
-            </div>
-        <div id="status" class="status-msg">
-            <i class="fas fa-spinner fa-spin fa-2x text-primary"></i><br><br>Loading Gallery...
-        </div>
+        <div id="gallery" class="gallery-grid"></div>
     </div>
 
     <div class="modal fade" id="lightboxModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
         <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
             <div class="modal-content">
                 <div class="modal-body">
-                    <span class="lb-close" data-dismiss="modal">&times;</span>
                     
+                    <div class="lb-header">
+                        <div class="dropdown">
+                            <span class="lb-icon" data-toggle="dropdown" title="Download Image">
+                                <i class="fas fa-download"></i>
+                            </span>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="downloadImage('normal')">
+                                    <i class="fas fa-bolt mr-2 text-warning"></i> Normal Quality (Instant)
+                                </a>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="downloadImage('high')">
+                                    <i class="fas fa-star mr-2 text-primary"></i> High Quality (Original)
+                                </a>
+                            </div>
+                        </div>
+                        <span class="lb-icon" data-dismiss="modal" title="Close"><i class="fas fa-times"></i></span>
+                    </div>
+
                     <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
-                    
-                    <img id="lightboxImage" src="" alt="">
-                    
+                    <img id="lightboxImage" src="" alt="Gallery Image">
                     <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
                     
                     <div id="lightboxCaption" class="lb-caption"></div>
@@ -234,86 +128,130 @@
 
     <script>
         const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/";
-        
-        // URL Params
         const params = new URLSearchParams(window.location.search);
-        const batchId = params.get('batch_id');
-        const id = params.get('id');
+        
+        let galleryData = []; 
+        let currentIndex = 0; 
+        let uniqueFilenames = [];
 
-        // State
-        let galleryData = []; // Store all images here
-        let currentIndex = 0; // Track which image is open
-
-        // 1. Load Data
-        async function loadSharedMedia() {
+        // --- 1. THE INITIALIZER (2 Requests Total) ---
+        async function initializeGallery() {
             try {
+                // Fetch text metadata
                 let url = `${API_BASE}fetch.php?mode=shared`;
-                if(batchId) url += `&batch_id=${batchId}`;
-                if(id) url += `&id=${id}`;
+                if(params.get('batch_id')) url += `&batch_id=${params.get('batch_id')}`;
+                if(params.get('id')) url += `&id=${params.get('id')}`;
 
-                const response = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } });
-                const result = await response.json();
+                const textRes = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } });
+                const textData = await textRes.json();
 
-                const gallery = document.getElementById('gallery');
-                const status = document.getElementById('status');
-
-                if (result.success && result.data.length > 0) {
-                    status.style.display = 'none';
-                    galleryData = result.data; // Save data to global variable
-                    
-                    let html = '';
-                    galleryData.forEach((item, index) => {
-                        const displayName = item.title_from_filename || item.title || 'Photo';
-                        html += `
-                            <div class="gallery-item" onclick="openLightbox(${index})">
-                                <img src="${item.file_path}" loading="lazy" alt="${displayName}">
-                            </div>
-                        `;
-                    });
-                    gallery.innerHTML = html;
-                } else {
-                    status.innerHTML = "<p>No photos found. This link might be invalid or private.</p>";
+                if (!textData.success || textData.data.length === 0) {
+                    $('#main-loader').html('<h3 class="text-danger">Invalid Gallery Link</h3>');
+                    return;
                 }
+
+                galleryData = textData.data;
+                const filenames = galleryData.map(item => item.clean_name || item.file_path.split('/').pop());
+                uniqueFilenames = [...new Set(filenames)];
+
+                // Fetch ALL images in ONE single batch
+                const imgRes = await fetch(`${API_BASE}batch_proxy.php`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420" },
+                    body: JSON.stringify({ files: uniqueFilenames })
+                });
+                const imgData = await imgRes.json();
+
+                // Prepare and render HTML
+                let html = '';
+                galleryData.forEach((item, index) => {
+                    const fname = item.clean_name || item.file_path.split('/').pop();
+                    const b64Data = imgData.images[fname] || ""; 
+                    
+                    // Store for instant viewing/normal download
+                    galleryData[index].secureBlob = b64Data; 
+                    galleryData[index].filename = fname;
+
+                    html += `
+                        <div class="gallery-item" onclick="openLightbox(${index})">
+                            <img src="${b64Data}" alt="${item.title || 'Photo'}">
+                        </div>
+                    `;
+                });
+
+                document.getElementById('gallery').innerHTML = html;
+
+                // Reveal page
+                $('#main-loader').fadeOut(600, function() {
+                    $('#gallery').css('opacity', 1);
+                });
+
             } catch (e) {
                 console.error(e);
-                document.getElementById('status').innerHTML = "<p>Error connecting to gallery server.</p>";
+                $('#main-loader').html('<h3 class="text-danger">Connection Error. Please refresh.</h3>');
             }
         }
 
-        // 2. Open Lightbox
+        // --- 2. THE DUAL-DOWNLOAD SYSTEM ---
+        function downloadImage(quality) {
+            const currentItem = galleryData[currentIndex];
+            if (!currentItem || !currentItem.filename) return;
+
+            if (quality === 'normal') {
+                // Zero Request Download (Uses browser memory)
+                const link = document.createElement('a');
+                link.href = currentItem.secureBlob;
+                link.download = "Supriya_" + currentItem.filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                // HQ Original Download (Uses download.php GET)
+                window.location.href = `${API_BASE}download.php?f=${currentItem.filename}`;
+            }
+        }
+
+        // --- 3. GROUP DOWNLOAD (ZIP) ---
+        function downloadAllImages() {
+            if (uniqueFilenames.length === 0) return;
+
+            // Using the combined download.php via POST for ZIP
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = `${API_BASE}download.php`;
+
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "files";
+            input.value = JSON.stringify(uniqueFilenames);
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+
+        // --- 4. LIGHTBOX NAVIGATION ---
         function openLightbox(index) {
             currentIndex = index;
             updateLightbox();
             $('#lightboxModal').modal('show');
         }
 
-        // 3. Update Image & Caption
         function updateLightbox() {
             const item = galleryData[currentIndex];
-            const img = document.getElementById('lightboxImage');
-            const caption = document.getElementById('lightboxCaption');
-            
-            // Fade effect
-            img.style.opacity = 0;
-            setTimeout(() => {
-                img.src = item.file_path;
-                caption.innerText = item.title_from_filename || item.title;
-                img.style.opacity = 1;
-            }, 200);
+            document.getElementById('lightboxImage').src = item.secureBlob;
+            document.getElementById('lightboxCaption').innerText = item.title_from_filename || item.title || 'Supriya Digitals Photo';
         }
 
-        // 4. Navigation Logic (Prev/Next)
         function changeImage(direction) {
             currentIndex += direction;
-            
-            // Loop around if at end or start
             if (currentIndex >= galleryData.length) currentIndex = 0;
             if (currentIndex < 0) currentIndex = galleryData.length - 1;
-            
             updateLightbox();
         }
 
-        // 5. Keyboard Support (Left/Right Keys)
+        // Hotkeys
         document.addEventListener('keydown', function(event) {
             if ($('#lightboxModal').is(':visible')) {
                 if (event.key === "ArrowLeft") changeImage(-1);
@@ -322,8 +260,8 @@
             }
         });
 
-        // Initialize
-        loadSharedMedia();
+        // Bootstrap the app
+        initializeGallery();
     </script>
 </body>
 </html>
