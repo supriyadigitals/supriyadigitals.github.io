@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Supriya Bill</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.1.4/otpauth.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4338ca;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --error: #ef4444;
+            --success: #10b981;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 90px; }
+
+        /* --- LAYOUT --- */
+        .app-bar {
+            background: var(--surface);
+            color: var(--text-main);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 16px; }
+
+        /* --- CARDS & LISTS --- */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+            border: 1px solid var(--border);
+        }
+        .card:active { transform: scale(0.98); }
+
+        /* --- TYPOGRAPHY --- */
+        .title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .subtitle { font-size: 0.85rem; color: var(--text-sub); margin-top: 4px; font-weight: 500; }
+        .price-tag { font-family: monospace; font-weight: 600; font-size: 1rem; }
+        
+        .text-error { color: var(--error); }
+        .text-green { color: var(--success); }
+        .text-warn { color: var(--warn); }
+        .chip { 
+            background: #e0e7ff; color: var(--primary); 
+            padding: 6px 12px; border-radius: 20px; 
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* --- FORMS & BUTTONS --- */
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #f9fafb;
+            font-size: 16px; 
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus { border-color: var(--primary); background: #fff; }
+
+        button.btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 15px;
+            box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        button.btn:active { background: var(--primary-dark); transform: translateY(1px); }
+        
+        button.btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); box-shadow: none; }
+        button.btn-danger { background: var(--error); color: white; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
+        
+        button.btn-icon {
+            background: transparent; color: var(--text-main); border: none; padding: 8px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        button.btn-icon:hover { background: #f3f4f6; }
+
+        /* --- BOTTOM NAVIGATION --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--surface);
+            display: flex; justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+            z-index: 40;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-sub); font-size: 0.75rem; font-weight: 500;
+            gap: 4px; cursor: pointer; transition: color 0.2s;
+        }
+        .nav-item.active { color: var(--primary); }
+        .nav-item .material-icons-round { font-size: 26px; }
+
+        /* --- FAB --- */
+        .fab {
+            position: fixed; bottom: 90px; right: 20px;
+            background: var(--primary); color: white;
+            width: 56px; height: 56px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            font-size: 28px; z-index: 45; border: none; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .fab:active { transform: scale(0.9); }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            display: flex; align-items: flex-end;
+            justify-content: center; z-index: 100;
+        }
+        .modal {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 24px 24px 0 0;
+            width: 100%; max-width: 600px;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            animation: slideUp 0.3s ease-out;
+        }
+        @media (min-width: 600px) {
+            .modal-overlay { align-items: center; }
+            .modal { border-radius: 24px; width: 90%; }
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* --- UTILS --- */
+        .flex { display: flex; gap: 10px; align-items: center; }
+        .flex-between { justify-content: space-between; }
+        .flex-col { flex-direction: column; }
+        .w-full { width: 100%; }
+        .item-row { padding: 12px 0; border-bottom: 1px dashed var(--border); }
+        .item-row:last-child { border-bottom: none; }
+
+        /* --- AUTH SCREEN --- */
+        .login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--surface); z-index: 2000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
+        }
+        .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 30px; width: 100%; max-width: 320px; }
+        .pin-btn {
+            height: 72px; width: 72px; border-radius: 50%;
+            background: #f3f4f6; color: var(--text-main);
+            font-size: 24px; font-weight: 600; border: none;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto; cursor: pointer; transition: background 0.1s;
+        }
+        .pin-btn:active { background: #e5e7eb; }
+        .pin-dots { font-size: 40px; letter-spacing: 12px; margin: 20px 0; color: var(--primary); height: 50px; }
+        .qr-container { background: white; padding: 16px; border-radius: 8px; margin: 20px 0; }
+        .auth-instructions { text-align: center; max-width: 300px; line-height: 1.5; font-size: 0.9rem; opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    
+    <div v-if="!isAuthenticated" class="login-screen">
+        <div v-if="!hasSecret">
+            <span class="material-icons-round text-primary" style="font-size: 64px;">qr_code_2</span>
+            <h2 class="title" style="margin: 10px 0;">Setup Security</h2>
+            <p class="subtitle" style="margin-bottom: 20px;">Scan with Google Authenticator</p>
+            <div class="qr-container"><canvas id="qr-code"></canvas></div>
+            <p class="subtitle">Enter 6-digit code:</p>
+        </div>
+        <div v-else>
+            <span class="material-icons-round" style="font-size: 64px; color: var(--primary);">lock</span>
+            <h2 class="title" style="margin-top: 10px;">Welcome Back</h2>
+            <p class="subtitle">Enter your 6-digit App Code</p>
+        </div>
+
+        <div class="pin-dots">{{ pinMask }}</div>
+
+        <div class="pin-pad">
+            <button class="pin-btn" v-for="n in 9" :key="n" @click="enterPin(n)">{{ n }}</button>
+            <button class="pin-btn" @click="enterPin('C')"><span class="material-icons-round">backspace</span></button>
+            <button class="pin-btn" @click="enterPin(0)">0</button>
+            <button class="pin-btn" style="background: var(--primary); color: white;" @click="unlockApp"><span class="material-icons-round">arrow_forward</span></button>
+        </div>
+        
+        <div v-if="hasSecret" style="margin-top: 40px; font-size: 0.85rem; color: var(--text-sub); cursor: pointer;" @click="resetAuth">
+            Reset Authenticator
+        </div>
+    </div>
+
+    <div v-else>
+        <div class="app-bar">
+            <div class="flex">
+                <button v-if="view === 'detail'" class="btn-icon" @click="view = 'list'"><span class="material-icons-round">arrow_back</span></button>
+                <div class="flex-col">
+                    <span class="title" style="font-size: 1.2rem;">{{ viewTitle }}</span>
+                    <span v-if="view === 'detail' && selectedEvent?.isConfirmed" class="chip" style="font-size: 0.6rem; padding: 2px 6px;">Confirmed</span>
+                </div>
+            </div>
+            
+            <div class="flex" v-if="view === 'detail'">
+                <button class="btn-icon" @click="openModal('editEvent')"><span class="material-icons-round">edit</span></button>
+                <button class="btn-icon text-error" @click="deleteEvent"><span class="material-icons-round">delete</span></button>
+            </div>
+        </div>
+
+        <div class="container">
+            
+            <div v-if="view === 'list'">
+                <div class="card" style="padding: 12px;">
+                    <div class="flex" style="background: #f3f4f6; border-radius: 12px; padding: 4px 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="color: var(--text-sub);">search</span>
+                        <input v-model="filters.search" placeholder="Search events..." style="border:none; background: transparent; margin: 0; padding: 12px;">
+                    </div>
+                    <div class="flex flex-between">
+                        <div class="flex w-full">
+                            <select v-model="filters.year" style="padding: 8px 12px; margin:0;"><option value="">Year</option><option v-for="y in years" :value="y">{{ y }}</option></select>
+                            <select v-model="filters.month" style="padding: 8px 12px; margin:0;"><option value="">Month</option><option v-for="(m, i) in months" :value="String(i+1).padStart(2,'0')">{{ m }}</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="loading" style="text-align: center; padding: 40px; color: var(--text-sub);">Loading Events...</div>
+                
+                <div v-else>
+                    <div v-for="event in filteredEvents" :key="event.id" class="card" @click="openEvent(event)">
+                        <div class="flex flex-between" style="margin-bottom: 6px;">
+                            <span class="title">{{ event.title }}</span>
+                            <span v-if="event.isConfirmed" class="material-icons-round text-green">verified</span>
+                        </div>
+                        <div class="subtitle">{{ event.customerName }}</div>
+                        <div class="flex flex-between" style="margin-top: 12px; align-items: flex-end;">
+                            <span class="subtitle" style="background: #e5e7eb; padding: 2px 8px; border-radius: 4px;">{{ event.date }}</span>
+                            <span class="price-tag" :class="getBalance(event) > 0 ? 'text-error' : 'text-green'">
+                                {{ getBalance(event) > 0 ? 'Due' : 'Paid' }}: ₹{{ formatCurrency(getBalance(event)) }}
+                            </span>
+                        </div>
+                    </div>
+                    <div style="height: 80px;"></div>
+                </div>
+                
+                <button class="fab" @click="openModal('addEvent')"><span class="material-icons-round">add</span></button>
+            </div>
+
+            <div v-if="view === 'detail' && selectedEvent">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                    <button class="btn btn-outline" @click="generatePDF(selectedEvent, false)">
+                        <span class="material-icons-round">receipt</span> Estimate
+                    </button>
+                    <button class="btn" @click="generatePDF(selectedEvent, true)">
+                        <span class="material-icons-round">download</span> Invoice
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="flex flex-between">
+                        <span class="title">Summary</span>
+                        <span class="chip text-warn" @click="openModal('internalExpenses')">Exp: ₹{{ formatCurrency(totalInternalExpenses) }}</span>
+                    </div>
+                    
+                    <div class="flex flex-between item-row" style="margin-top: 10px;">
+                        <span class="subtitle">Sub-Total</span>
+                        <span class="bold">₹{{ formatCurrency(totalCost) }}</span>
+                    </div>
+                    <div class="flex flex-between item-row" @click="openModal('discount')">
+                        <span class="subtitle flex">Discount <span class="material-icons-round" style="font-size: 14px;">edit</span></span>
+                        <span class="text-error">- ₹{{ formatCurrency(selectedEvent.discount || 0) }}</span>
+                    </div>
+                    <div class="flex flex-between item-row" style="background: #f9fafb; padding: 10px; border-radius: 8px; border:none; margin: 5px 0;">
+                        <span class="bold">Grand Total</span>
+                        <span class="bold">₹{{ formatCurrency(totalCost - (selectedEvent.discount || 0)) }}</span>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <div class="subtitle" style="margin-bottom: 5px;">Payments</div>
+                        <div v-for="pay in selectedEvent.payments" :key="pay.id" class="flex flex-between item-row" @click="editPayment(pay)" style="padding: 8px 0;">
+                            <div>
+                                <div style="font-weight: 500;">{{ pay.title }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-sub);">{{ pay.date }}</div>
+                            </div>
+                            <span class="text-green">- ₹{{ formatCurrency(pay.amount) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-between" style="margin-top: 15px; border-top: 2px solid var(--border); padding-top: 15px;">
+                        <span class="title">Balance Due</span>
+                        <span class="title" :class="remainingBalance > 0 ? 'text-error' : 'text-green'">₹{{ formatCurrency(remainingBalance) }}</span>
+                    </div>
+
+                    <div class="flex gap-16" style="margin-top: 20px;">
+                        <button class="btn" @click="openModal('payment')">Add Pay</button>
+                        <button class="btn btn-outline" @click="openModal('album')">+ Album</button>
+                    </div>
+                </div>
+
+                <div v-for="(day, index) in selectedEvent.days" :key="day.id" class="card">
+                    <div class="flex flex-between" style="margin-bottom: 10px;">
+                        <div>
+                            <div class="title">{{ day.title }}</div>
+                            <div class="subtitle">{{ day.date }}</div>
+                        </div>
+                        <button class="btn-icon text-error" @click.stop="deleteDay(index)"><span class="material-icons-round">delete</span></button>
+                    </div>
+                    
+                    <div class="section-header">Services</div>
+                    <div v-if="!day.items?.length" class="subtitle" style="padding: 10px; text-align: center; font-style: italic;">No services added</div>
+                    <div v-for="item in day.items" :key="item.id" class="flex flex-between item-row" @click="editItem(item, day.id)">
+                        <div>
+                            <div style="font-weight: 500;">{{ item.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub);">Qty: {{ item.quantity }}</div>
+                        </div>
+                        <span class="bold">₹{{ formatCurrency(item.cost * item.quantity) }}</span>
+                    </div>
+                    
+                    <div class="section-header" style="margin-top: 15px;">Takers (Staff)</div>
+                    <div v-if="!day.takers?.length" class="subtitle" style="padding: 10px; text-align: center; font-style: italic;">No takers assigned</div>
+                    <div v-for="taker in day.takers" :key="taker.id" class="flex flex-between item-row" @click="editTaker(taker, day.id)">
+                        <span style="font-weight: 500;">{{ taker.name }}</span>
+                        <span :class="(taker.totalDue - taker.amountPaid) > 0 ? 'text-error' : 'text-green'" style="font-size: 0.85rem; font-weight: 600;">
+                            Due: ₹{{ formatCurrency(taker.totalDue - taker.amountPaid) }}
+                        </span>
+                    </div>
+
+                    <div class="flex" style="margin-top: 15px;">
+                        <button class="btn btn-outline" style="flex:1; padding: 10px;" @click="openModal('item', day.id)">+ Service</button>
+                        <button class="btn btn-outline" style="flex:1; padding: 10px;" @click="openModal('taker', day.id)">+ Taker</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="title" style="margin-bottom: 10px;">General / Extra</div>
+                    <div v-for="item in selectedEvent.eventItems" :key="item.id" class="flex flex-between item-row" @click="editItem(item, null)">
+                        <div>
+                            <div style="font-weight: 500;">{{ item.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub);">Qty: {{ item.quantity }}</div>
+                        </div>
+                        <span class="bold">₹{{ formatCurrency(item.cost * item.quantity) }}</span>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 15px;" @click="openModal('item', null)">+ Add General Service</button>
+                </div>
+
+                <button class="btn" style="margin-bottom: 20px;" @click="openModal('day')">Add Event Day</button>
+            </div>
+
+            <div v-if="view === 'takers'">
+                 <div v-if="groupedTakers.length === 0" style="text-align: center; padding: 40px; color: var(--text-sub);">No taker data yet.</div>
+                 <div v-for="group in groupedTakers" :key="group.name" class="card">
+                     <div class="flex flex-between">
+                         <div class="flex">
+                             <div style="background: #e0e7ff; color: var(--primary); padding: 8px; border-radius: 50%; display: flex;">
+                                 <span class="material-icons-round">person</span>
+                             </div>
+                             <span class="title">{{ group.name }}</span>
+                         </div>
+                         <a v-if="group.phone" :href="'tel:' + group.phone" class="btn-icon text-green"><span class="material-icons-round">call</span></a>
+                     </div>
+                     <div style="margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 10px;">
+                         <div v-for="d in group.details" class="item-row" style="font-size: 0.85rem;">
+                             <div class="bold">{{ d.eventTitle }}</div>
+                             <div class="subtitle">{{ d.dayTitle }}</div>
+                             <div class="flex flex-between" style="margin-top: 4px;">
+                                 <span class="text-error">Due: ₹{{ formatCurrency(d.due) }}</span>
+                                 <span class="text-green">Paid: ₹{{ formatCurrency(d.paid) }}</span>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="flex flex-between" style="background: #f9fafb; padding: 12px; margin: 10px -10px -10px -10px; border-radius: 0 0 12px 12px;">
+                         <span class="bold">Total Balance</span>
+                         <span class="price-tag" :class="group.balance > 0 ? 'text-error' : 'text-green'">₹{{ formatCurrency(group.balance) }}</span>
+                     </div>
+                 </div>
+            </div>
+
+            <div v-if="view === 'settings'">
+                <div class="card">
+                    <span class="title">Invoice Logo</span>
+                    <p class="subtitle">Upload your studio logo for the PDF.</p>
+                    <div class="flex flex-between" style="margin-top: 15px;">
+                        <img v-if="studioLogo" :src="studioLogo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border);">
+                        <div v-else class="subtitle">No logo selected</div>
+                        <div class="flex-col">
+                            <label class="btn btn-outline" style="padding: 8px 12px; font-size: 0.8rem; width: auto;">
+                                Upload <input type="file" accept="image/*" @change="handleLogoUpload" style="display: none;">
+                            </label>
+                            <button v-if="studioLogo" class="btn-icon text-error" @click="clearLogo" style="margin-top: 4px;"><span class="material-icons-round">delete</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="flex flex-between">
+                        <span class="title">Master Items</span>
+                        <button class="btn-icon text-green" @click="openModal('masterItem')"><span class="material-icons-round">add_circle</span></button>
+                    </div>
+                    <div v-for="item in masterItems" :key="item.id" class="flex flex-between item-row">
+                        <span>{{ item.name }}</span>
+                        <div class="flex">
+                            <span class="bold">₹{{ item.cost }}</span>
+                            <button class="btn-icon text-error" style="padding: 4px;" @click="deleteMaster('master_items', item.id)"><span class="material-icons-round" style="font-size: 18px;">close</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="flex flex-between">
+                        <span class="title">Master Takers</span>
+                        <button class="btn-icon text-green" @click="openModal('masterTaker')"><span class="material-icons-round">add_circle</span></button>
+                    </div>
+                    <div v-for="t in masterTakers" :key="t.id" class="flex flex-between item-row">
+                        <div class="flex-col">
+                            <span style="font-weight: 500;">{{ t.name }}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-sub);">{{ t.phone }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="text-error" style="font-size: 0.8rem;">Due: {{ t.defaultTotalDue }}</span>
+                            <button class="btn-icon text-error" style="padding: 4px;" @click="deleteMaster('master_takers', t.id)"><span class="material-icons-round" style="font-size: 18px;">close</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <div class="bottom-nav">
+            <div class="nav-item" :class="{ active: view === 'list' }" @click="view = 'list'">
+                <span class="material-icons-round">dashboard</span>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" :class="{ active: view === 'takers' }" @click="view = 'takers'">
+                <span class="material-icons-round">groups</span>
+                <span>Takers</span>
+            </div>
+            <div class="nav-item" :class="{ active: view === 'settings' }" @click="view = 'settings'">
+                <span class="material-icons-round">settings</span>
+                <span>Settings</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div v-if="activeModal" class="modal-overlay" @click.self="closeModal">
+        <div class="modal">
+            <div class="flex flex-between" style="margin-bottom: 20px;">
+                <span class="title" style="font-size: 1.2rem;">
+                    {{ activeModal === 'addEvent' ? 'New Event' : activeModal === 'item' ? 'Service / Item' : activeModal === 'payment' ? 'Add Payment' : 'Details' }}
+                </span>
+                <button class="btn-icon" @click="closeModal"><span class="material-icons-round">close</span></button>
+            </div>
+
+            <div v-if="activeModal === 'addEvent' || activeModal === 'editEvent'">
+                <label class="subtitle">Event Title</label><input v-model="forms.event.title" placeholder="e.g. Wedding Ceremony">
+                <label class="subtitle">Date</label><input v-model="forms.event.date" type="date">
+                <label class="subtitle">Customer Name</label><input v-model="forms.event.cName" placeholder="Full Name">
+                <label class="subtitle">Phone</label><input v-model="forms.event.cPhone" placeholder="Mobile Number" type="tel">
+                <button class="btn" style="margin-top: 20px;" @click="saveNewEvent">Save Event</button>
+            </div>
+
+            <div v-if="activeModal === 'item'">
+                <label class="subtitle">Select Service (Optional)</label>
+                <select v-if="!editingId" v-model="forms.item.name" @change="fillItemCost">
+                    <option value="" disabled>Choose from Master List</option>
+                    <option v-for="m in masterItems" :value="m.name">{{ m.name }} (₹{{ m.cost }})</option>
+                </select>
+                <label class="subtitle">Item Name</label><input v-model="forms.item.name" placeholder="Service Name">
+                <div class="flex">
+                    <div class="w-full"><label class="subtitle">Cost</label><input v-model="forms.item.cost" type="number"></div>
+                    <div class="w-full"><label class="subtitle">Qty</label><input v-model="forms.item.qty" type="number"></div>
+                </div>
+                <div class="flex gap-16" style="margin-top: 15px;">
+                    <button v-if="editingId" class="btn btn-danger" @click="deleteItem">Delete</button>
+                    <button class="btn" @click="saveItem">Save</button>
+                </div>
+            </div>
+
+            <div v-if="activeModal === 'payment'">
+                <label class="subtitle">Description</label><input v-model="forms.payment.title">
+                <label class="subtitle">Amount</label><input v-model="forms.payment.amount" type="number">
+                <label class="subtitle">Date</label><input v-model="forms.payment.date" type="date">
+                <div class="flex gap-16" style="margin-top: 15px;">
+                    <button v-if="editingId" class="btn btn-danger" @click="deletePayment">Delete</button>
+                    <button class="btn" @click="savePayment">Save Payment</button>
+                </div>
+            </div>
+
+            <div v-if="activeModal === 'day'">
+                <label class="subtitle">Day Title</label><input v-model="forms.day.title" placeholder="e.g. Reception">
+                <label class="subtitle">Date</label><input v-model="forms.day.date" type="date">
+                <button class="btn" style="margin-top: 20px;" @click="saveDay">Add Day</button>
+            </div>
+
+            <div v-if="activeModal === 'taker'">
+                <select v-if="!editingId" v-model="forms.taker.name" @change="fillTakerDefaults">
+                    <option value="" disabled>Select Staff</option>
+                    <option v-for="t in masterTakers" :value="t.name">{{ t.name }}</option>
+                </select>
+                <input v-model="forms.taker.name" placeholder="Name">
+                <div class="flex">
+                    <div class="w-full"><label class="subtitle">Total Due</label><input v-model="forms.taker.due" type="number"></div>
+                    <div class="w-full"><label class="subtitle">Paid</label><input v-model="forms.taker.paid" type="number"></div>
+                </div>
+                <div class="flex gap-16" style="margin-top: 15px;">
+                    <button v-if="editingId" class="btn btn-danger" @click="deleteTaker">Delete</button>
+                    <button class="btn" @click="saveTaker">Save</button>
+                </div>
+            </div>
+
+            <div v-if="activeModal === 'album'">
+                <input v-model="forms.album.name" placeholder="Album Name">
+                <div class="flex">
+                    <div class="w-full"><label class="subtitle">Sheets</label><input v-model="forms.album.sheets" type="number"></div>
+                    <div class="w-full"><label class="subtitle">Copies</label><input v-model="forms.album.qty" type="number"></div>
+                </div>
+                <div class="chip text-warn" style="margin: 10px 0; display: inline-block;">Est Cost: ₹{{ calcAlbumCost }}</div>
+                <button class="btn" @click="saveAlbum">Add Album</button>
+            </div>
+
+            <div v-if="activeModal === 'discount'">
+                <label class="subtitle">Discount Amount</label>
+                <input v-model="forms.discount" type="number" style="font-size: 1.5rem; text-align: center; color: var(--error);">
+                <button class="btn" style="margin-top: 15px;" @click="saveDiscount">Apply Discount</button>
+            </div>
+
+            <div v-if="activeModal === 'internalExpenses'">
+                <div v-for="(exp, idx) in selectedEvent.internalExpenses || []" class="flex flex-between item-row">
+                    <span>{{ exp.title }}</span>
+                    <span>₹{{ exp.amount }} <button class="btn-icon text-error" style="display:inline-flex; padding:0;" @click="deleteInternal(idx)"><span class="material-icons-round">close</span></button></span>
+                </div>
+                <hr style="margin: 20px 0;">
+                <label class="subtitle">New Expense</label>
+                <div class="flex">
+                    <input v-model="forms.internal.title" placeholder="Desc" class="w-full">
+                    <input v-model="forms.internal.amount" type="number" placeholder="Amt" class="w-full">
+                </div>
+                <button class="btn" style="margin-top: 10px;" @click="saveInternal">Add</button>
+            </div>
+
+            <div v-if="activeModal === 'masterItem' || activeModal === 'masterTaker'">
+                <div v-if="activeModal === 'masterItem'">
+                    <input v-model="forms.masterItem.name" placeholder="Item Name">
+                    <input v-model="forms.masterItem.cost" type="number" placeholder="Default Cost">
+                    <button class="btn" style="margin-top:15px;" @click="saveMasterItem">Add Master Item</button>
+                </div>
+                <div v-else>
+                    <input v-model="forms.masterTaker.name" placeholder="Staff Name">
+                    <input v-model="forms.masterTaker.phone" placeholder="Phone">
+                    <input v-model="forms.masterTaker.due" type="number" placeholder="Default Pay">
+                    <button class="btn" style="margin-top:15px;" @click="saveMasterTaker">Add Master Taker</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+    import { createApp, ref, computed, onMounted, reactive, onUnmounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 2. CONFIG
+    const firebaseConfig = {
+        apiKey: "AIzaSyDrtZ-LW_4OIfwvNcWkF4-SWovEbVXL59o",
+        authDomain: "supriyadigitalproducer-6eafe.firebaseapp.com",
+        projectId: "supriyadigitalproducer-6eafe",
+        storageBucket: "supriyadigitalproducer-6eafe.firebasestorage.app",
+        messagingSenderId: "112061913106",
+        appId: "1:112061913106:web:d293d1eed93f7c6ce4a0cb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    createApp({
+        setup() {
+            // STATE (DEFINED FIRST)
+            const hasSecret = ref(!!localStorage.getItem('producer_auth_secret'));
+            const isAuthenticated = ref(false), pinEntry = ref(''), view = ref('list'), loading = ref(true);
+            const events = ref([]), masterItems = ref([]), masterTakers = ref([]), selectedEvent = ref(null);
+            const albumSettings = ref({ baseCost: 10000, defaultSheets: 30, extraSheetCost: 250 });
+            const filters = reactive({ search: '', year: '', month: '' }), sortDesc = ref(true);
+            const activeModal = ref(null), activeDayId = ref(null), editingId = ref(null);
+            const forms = reactive({ event: { title:'', date:'', cName:'', cPhone:'' }, item: { name:'', cost:'', qty:1 }, payment: { title:'Advance', amount:'', date:'' }, day: { title:'', date:'' }, taker: { name:'', due:'', paid:'' }, album: { name:'', sheets:30, qty:1 }, discount: 0, internal: { title:'', amount:'' }, masterItem: { name:'', cost:'' }, masterTaker: { name:'', due:'', phone:'' } });
+            const studioLogo = ref(localStorage.getItem('studioLogo') || null);
+            const setupSecret = ref('');
+
+            // -- AUTH FUNCTIONS (DEFINED BEFORE USE) --
+            const pinMask = computed(() => '*'.repeat(pinEntry.value.length));
+            
+            const initSetup = () => {
+                const secret = new OTPAuth.Secret({ size: 20 });
+                setupSecret.value = secret.base32;
+                const totp = new OTPAuth.TOTP({ issuer: "SupriyaDigital", label: "ProducerApp", algorithm: "SHA1", digits: 6, period: 30, secret: secret });
+                setTimeout(() => { new QRious({ element: document.getElementById('qr-code'), value: totp.toString(), size: 200 }); }, 100);
+            };
+
+            const enterPin = (val) => { 
+                if(val === 'C') pinEntry.value = ''; 
+                else if(pinEntry.value.length < 6) pinEntry.value += val; 
+            };
+
+            const verifySetup = () => {
+                const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(setupSecret.value) });
+                if(totp.validate({ token: pinEntry.value, window: 1 }) !== null) {
+                    localStorage.setItem('producer_auth_secret', setupSecret.value);
+                    hasSecret.value = true; isAuthenticated.value = true; pinEntry.value = '';
+                } else { alert("Invalid Code"); pinEntry.value = ''; }
+            };
+
+            const verifyLogin = () => {
+                const secret = localStorage.getItem('producer_auth_secret');
+                const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(secret) });
+                if(totp.validate({ token: pinEntry.value, window: 1 }) !== null) {
+                    isAuthenticated.value = true; pinEntry.value = '';
+                } else { alert("Invalid Code"); pinEntry.value = ''; }
+            };
+
+            const unlockApp = () => hasSecret.value ? verifyLogin() : verifySetup();
+
+            const resetAuth = () => {
+                const code = prompt("Enter Master Reset Code:");
+                if (code === '9966') {
+                    localStorage.removeItem('producer_auth_secret');
+                    hasSecret.value = false;
+                    isAuthenticated.value = false;
+                    pinEntry.value = '';
+                    initSetup();
+                    alert("Authenticator Reset Successfully.");
+                } else {
+                    alert("Invalid Reset Code.");
+                }
+            };
+
+            const handleKey = (e) => { 
+                if(isAuthenticated.value) return; 
+                if(e.key >= '0' && e.key <= '9') enterPin(e.key); 
+                if(e.key === 'Backspace') enterPin('C'); 
+                if(e.key === 'Enter') unlockApp(); 
+            };
+
+            // LIFECYCLE
+            onMounted(() => {
+                if(!hasSecret.value) initSetup();
+                window.addEventListener('keydown', handleKey);
+                onSnapshot(query(collection(db, "events"), orderBy("id", "desc")), (snap) => { events.value = snap.docs.map(d => d.data()); loading.value = false; if(selectedEvent.value) selectedEvent.value = JSON.parse(JSON.stringify(events.value.find(e => e.id === selectedEvent.value.id))); });
+                onSnapshot(collection(db, "master_items"), (snap) => masterItems.value = snap.docs.map(d => d.data()));
+                onSnapshot(collection(db, "master_takers"), (snap) => masterTakers.value = snap.docs.map(d => d.data()));
+            });
+            onUnmounted(() => window.removeEventListener('keydown', handleKey));
+
+            // COMPUTED
+            const years = computed(() => [...new Set(events.value.map(e => (e.date || "").split('-')[2]).filter(Boolean))].sort().reverse());
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const filteredEvents = computed(() => {
+                let res = events.value.filter(e => ((e.title?.toLowerCase().includes(filters.search.toLowerCase())) || (e.customerName?.toLowerCase().includes(filters.search.toLowerCase()))) && (!filters.year || (e.date||"").split('-')[2] === filters.year) && (!filters.month || (e.date||"").split('-')[1] === filters.month));
+                return sortDesc.value ? res : res.reverse();
+            });
+            const totalCost = computed(() => { if(!selectedEvent.value) return 0; let sum = 0; (selectedEvent.value.eventItems||[]).forEach(i => sum += i.cost * i.quantity); (selectedEvent.value.days||[]).forEach(d => (d.items||[]).forEach(i => sum += i.cost * i.quantity)); return sum; });
+            const remainingBalance = computed(() => { if(!selectedEvent.value) return 0; return totalCost.value - (selectedEvent.value.discount||0) - (selectedEvent.value.payments||[]).reduce((a,b)=>a+b.amount,0); });
+            const totalInternalExpenses = computed(() => (selectedEvent.value?.internalExpenses || []).reduce((a,b)=>a+b.amount,0));
+            const calcAlbumCost = computed(() => (albumSettings.value.baseCost + (Math.max(0, forms.album.sheets - albumSettings.value.defaultSheets) * albumSettings.value.extraSheetCost)) * forms.album.qty);
+            const groupedTakers = computed(() => {
+                const groups = {}; events.value.forEach(evt => { (evt.days||[]).forEach(day => { (day.takers||[]).forEach(t => { if(!groups[t.name]) groups[t.name] = { name: t.name, phone: (masterTakers.value.find(mt => mt.name === t.name) || {}).defaultPhone || '', details: [], balance: 0 }; groups[t.name].details.push({ eventTitle: evt.title, dayTitle: day.title, due: t.totalDue, paid: t.amountPaid }); groups[t.name].balance += (t.totalDue - t.amountPaid); }); }); }); return Object.values(groups);
+            });
+            const viewTitle = computed(() => view.value === 'list' ? 'Dashboard' : view.value === 'settings' ? 'Settings' : view.value === 'takers' ? 'Takers Dashboard' : selectedEvent.value?.title || 'Event Details');
+            
+            // LOGIC
+            const formatCurrency = (val) => Number(val).toFixed(2);
+            const formatDate = (iso) => { if(!iso) return ""; const [y,m,d] = iso.split('-'); return `${d}-${m}-${y}`; };
+            const parseDate = (ddmmyyyy) => { if(!ddmmyyyy) return ""; const [d,m,y] = ddmmyyyy.split('-'); return `${y}-${m}-${d}`; };
+            const getBalance = (e) => { let c = (e.eventItems||[]).reduce((s,i)=>s+i.cost*i.quantity,0); (e.days||[]).forEach(d => c += (d.items||[]).reduce((s,i)=>s+i.cost*i.quantity,0)); return c - (e.discount||0) - (e.payments||[]).reduce((s,p)=>s+p.amount,0); };
+            const openModal = (type, dayId=null) => {
+                activeModal.value = type; activeDayId.value = dayId; editingId.value = null; const today = new Date().toISOString().split('T')[0];
+                if(type === 'addEvent') forms.event = { title:'', date:today, cName:'', cPhone:'' };
+                if(type === 'editEvent') forms.event = { title: selectedEvent.value.title, date: parseDate(selectedEvent.value.date), cName: selectedEvent.value.customerName, cPhone: selectedEvent.value.customerPhone };
+                if(type === 'item') forms.item = { name:'', cost:'', qty:1 }; if(type === 'payment') forms.payment = { title:'Advance', amount:'', date: today };
+                if(type === 'day') forms.day = { title:'', date: today }; if(type === 'taker') forms.taker = { name:'', due:'', paid:0 };
+                if(type === 'album') forms.album = { name:'', sheets: albumSettings.value.defaultSheets, qty:1 }; if(type === 'discount') forms.discount = selectedEvent.value.discount || 0;
+            };
+            const closeModal = () => activeModal.value = null;
+            const openEvent = (e) => { selectedEvent.value = JSON.parse(JSON.stringify(e)); view.value = 'detail'; };
+            const updateDB = async () => { await updateDoc(doc(db, "events", selectedEvent.value.id.toString()), selectedEvent.value); };
+            const handleLogoUpload = (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { studioLogo.value = e.target.result; localStorage.setItem('studioLogo', e.target.result); }; reader.readAsDataURL(file); } };
+            const clearLogo = () => { studioLogo.value = null; localStorage.removeItem('studioLogo'); };
+
+            // CRUD OPS
+            const saveNewEvent = async () => { if(activeModal.value === 'editEvent') { selectedEvent.value.title = forms.event.title; selectedEvent.value.date = formatDate(forms.event.date); selectedEvent.value.customerName = forms.event.cName; selectedEvent.value.customerPhone = forms.event.cPhone; await updateDB(); } else { const id = Date.now(); const evt = { id: id, title: forms.event.title, date: formatDate(forms.event.date), customerName: forms.event.cName, customerPhone: forms.event.cPhone, days:[], eventItems:[], payments:[], internalExpenses:[], discount:0, isConfirmed:false }; await setDoc(doc(db, "events", id.toString()), evt); } closeModal(); };
+            const deleteEvent = async () => { if(!confirm("Delete?")) return; await deleteDoc(doc(db, "events", selectedEvent.value.id.toString())); selectedEvent.value = null; view.value = 'list'; };
+            const saveItem = async () => { const item = { id: editingId.value || Date.now(), name: forms.item.name, cost: Number(forms.item.cost), quantity: Number(forms.item.qty) }; if(activeDayId.value) { const day = selectedEvent.value.days.find(d => d.id === activeDayId.value); if(editingId.value) day.items[day.items.findIndex(i => i.id === editingId.value)] = item; else { if(!day.items) day.items = []; day.items.push(item); } } else { if(editingId.value) selectedEvent.value.eventItems[selectedEvent.value.eventItems.findIndex(i => i.id === editingId.value)] = item; else { if(!selectedEvent.value.eventItems) selectedEvent.value.eventItems = []; selectedEvent.value.eventItems.push(item); } } await updateDB(); closeModal(); };
+            const editItem = (item, dayId) => { openModal('item', dayId); editingId.value = item.id; forms.item = { name: item.name, cost: item.cost, qty: item.quantity }; };
+            const deleteItem = async () => { if(!confirm("Delete?")) return; if(activeDayId.value) { const day = selectedEvent.value.days.find(d => d.id === activeDayId.value); day.items = day.items.filter(i => i.id !== editingId.value); } else selectedEvent.value.eventItems = selectedEvent.value.eventItems.filter(i => i.id !== editingId.value); await updateDB(); closeModal(); };
+            const savePayment = async () => { const pay = { id: editingId.value || Date.now(), title: forms.payment.title, amount: Number(forms.payment.amount), date: formatDate(forms.payment.date) }; if(editingId.value) selectedEvent.value.payments[selectedEvent.value.payments.findIndex(p => p.id === editingId.value)] = pay; else { if(!selectedEvent.value.payments) selectedEvent.value.payments = []; selectedEvent.value.payments.push(pay); if(pay.amount > 0) selectedEvent.value.isConfirmed = true; } await updateDB(); closeModal(); };
+            const editPayment = (p) => { openModal('payment'); editingId.value = p.id; forms.payment = { title: p.title, amount: p.amount, date: parseDate(p.date) }; };
+            const deletePayment = async () => { if(!confirm("Delete?")) return; selectedEvent.value.payments = selectedEvent.value.payments.filter(p => p.id !== editingId.value); await updateDB(); closeModal(); };
+            const saveDay = async () => { const d = { id: Date.now(), title: forms.day.title, date: formatDate(forms.day.date), items:[], takers:[] }; if(!selectedEvent.value.days) selectedEvent.value.days = []; selectedEvent.value.days.push(d); await updateDB(); closeModal(); };
+            const saveTaker = async () => { const t = { id: editingId.value || Date.now(), name: forms.taker.name, totalDue: Number(forms.taker.due), amountPaid: Number(forms.taker.paid) }; const day = selectedEvent.value.days.find(d => d.id === activeDayId.value); if(editingId.value) day.takers[day.takers.findIndex(tk => tk.id === editingId.value)] = t; else { if(!day.takers) day.takers = []; day.takers.push(t); } await updateDB(); closeModal(); };
+            const editTaker = (t, dayId) => { openModal('taker', dayId); editingId.value = t.id; forms.taker = { name: t.name, due: t.totalDue, paid: t.amountPaid }; };
+            const deleteTaker = async () => { if(!confirm("Remove?")) return; const day = selectedEvent.value.days.find(d => d.id === activeDayId.value); day.takers = day.takers.filter(t => t.id !== editingId.value); await updateDB(); closeModal(); };
+            const saveAlbum = async () => { const cost = calcAlbumCost.value / forms.album.qty; const item = { id: Date.now(), name: `${forms.album.name} (${forms.album.sheets} sheets)`, cost: cost, quantity: Number(forms.album.qty) }; if(!selectedEvent.value.eventItems) selectedEvent.value.eventItems = []; selectedEvent.value.eventItems.push(item); await updateDB(); closeModal(); };
+            const saveDiscount = async () => { selectedEvent.value.discount = Number(forms.discount); await updateDB(); closeModal(); };
+            const saveInternal = async () => { const exp = { id: Date.now(), title: forms.internal.title, amount: Number(forms.internal.amount), date: new Date().toLocaleDateString('en-GB') }; if(!selectedEvent.value.internalExpenses) selectedEvent.value.internalExpenses = []; selectedEvent.value.internalExpenses.push(exp); await updateDB(); closeModal(); };
+            const deleteInternal = async (idx) => { if(!confirm("Delete?")) return; selectedEvent.value.internalExpenses.splice(idx, 1); await updateDB(); };
+            const deleteDay = async (idx) => { if(!confirm("Delete?")) return; selectedEvent.value.days.splice(idx, 1); await updateDB(); };
+            const saveMasterItem = async () => { const id = Date.now(); await setDoc(doc(db, "master_items", id.toString()), { id: id, name: forms.masterItem.name, cost: Number(forms.masterItem.cost) }); closeModal(); };
+            const saveMasterTaker = async () => { const id = Date.now(); await setDoc(doc(db, "master_takers", id.toString()), { id: id, name: forms.masterTaker.name, defaultTotalDue: Number(forms.masterTaker.due), defaultPhone: forms.masterTaker.phone }); closeModal(); };
+            const deleteMaster = async (coll, id) => { if(confirm("Delete?")) await deleteDoc(doc(db, coll, id.toString())); };
+            const fillItemCost = () => { const m = masterItems.value.find(i => i.name === forms.item.name); if(m) forms.item.cost = m.cost; };
+            const fillTakerDefaults = () => { const t = masterTakers.value.find(tk => tk.name === forms.taker.name); if(t) forms.taker.due = t.defaultTotalDue; };
+
+            const generatePDF = (evt, isFinal) => {
+                if(!window.jspdf) { alert("PDF Lib loading..."); return; }
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const filePrefix = isFinal ? "Invoice" : "Estimate";
+                const titleText = isFinal ? "I N V O I C E" : "BILL ANALYSIS";
+
+                const drawPageBackground = (data) => {
+                    doc.rect(5, 5, 200, 287);
+                    if (studioLogo.value) {
+                        try {
+                            const imgW = 100; const imgH = 100;
+                            const x = (210 - imgW) / 2; const y = (297 - imgH) / 2;
+                            doc.saveGraphicsState();
+                            doc.setGState(new doc.GState({opacity: 0.1}));
+                            doc.addImage(studioLogo.value, 'JPEG', x, y, imgW, imgH);
+                            doc.restoreGraphicsState();
+                        } catch(e) { console.error("Logo error", e); }
+                    }
+                };
+
+                doc.setFontSize(24); doc.setFont("times", "bold"); doc.text("Supriya Digital Studio", 105, 30, null, null, "center");
+                doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("Photography & Videography", 105, 36, null, null, "center");
+                doc.setFont("helvetica", "bold"); doc.text("Phone: 9246789966", 195, 20, null, null, "right");
+                doc.setFontSize(16); doc.text(titleText, 105, 55, null, null, "center");
+
+                doc.setFontSize(10); doc.text("BILLED TO", 15, 70);
+                doc.setFont("helvetica", "bold"); doc.text(evt.customerName || "Customer", 15, 75);
+                doc.setFont("helvetica", "normal"); if(evt.customerPhone) doc.text("Ph: " + evt.customerPhone, 15, 80);
+
+                doc.setFont("helvetica", "bold"); doc.text(isFinal ? "INVOICE DETAILS" : "ESTIMATE DETAILS", 140, 70);
+                doc.setFont("helvetica", "normal"); doc.text("Date: " + new Date().toLocaleDateString('en-GB'), 140, 75);
+                doc.setFont("helvetica", "bold"); doc.text("Event: " + (evt.title || "Event"), 140, 80);
+
+                const rows = [];
+                (evt.days || []).forEach(day => { if(day.items && day.items.length > 0) { rows.push([{content: `Event: ${day.title} (${day.date})`, colSpan: 4, styles: {fontStyle: 'bold', fillColor: [240, 240, 240]}}]); day.items.forEach(item => rows.push([item.name, item.quantity, "Rs. " + formatCurrency(item.cost), "Rs. " + formatCurrency(item.cost * item.quantity)])); } });
+                if(evt.eventItems && evt.eventItems.length > 0) { rows.push([{content: "Other Services", colSpan: 4, styles: {fontStyle: 'bold', fillColor: [240, 240, 240]}}]); evt.eventItems.forEach(item => rows.push([item.name, item.quantity, "Rs. " + formatCurrency(item.cost), "Rs. " + formatCurrency(item.cost * item.quantity)])); }
+
+                doc.autoTable({ startY: 90, head: [['Description', 'Qty', 'Unit Cost', 'Total']], body: rows, theme: 'plain', styles: { fontSize: 10, cellPadding: 3 }, columnStyles: { 0: { cellWidth: 'auto' }, 1: { halign: 'center' }, 2: { halign: 'right' }, 3: { halign: 'right', fontStyle: 'bold' } }, headStyles: { fillColor: [240, 240, 240], textColor: 0, fontStyle: 'bold' }, didDrawPage: drawPageBackground });
+
+                let finalY = doc.lastAutoTable.finalY + 10;
+                const drawTotal = (label, val, bold=false) => { doc.setFont("helvetica", "normal"); doc.text(label, 150, finalY, null, null, "right"); doc.setFont("helvetica", bold ? "bold" : "normal"); doc.text(val, 195, finalY, null, null, "right"); finalY += 6; };
+                const paid = (evt.payments||[]).reduce((s,p)=>s+p.amount,0);
+                drawTotal("Sub Total", "Rs. " + formatCurrency(totalCost.value));
+                if(evt.discount > 0) drawTotal("Discount", "- Rs. " + formatCurrency(evt.discount));
+                (evt.payments || []).forEach(p => drawTotal(`Paid (${p.date})`, "- Rs. " + formatCurrency(p.amount)));
+                
+                doc.setLineWidth(0.5); doc.line(130, finalY, 195, finalY); finalY += 6;
+                const bal = totalCost.value - (evt.discount||0) - paid;
+                doc.setFontSize(12); doc.setTextColor(bal > 0 ? 200 : 0, bal > 0 ? 0 : 100, 0); drawTotal(isFinal ? "Balance Due" : "Est. Balance", "Rs. " + formatCurrency(bal), true);
+                
+                doc.setFontSize(8); doc.setTextColor(100); doc.text(isFinal ? "* This invoice confirms the booking." : "* This is an estimate only.", 15, 280);
+                
+                const safeName = (evt.customerName || "Customer").replace(/[^a-z0-9]/gi, '_');
+                const safeTitle = (evt.title || "Event").replace(/[^a-z0-9]/gi, '_');
+                doc.save(`${filePrefix}_${safeName}_${safeTitle}.pdf`);
+            };
+
+            return { isAuthenticated, pinEntry, pinMask, enterPin, unlockApp, events, view, selectedEvent, filters, filteredEvents, loading, masterItems, masterTakers, albumSettings, viewTitle, activeModal, openModal, closeModal, forms, toggleSort: () => sortDesc.value = !sortDesc.value, years, months, saveNewEvent, deleteEvent, saveItem, savePayment, saveDay, saveTaker, saveAlbum, saveDiscount, saveInternal, saveMasterItem, saveMasterTaker, deleteMaster, deleteDay, editItem, deleteItem, editPayment, deletePayment, editTaker, deleteTaker, deleteInternal, fillItemCost, fillTakerDefaults, calcAlbumCost, totalCost, remainingBalance, totalInternalExpenses, groupedTakers, formatCurrency, getBalance, generatePDF, openEvent, handleLogoUpload, clearLogo, studioLogo, hasSecret, verifySetup, verifyLogin, resetAuth };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
