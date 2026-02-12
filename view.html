@@ -11,10 +11,18 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
 
     <style>
-        :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; --selected-overlay: rgba(212, 175, 55, 0.4); }
         
-        /* --- 1. FULL SCREEN PREMIUM LOADER --- */
+        /* PROTECTION: Disable Selection & Right Click */
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; padding: 0; overflow-x: hidden;
+            user-select: none; -webkit-user-select: none;
+        }
+        img { pointer-events: none; } /* Prevents Drag and Drop */
+
+        /* LOADER */
         #main-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 9999;
@@ -25,99 +33,113 @@
             border-top: 5px solid var(--primary); border-radius: 50%;
             animation: spin 1s linear infinite; margin-bottom: 20px;
         }
-        .loading-text { font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 2px; color: var(--primary); }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- 2. HEADER & NAVIGATION --- */
-        .gallery-header { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #000; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+        /* HEADER */
+        .gallery-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #000; margin: 0; text-transform: uppercase; }
         .brand-title span { color: var(--primary); }
         
-        .btn-custom { border: 1px solid #ddd; color: #555; border-radius: 30px; padding: 8px 25px; font-size: 0.9rem; transition: all 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; }
-        .btn-custom:hover { background: var(--primary); border-color: var(--primary); color: #fff; text-decoration: none; transform: translateY(-2px); }
+        .btn-custom { border: 1px solid #ddd; color: #555; border-radius: 30px; padding: 6px 20px; font-size: 0.85rem; transition: all 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; margin-left: 10px; }
+        .btn-custom:hover, .btn-custom.active { background: var(--primary); border-color: var(--primary); color: #fff; text-decoration: none; transform: translateY(-2px); }
         
-        /* --- 3. GALLERY GRID --- */
-        .container-fluid { padding: 40px; }
-        .gallery-grid { column-count: 4; column-gap: 20px; opacity: 0; transition: opacity 0.8s ease-in-out; }
+        /* GRID */
+        .container-fluid { padding: 20px; padding-bottom: 100px; }
+        .gallery-grid { column-count: 4; column-gap: 15px; opacity: 0; transition: opacity 0.8s; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { .gallery-grid { column-count: 1; } .container-fluid { padding: 20px; } .gallery-header { padding: 15px 20px; } }
+        @media (max-width: 768px) { .gallery-grid { column-count: 2; padding: 10px; } .brand-title { font-size: 1.2rem; } }
+        @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
         
-        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s; background: #eee; }
-        .gallery-item:hover { transform: translateY(-5px); }
-        .gallery-item img { width: 100%; display: block; transition: opacity 0.3s; }
+        .gallery-item { 
+            break-inside: avoid; margin-bottom: 15px; position: relative; 
+            border-radius: 8px; overflow: hidden; cursor: pointer; 
+            background: #eee; transition: transform 0.2s; 
+        }
         
-        /* --- 4. LIGHTBOX MODAL --- */
+        /* Modern Lazy Loading */
+        .gallery-item img { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-in; }
+        .gallery-item img.loaded { opacity: 1; }
+
+        /* SELECTION STYLES */
+        .gallery-item.selected { transform: scale(0.95); box-shadow: 0 0 0 3px var(--primary); }
+        .gallery-item.selected::after {
+            content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900;
+            position: absolute; top: 10px; right: 10px;
+            background: var(--primary); color: #fff;
+            width: 25px; height: 25px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* FLOATING ACTION BAR */
+        #selection-bar {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px);
+            background: #222; color: #fff; padding: 12px 30px; border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 1050;
+            display: flex; align-items: center; gap: 15px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #selection-bar.visible { transform: translateX(-50%) translateY(0); }
+        .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 20px; border-radius: 20px; font-weight: 600; cursor: pointer; }
+
+        /* LIGHTBOX */
         .modal-content { background-color: rgba(0,0,0,0.95); border: none; height: 100vh; }
-        .modal-body { padding: 0; position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        
-        /* Control Bar */
-        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: flex-end; align-items: center; z-index: 1060; }
-        .lb-icon { font-size: 1.8rem; color: #fff; cursor: pointer; opacity: 0.7; transition: 0.3s; margin-left: 30px; }
-        .lb-icon:hover { opacity: 1; color: var(--primary); transform: scale(1.1); }
-        
-        #lightboxImage { max-height: 85vh; max-width: 90vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
-        
-        /* Dropdown Menu */
-        .dropdown-menu-dark { background-color: #222; border: 1px solid #444; margin-top: 10px; }
-        .dropdown-menu-dark .dropdown-item { color: #eee; font-size: 0.9rem; padding: 12px 20px; border-bottom: 1px solid #333; }
-        .dropdown-menu-dark .dropdown-item:hover { background-color: var(--primary); color: #fff; }
-
-        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2.5rem; color: rgba(255,255,255,0.7); cursor: pointer; z-index: 1060; padding: 20px; transition: 0.3s; }
+        .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; display: flex; justify-content: flex-end; z-index: 1060; }
+        .lb-icon { font-size: 1.5rem; color: #fff; cursor: pointer; margin-left: 20px; opacity: 0.8; }
+        .lb-icon:hover { color: var(--primary); opacity: 1; }
+        #lightboxImage { max-height: 85vh; max-width: 90vw; object-fit: contain; }
+        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2rem; color: rgba(255,255,255,0.5); cursor: pointer; padding: 20px; }
         .lb-control:hover { color: var(--primary); }
-        .lb-prev { left: 20px; }
-        .lb-next { right: 20px; }
-        .lb-caption { position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; color: #fff; font-size: 1.1rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-
+        .lb-prev { left: 10px; } .lb-next { right: 10px; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div id="main-loader">
         <div class="spinner"></div>
-        <div class="loading-text">SUPRIYA DIGITALS</div>
-        <p class="text-muted mt-2">Preparing your gallery...</p>
+        <p class="text-muted" style="letter-spacing: 2px;">LOADING GALLERY</p>
     </div>
 
     <div class="gallery-header">
-        <a href="index.html" class="btn-custom"><i class="fas fa-arrow-left mr-2"></i> Back to Home</a>
-        <h1 class="brand-title"><span>Supriya</span> Studio</h1>
+        <div class="d-flex align-items-center">
+            <a href="index.html" class="text-dark mr-3"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="brand-title d-none d-md-block"><span>Supriya</span> Studio</h1>
+        </div>
         
-        <button class="btn-custom" onclick="downloadAllImages()">
-            <i class="fas fa-file-archive mr-2 text-warning"></i> Download All (.ZIP)
-        </button>
+        <div>
+            <button class="btn-custom d-none" id="btnSelectMode" onclick="toggleSelectMode()">
+                <i class="fas fa-check-circle mr-2"></i> Select
+            </button>
+        </div>
     </div>
 
     <div class="container-fluid">
         <div id="gallery" class="gallery-grid"></div>
     </div>
 
-    <div class="modal fade" id="lightboxModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div id="selection-bar">
+        <span class="selection-count font-weight-bold">0 Selected</span>
+        <button class="btn-download-batch" onclick="downloadSelectedBatch()">
+            <i class="fas fa-download mr-2"></i> Download
+        </button>
+        <button class="btn btn-sm btn-outline-light rounded-circle" onclick="clearSelection()" title="Clear">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
         <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
             <div class="modal-content">
                 <div class="modal-body">
-                    
                     <div class="lb-header">
-                        <div class="dropdown">
-                            <span class="lb-icon" data-toggle="dropdown" title="Download Image">
-                                <i class="fas fa-download"></i>
-                            </span>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
-                                <a class="dropdown-item" href="javascript:void(0)" onclick="downloadImage('normal')">
-                                    <i class="fas fa-bolt mr-2 text-warning"></i> Normal Quality (Instant)
-                                </a>
-                                <a class="dropdown-item" href="javascript:void(0)" onclick="downloadImage('high')">
-                                    <i class="fas fa-star mr-2 text-primary"></i> High Quality (Original)
-                                </a>
-                            </div>
-                        </div>
-                        <span class="lb-icon" data-dismiss="modal" title="Close"><i class="fas fa-times"></i></span>
+                        <span class="lb-icon lb-download-btn d-none" onclick="downloadSingleImage()">
+                            <i class="fas fa-download"></i>
+                        </span>
+                        <span class="lb-icon" data-dismiss="modal"><i class="fas fa-times"></i></span>
                     </div>
-
                     <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
-                    <img id="lightboxImage" src="" alt="Gallery Image">
+                    <img id="lightboxImage" src="" alt="Gallery">
                     <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
-                    
-                    <div id="lightboxCaption" class="lb-caption"></div>
                 </div>
             </div>
         </div>
@@ -127,95 +149,125 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/";
+        // CONFIGURATION
+        // REPLACE THIS with your actual Tunnel URL
+        const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/"; 
         const params = new URLSearchParams(window.location.search);
         
         let galleryData = []; 
-        let currentIndex = 0; 
-        let uniqueFilenames = [];
+        let selectedFiles = new Set();
+        let isSelectMode = false;
+        let currentIndex = 0;
+        let canDownload = false; // Default blocked
 
-        // --- 1. THE INITIALIZER (2 Requests Total) ---
+        // --- 1. INITIALIZATION ---
         async function initializeGallery() {
             try {
-                // Fetch text metadata
                 let url = `${API_BASE}fetch.php?mode=shared`;
                 if(params.get('batch_id')) url += `&batch_id=${params.get('batch_id')}`;
                 if(params.get('id')) url += `&id=${params.get('id')}`;
 
-                const textRes = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } });
-                const textData = await textRes.json();
+                const response = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } });
+                const result = await response.json();
 
-                if (!textData.success || textData.data.length === 0) {
-                    $('#main-loader').html('<h3 class="text-danger">Invalid Gallery Link</h3>');
+                if (!result.success || result.data.length === 0) {
+                    $('#main-loader').html('<h4 class="text-danger">Gallery Not Found</h4>');
                     return;
                 }
 
-                galleryData = textData.data;
-                const filenames = galleryData.map(item => item.clean_name || item.file_path.split('/').pop());
-                uniqueFilenames = [...new Set(filenames)];
+                galleryData = result.data;
+                
+                // PERMISSION CHECK
+                // If any photo allows download, we enable the UI
+                canDownload = galleryData.some(item => item.can_download == 1);
+                
+                if (canDownload) {
+                    $('#btnSelectMode').removeClass('d-none');
+                }
 
-                // Fetch ALL images in ONE single batch
-                const imgRes = await fetch(`${API_BASE}batch_proxy.php`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420" },
-                    body: JSON.stringify({ files: uniqueFilenames })
-                });
-                const imgData = await imgRes.json();
-
-                // Prepare and render HTML
-                let html = '';
-                galleryData.forEach((item, index) => {
-                    const fname = item.clean_name || item.file_path.split('/').pop();
-                    const b64Data = imgData.images[fname] || ""; 
-                    
-                    // Store for instant viewing/normal download
-                    galleryData[index].secureBlob = b64Data; 
-                    galleryData[index].filename = fname;
-
-                    html += `
-                        <div class="gallery-item" onclick="openLightbox(${index})">
-                            <img src="${b64Data}" alt="${item.title || 'Photo'}">
-                        </div>
-                    `;
-                });
-
-                document.getElementById('gallery').innerHTML = html;
-
-                // Reveal page
-                $('#main-loader').fadeOut(600, function() {
-                    $('#gallery').css('opacity', 1);
-                });
+                renderGallery();
+                $('#main-loader').fadeOut(500, () => $('#gallery').css('opacity', 1));
 
             } catch (e) {
                 console.error(e);
-                $('#main-loader').html('<h3 class="text-danger">Connection Error. Please refresh.</h3>');
+                $('#main-loader').html('<h4 class="text-danger">Connection Error</h4>');
             }
         }
 
-        // --- 2. THE DUAL-DOWNLOAD SYSTEM ---
-        function downloadImage(quality) {
-            const currentItem = galleryData[currentIndex];
-            if (!currentItem || !currentItem.filename) return;
+        // --- 2. RENDER (Using Image Proxy) ---
+        function renderGallery() {
+            let html = '';
+            galleryData.forEach((item, index) => {
+                const fname = item.clean_name || item.file_path.split('/').pop();
+                const imgUrl = `${API_BASE}image_proxy.php?f=${fname}`;
+                
+                galleryData[index].fullUrl = imgUrl; 
+                galleryData[index].filename = fname;
 
-            if (quality === 'normal') {
-                // Zero Request Download (Uses browser memory)
-                const link = document.createElement('a');
-                link.href = currentItem.secureBlob;
-                link.download = "Supriya_" + currentItem.filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                html += `
+                    <div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})">
+                        <img src="${imgUrl}" loading="lazy" onload="this.classList.add('loaded')" alt="Photo">
+                    </div>`;
+            });
+            document.getElementById('gallery').innerHTML = html;
+        }
+
+        // --- 3. INTERACTION ---
+        function toggleSelectMode() {
+            isSelectMode = !isSelectMode;
+            $('#btnSelectMode').toggleClass('active');
+            
+            if(!isSelectMode && selectedFiles.size > 0) {
+                if(confirm("Exit selection mode? This will clear your selection.")) {
+                    clearSelection();
+                } else {
+                    isSelectMode = true; 
+                    $('#btnSelectMode').addClass('active');
+                }
+            }
+        }
+
+        function handleItemClick(index) {
+            if (isSelectMode) {
+                toggleSelection(index);
             } else {
-                // HQ Original Download (Uses download.php GET)
-                window.location.href = `${API_BASE}download.php?f=${currentItem.filename}`;
+                openLightbox(index);
             }
         }
 
-        // --- 3. GROUP DOWNLOAD (ZIP) ---
-        function downloadAllImages() {
-            if (uniqueFilenames.length === 0) return;
+        function toggleSelection(index) {
+            const item = galleryData[index];
+            const $el = $(`#item-${index}`);
+            
+            if (selectedFiles.has(item.filename)) {
+                selectedFiles.delete(item.filename);
+                $el.removeClass('selected');
+            } else {
+                selectedFiles.add(item.filename);
+                $el.addClass('selected');
+            }
+            updateFloatingBar();
+        }
 
-            // Using the combined download.php via POST for ZIP
+        function clearSelection() {
+            selectedFiles.clear();
+            $('.gallery-item').removeClass('selected');
+            updateFloatingBar();
+            isSelectMode = false;
+            $('#btnSelectMode').removeClass('active');
+        }
+
+        function updateFloatingBar() {
+            const count = selectedFiles.size;
+            $('.selection-count').text(count + " Selected");
+            if (count > 0) $('#selection-bar').addClass('visible');
+            else $('#selection-bar').removeClass('visible');
+        }
+
+        // --- 4. DOWNLOAD LOGIC ---
+        function downloadSelectedBatch() {
+            if (selectedFiles.size === 0) return;
+            
             const form = document.createElement("form");
             form.method = "POST";
             form.action = `${API_BASE}download.php`;
@@ -223,7 +275,7 @@
             const input = document.createElement("input");
             input.type = "hidden";
             input.name = "files";
-            input.value = JSON.stringify(uniqueFilenames);
+            input.value = JSON.stringify(Array.from(selectedFiles));
 
             form.appendChild(input);
             document.body.appendChild(form);
@@ -231,7 +283,14 @@
             document.body.removeChild(form);
         }
 
-        // --- 4. LIGHTBOX NAVIGATION ---
+        function downloadSingleImage() {
+            const item = galleryData[currentIndex];
+            if(item.can_download == 1) {
+                window.location.href = `${API_BASE}download.php?f=${item.filename}`;
+            }
+        }
+
+        // --- 5. LIGHTBOX ---
         function openLightbox(index) {
             currentIndex = index;
             updateLightbox();
@@ -240,27 +299,27 @@
 
         function updateLightbox() {
             const item = galleryData[currentIndex];
-            document.getElementById('lightboxImage').src = item.secureBlob;
-            document.getElementById('lightboxCaption').innerText = item.title_from_filename || item.title || 'Supriya Digitals Photo';
+            $('#lightboxImage').attr('src', item.fullUrl);
+            
+            // Show/Hide Download Button based on permission
+            if (item.can_download == 1) $('.lb-download-btn').removeClass('d-none');
+            else $('.lb-download-btn').addClass('d-none');
         }
 
-        function changeImage(direction) {
-            currentIndex += direction;
+        function changeImage(dir) {
+            currentIndex += dir;
             if (currentIndex >= galleryData.length) currentIndex = 0;
             if (currentIndex < 0) currentIndex = galleryData.length - 1;
             updateLightbox();
         }
 
-        // Hotkeys
-        document.addEventListener('keydown', function(event) {
+        document.addEventListener('keydown', (e) => {
             if ($('#lightboxModal').is(':visible')) {
-                if (event.key === "ArrowLeft") changeImage(-1);
-                if (event.key === "ArrowRight") changeImage(1);
-                if (event.key === "Escape") $('#lightboxModal').modal('hide');
+                if (e.key === "ArrowLeft") changeImage(-1);
+                if (e.key === "ArrowRight") changeImage(1);
             }
         });
 
-        // Bootstrap the app
         initializeGallery();
     </script>
 </body>
