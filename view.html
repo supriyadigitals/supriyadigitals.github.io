@@ -11,16 +11,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
 
     <style>
-        :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; --selected-overlay: rgba(212, 175, 55, 0.4); }
+        :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
         
-        /* PROTECTION: Disable Selection & Right Click */
+        /* CORE SETTINGS */
         body { 
             background-color: var(--bg); color: var(--text); 
             font-family: 'Montserrat', sans-serif; 
             margin: 0; padding: 0; overflow-x: hidden;
-            user-select: none; -webkit-user-select: none;
+            user-select: none; -webkit-user-select: none; /* Privacy */
         }
-        img { pointer-events: none; } /* Prevents Drag and Drop */
+        img { pointer-events: none; } 
 
         /* LOADER */
         #main-loader {
@@ -29,75 +29,101 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .spinner {
-            width: 50px; height: 50px; border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary); border-radius: 50%;
+            width: 50px; height: 50px; border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary); border-radius: 50%;
             animation: spin 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* HEADER */
-        .gallery-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #000; margin: 0; text-transform: uppercase; }
+        .gallery-header { 
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; 
+            background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+            position: sticky; top: 0; z-index: 100; 
+        }
+        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
         .brand-title span { color: var(--primary); }
         
-        .btn-custom { border: 1px solid #ddd; color: #555; border-radius: 30px; padding: 6px 20px; font-size: 0.85rem; transition: all 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; margin-left: 10px; }
-        .btn-custom:hover, .btn-custom.active { background: var(--primary); border-color: var(--primary); color: #fff; text-decoration: none; transform: translateY(-2px); }
+        .btn-header { 
+            border: 1px solid #eee; color: #555; border-radius: 50px; 
+            padding: 8px 20px; font-size: 0.85rem; transition: 0.3s; 
+            background: #fff; cursor: pointer; display: inline-flex; align-items: center; 
+            margin-left: 10px; font-weight: 600;
+        }
+        .btn-header:hover, .btn-header.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+        /* GALLERY GRID */
+        .container-fluid { padding: 30px; padding-bottom: 120px; }
+        .gallery-grid { column-count: 4; column-gap: 20px; }
         
-        /* GRID */
-        .container-fluid { padding: 20px; padding-bottom: 100px; }
-        .gallery-grid { column-count: 4; column-gap: 15px; opacity: 0; transition: opacity 0.8s; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { .gallery-grid { column-count: 2; padding: 10px; } .brand-title { font-size: 1.2rem; } }
+        @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } }
         @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
         
         .gallery-item { 
-            break-inside: avoid; margin-bottom: 15px; position: relative; 
+            break-inside: avoid; margin-bottom: 20px; position: relative; 
             border-radius: 8px; overflow: hidden; cursor: pointer; 
-            background: #eee; transition: transform 0.2s; 
+            background: #f0f0f0; transition: transform 0.2s; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
-        
-        /* Modern Lazy Loading */
-        .gallery-item img { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-in; }
+        .gallery-item img { width: 100%; display: block; opacity: 0; transition: opacity 0.4s ease-in; }
         .gallery-item img.loaded { opacity: 1; }
 
-        /* SELECTION STYLES */
-        .gallery-item.selected { transform: scale(0.95); box-shadow: 0 0 0 3px var(--primary); }
+        /* SELECTION MODE */
+        .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
         .gallery-item.selected::after {
             content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900;
             position: absolute; top: 10px; right: 10px;
             background: var(--primary); color: #fff;
-            width: 25px; height: 25px; border-radius: 50%;
+            width: 28px; height: 28px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         /* FLOATING ACTION BAR */
         #selection-bar {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px);
             background: #222; color: #fff; padding: 12px 30px; border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 1050;
-            display: flex; align-items: center; gap: 15px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050;
+            display: flex; align-items: center; gap: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #selection-bar.visible { transform: translateX(-50%) translateY(0); }
-        .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 20px; border-radius: 20px; font-weight: 600; cursor: pointer; }
+        .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
 
         /* LIGHTBOX */
-        .modal-content { background-color: rgba(0,0,0,0.95); border: none; height: 100vh; }
+        .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; }
         .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; display: flex; justify-content: flex-end; z-index: 1060; }
-        .lb-icon { font-size: 1.5rem; color: #fff; cursor: pointer; margin-left: 20px; opacity: 0.8; }
-        .lb-icon:hover { color: var(--primary); opacity: 1; }
-        #lightboxImage { max-height: 85vh; max-width: 90vw; object-fit: contain; }
-        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2rem; color: rgba(255,255,255,0.5); cursor: pointer; padding: 20px; }
-        .lb-control:hover { color: var(--primary); }
-        .lb-prev { left: 10px; } .lb-next { right: 10px; }
+        
+        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; }
+        .lb-title { color: #fff; font-size: 1.1rem; opacity: 0.8; }
+        .lb-actions { display: flex; align-items: center; }
+        
+        .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
+        .lb-icon:hover { opacity: 1; color: var(--primary); }
+        
+        #lightboxImage { max-height: 90vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        
+        /* NAVIGATION ARROWS */
+        .lb-control { 
+            position: absolute; top: 50%; transform: translateY(-50%); 
+            width: 50px; height: 50px; background: rgba(255,255,255,0.1); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #fff; cursor: pointer; transition: 0.3s; 
+        }
+        .lb-control:hover { background: var(--primary); }
+        .lb-prev { left: 20px; } .lb-next { right: 20px; }
+
+        /* DROPDOWN MENU */
+        .dropdown-menu-dark { background: #222; border: 1px solid #444; }
+        .dropdown-item { color: #eee; padding: 10px 20px; border-bottom: 1px solid #333; }
+        .dropdown-item:last-child { border: 0; }
+        .dropdown-item:hover { background: var(--primary); color: #fff; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div id="main-loader">
         <div class="spinner"></div>
-        <p class="text-muted" style="letter-spacing: 2px;">LOADING GALLERY</p>
+        <p class="text-muted small font-weight-bold">LOADING GALLERY</p>
     </div>
 
     <div class="gallery-header">
@@ -107,8 +133,12 @@
         </div>
         
         <div>
-            <button class="btn-custom d-none" id="btnSelectMode" onclick="toggleSelectMode()">
-                <i class="fas fa-check-circle mr-2"></i> Select
+            <button class="btn-header" id="btnSelectMode" onclick="toggleSelectMode()">
+                <i class="far fa-check-circle mr-2"></i> Select
+            </button>
+            
+            <button class="btn-header download-ui d-none" onclick="downloadAllImages()">
+                <i class="fas fa-download mr-2"></i> All
             </button>
         </div>
     </div>
@@ -118,11 +148,11 @@
     </div>
 
     <div id="selection-bar">
-        <span class="selection-count font-weight-bold">0 Selected</span>
-        <button class="btn-download-batch" onclick="downloadSelectedBatch()">
-            <i class="fas fa-download mr-2"></i> Download
+        <span class="selection-count text-white font-weight-bold">0 Selected</span>
+        <button class="btn-download-batch download-ui d-none" onclick="downloadSelectedBatch()">
+            <i class="fas fa-cloud-download-alt mr-2"></i> Download
         </button>
-        <button class="btn btn-sm btn-outline-light rounded-circle" onclick="clearSelection()" title="Clear">
+        <button class="btn btn-sm btn-outline-light rounded-circle border-0" onclick="clearSelection()" title="Clear">
             <i class="fas fa-times"></i>
         </button>
     </div>
@@ -131,15 +161,32 @@
         <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
             <div class="modal-content">
                 <div class="modal-body">
+                    
                     <div class="lb-header">
-                        <span class="lb-icon lb-download-btn d-none" onclick="downloadSingleImage()">
-                            <i class="fas fa-download"></i>
-                        </span>
-                        <span class="lb-icon" data-dismiss="modal"><i class="fas fa-times"></i></span>
+                        <div class="lb-title" id="lbFileName">image.jpg</div>
+                        <div class="lb-actions">
+                            <div class="dropdown download-ui d-none">
+                                <span class="lb-icon" data-toggle="dropdown">
+                                    <i class="fas fa-download"></i>
+                                </span>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
+                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('normal')">
+                                        <i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Viewer)
+                                    </a>
+                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full')">
+                                        <i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <span class="lb-icon" data-dismiss="modal"><i class="fas fa-times"></i></span>
+                        </div>
                     </div>
+
                     <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
                     <img id="lightboxImage" src="" alt="Gallery">
                     <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
+
                 </div>
             </div>
         </div>
@@ -149,8 +196,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // CONFIGURATION
-        // REPLACE THIS with your actual Tunnel URL
         const API_BASE = "https://pseudoascetical-pilose-bennett.ngrok-free.dev/supriya_studio/api/"; 
         const params = new URLSearchParams(window.location.search);
         
@@ -158,9 +203,8 @@
         let selectedFiles = new Set();
         let isSelectMode = false;
         let currentIndex = 0;
-        let canDownload = false; // Default blocked
+        let canDownload = false;
 
-        // --- 1. INITIALIZATION ---
         async function initializeGallery() {
             try {
                 let url = `${API_BASE}fetch.php?mode=shared`;
@@ -176,25 +220,22 @@
                 }
 
                 galleryData = result.data;
-                
-                // PERMISSION CHECK
-                // If any photo allows download, we enable the UI
+                // Check if AT LEAST ONE photo allows download
                 canDownload = galleryData.some(item => item.can_download == 1);
                 
                 if (canDownload) {
-                    $('#btnSelectMode').removeClass('d-none');
+                    $('.download-ui').removeClass('d-none');
                 }
 
                 renderGallery();
-                $('#main-loader').fadeOut(500, () => $('#gallery').css('opacity', 1));
+                $('#main-loader').fadeOut(500);
 
             } catch (e) {
                 console.error(e);
-                $('#main-loader').html('<h4 class="text-danger">Connection Error</h4>');
+                $('#main-loader').html('<h4 class="text-danger">Network Error</h4>');
             }
         }
 
-        // --- 2. RENDER (Using Image Proxy) ---
         function renderGallery() {
             let html = '';
             galleryData.forEach((item, index) => {
@@ -212,27 +253,16 @@
             document.getElementById('gallery').innerHTML = html;
         }
 
-        // --- 3. INTERACTION ---
+        // --- INTERACTION ---
         function toggleSelectMode() {
             isSelectMode = !isSelectMode;
             $('#btnSelectMode').toggleClass('active');
-            
-            if(!isSelectMode && selectedFiles.size > 0) {
-                if(confirm("Exit selection mode? This will clear your selection.")) {
-                    clearSelection();
-                } else {
-                    isSelectMode = true; 
-                    $('#btnSelectMode').addClass('active');
-                }
-            }
+            if(!isSelectMode) clearSelection();
         }
 
         function handleItemClick(index) {
-            if (isSelectMode) {
-                toggleSelection(index);
-            } else {
-                openLightbox(index);
-            }
+            if (isSelectMode) toggleSelection(index);
+            else openLightbox(index);
         }
 
         function toggleSelection(index) {
@@ -253,8 +283,6 @@
             selectedFiles.clear();
             $('.gallery-item').removeClass('selected');
             updateFloatingBar();
-            isSelectMode = false;
-            $('#btnSelectMode').removeClass('active');
         }
 
         function updateFloatingBar() {
@@ -264,33 +292,53 @@
             else $('#selection-bar').removeClass('visible');
         }
 
-        // --- 4. DOWNLOAD LOGIC ---
+        // --- DOWNLOAD LOGIC (RESTORED FEATURES) ---
+        function downloadAllImages() {
+            if(!canDownload) return alert("Download not allowed.");
+            if(!confirm(`Download all ${galleryData.length} images? This might take a moment.`)) return;
+            
+            const allFiles = galleryData.map(i => i.filename);
+            postDownload(allFiles);
+        }
+
         function downloadSelectedBatch() {
             if (selectedFiles.size === 0) return;
-            
+            postDownload(Array.from(selectedFiles));
+        }
+
+        function postDownload(filesArray) {
             const form = document.createElement("form");
             form.method = "POST";
             form.action = `${API_BASE}download.php`;
-
             const input = document.createElement("input");
             input.type = "hidden";
             input.name = "files";
-            input.value = JSON.stringify(Array.from(selectedFiles));
-
+            input.value = JSON.stringify(filesArray);
             form.appendChild(input);
             document.body.appendChild(form);
             form.submit();
             document.body.removeChild(form);
         }
 
-        function downloadSingleImage() {
+        function downloadSingleImage(type) {
             const item = galleryData[currentIndex];
-            if(item.can_download == 1) {
+            if(item.can_download != 1) return;
+
+            if (type === 'normal') {
+                // Fast Browser Download
+                const link = document.createElement('a');
+                link.href = item.fullUrl;
+                link.download = item.filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                // Forced Server Download (Full Quality)
                 window.location.href = `${API_BASE}download.php?f=${item.filename}`;
             }
         }
 
-        // --- 5. LIGHTBOX ---
+        // --- LIGHTBOX ---
         function openLightbox(index) {
             currentIndex = index;
             updateLightbox();
@@ -300,10 +348,11 @@
         function updateLightbox() {
             const item = galleryData[currentIndex];
             $('#lightboxImage').attr('src', item.fullUrl);
+            $('#lbFileName').text(item.title_from_filename || `Image ${currentIndex + 1}`);
             
-            // Show/Hide Download Button based on permission
-            if (item.can_download == 1) $('.lb-download-btn').removeClass('d-none');
-            else $('.lb-download-btn').addClass('d-none');
+            // Show/Hide download UI based on specific item permission
+            if (item.can_download == 1) $('.download-ui').removeClass('d-none');
+            else $('.download-ui').addClass('d-none');
         }
 
         function changeImage(dir) {
