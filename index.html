@@ -15,8 +15,6 @@
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" rel="stylesheet">
 
     <style>
         /* --- 1. GLOBAL VARIABLES & RESET --- */
@@ -26,7 +24,7 @@
             --dark: #1a1a1a;
             --light: #f8f9fa;
             --text-gray: #666;
-            --glass: rgba(26, 26, 26, 0.85);
+            --glass: rgba(26, 26, 26, 0.95);
         }
 
         body {
@@ -152,67 +150,52 @@
 
         /* --- 5. GRID SYSTEMS & SKELETON LOADER --- */
         
-        /* Skeleton Loading Animation */
+        /* Skeleton Animation */
         .image-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background: #eee;
+            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+            border-radius: 8px;
             background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            position: relative;
-            height: 250px; /* Match image height */
+            animation: 1.5s shine linear infinite;
+            min-height: 250px; 
             width: 100%;
+        }
+
+        @keyframes shine {
+            to { background-position-x: -200%; }
+        }
+
+        /* Gallery Item Card */
+        .gallery-card {
+            border: none;
             border-radius: 8px;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .image-skeleton::after {
-            content: "\f110"; /* FontAwesome Spinner */
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2rem;
-            color: var(--primary);
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .gallery-grid {
-            column-count: 3;
-            column-gap: 20px;
-        }
-
-        .gallery-item {
-            break-inside: avoid;
-            margin-bottom: 20px;
-            position: relative;
             overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            cursor: pointer;
-            background: #000;
-            display: inline-block;
-            width: 100%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+            background: #fff;
         }
 
-        .gallery-item img {
+        .gallery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        /* The Image itself */
+        .gallery-img {
             width: 100%;
-            height: 250px !important;
+            height: 250px; /* Fixed height for perfect grid */
+            object-fit: cover; /* Prevents stretching */
             display: block;
-            transition: transform 0.5s ease;
-            object-fit: cover;
+            opacity: 0; /* Hidden until loaded */
+            transition: opacity 0.5s ease;
         }
 
-        .gallery-item:hover img {
-            transform: scale(1.05);
+        .gallery-img.loaded {
+            opacity: 1;
         }
 
-        .video-item {
+        .video-container {
             position: relative;
             padding-bottom: 56.25%; 
             height: 0;
@@ -221,7 +204,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             background: #000;
         }
-        .video-item iframe {
+        .video-container iframe {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%; border: 0;
         }
@@ -243,7 +226,7 @@
         .stats-box h2 { font-size: 2.5rem; color: var(--primary); margin: 0; }
         
         /* --- 7. PAGINATION --- */
-        .pagination { margin-top: 40px; }
+        .pagination { margin-top: 20px; }
         .page-link {
             color: var(--dark);
             border: none;
@@ -279,10 +262,10 @@
 
         /* --- 9. MOBILE RESPONSIVE FIXES --- */
         @media (max-width: 768px) {
-            .container { padding-left: 25px; padding-right: 25px; }
+            .container { padding-left: 20px; padding-right: 20px; }
             .section-padding { padding: 50px 0; }
             h1 { font-size: 2rem !important; }
-            .display-4 { font-size: 2.2rem; }
+            .display-3 { font-size: 2.2rem; }
             .carousel-caption h1 { font-size: 2rem; }
             .about-img { margin-bottom: 40px; box-shadow: 10px 10px 0px var(--primary); }
         }
@@ -528,8 +511,8 @@
             
             <div class="row mt-5">
                 <div class="col-12">
-                    <div class="map-container rounded overflow-hidden shadow">
-                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3826.664409607374!2d80.56066757469736!3d16.441864129367335!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f0bd84742749%3A0x87702e865f3708a3!2sSupriya%20Digitals!5e0!3m2!1sen!2sin!4v1703000000000!5m2!1sen!2sin" 
+                    <div class="map-container rounded overflow-hidden shadow" style="height: 400px;">
+                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3826.6642674384963!2d80.56068231486333!3d16.44192598865175!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f0a2a0d1d9d9%3A0x6b0f3b0f3b0f3b0f!2sMangalagiri%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1625634567890!5m2!1sen!2sin" 
                          width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                     </div>
                 </div>
@@ -557,7 +540,7 @@
                         <a class="mb-2" href="#about"><i class="fa fa-angle-right mr-2"></i>About Us</a>
                         <a class="mb-2" href="#services"><i class="fa fa-angle-right mr-2"></i>Services</a>
                         <a class="mb-2" href="#works"><i class="fa fa-angle-right mr-2"></i>Portfolio</a>
-                        <a href="#contact"><i class="fa fa-angle-right mr-2"></i>Contact</a>
+                        <a class="mb-2" href="#contact"><i class="fa fa-angle-right mr-2"></i>Contact</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
@@ -575,8 +558,8 @@
     <div class="modal fade" id="imageModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content bg-transparent border-0">
-                <div class="modal-body p-0 text-center">
-                    <button type="button" class="close text-white" data-dismiss="modal" style="position: absolute; right: 10px; top: -30px; opacity: 1;">×</button>
+                <div class="modal-body p-0 text-center position-relative">
+                    <button type="button" class="close text-white" data-dismiss="modal" style="position: absolute; right: 0; top: -30px; opacity: 1; font-size: 2rem;">&times;</button>
                     <img id="modalImage" src="" alt="Full size" class="img-fluid rounded shadow-lg">
                 </div>
             </div>
@@ -588,29 +571,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
     <script>
         /* --- CORE CONFIGURATION --- */
         const API_BASE = "https://supriyadigitals.store/supriya_studio/api/";
-        const ITEMS_PER_PAGE = 8; 
+        const ITEMS_PER_PAGE = 9; // Grid of 3x3 looks best
         
-        // Data buckets for the 4 sections
         let mediaData = { works: [], albums: [], teasers: [], live: [] };
 
         // 1. FETCH ALL METADATA
         async function fetchAllMediaData() {
             try {
+                // Fetch direct from your NAS via new domain
                 const response = await fetch(`${API_BASE}fetch.php?mode=public&type=all`, {
                     method: "GET",
-                    headers: { "ngrok-skip-browser-warning": "69420", "Content-Type": "application/json" }
+                    headers: { "Content-Type": "application/json" }
                 });
                 const result = await response.json();
                 if (result.success) distributeData(result.data);
             } catch (error) { console.error("Fetch Error:", error); }
         }
 
-        // 2. DISTRIBUTE DATA & RENDER SKELETONS
+        // 2. DISTRIBUTE DATA
         function distributeData(allData) {
             allData.forEach(item => {
                 if (item.type === 'work') mediaData.works.push(item);
@@ -619,17 +601,14 @@
                 if (item.type === 'live') mediaData.live.push(item);
             });
 
-            // Render the HTML for page 1 of all sections immediately
+            // Initial Render of Page 1
             renderContent('works', 1);
             renderContent('albums', 1);
             renderContent('teasers', 1);
             renderContent('live', 1);
-
-            // Fetch the actual images in ONE single Master Request
-            loadAllImagesAtOnce(); 
         }
 
-        // 3. RENDER CONTENT (Injects Skeleton Loaders)
+        // 3. RENDER CONTENT (Modern Loading with Skeletons)
         function renderContent(sectionId, page) {
             const containerId = `#${sectionId}-grid-container`;
             const paginationId = `#${sectionId}-pagination-nav`;
@@ -638,76 +617,48 @@
             const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
             const pageItems = data.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-            const placeholder = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
             let contentHtml = '<div class="row">'; 
 
-            if (pageItems.length === 0) contentHtml = `<div class="col-12"><p class="text-center text-muted">Coming Soon...</p></div>`;
-
-            pageItems.forEach(item => {
-                const filename = item.clean_name || item.file_path.split('/').pop();
-
-                if (item.type === 'work' || sectionId === 'works' || item.type === 'album' || sectionId === 'albums') {
-                    contentHtml += `
-                        <div class="col-lg-4 col-md-6 mb-4">
-                            <div class="gallery-item image-skeleton">
-                                <img class="img-fluid w-100 master-batch-target" 
-                                    src="${placeholder}" 
-                                    data-f-name="${filename}" 
-                                    alt="${item.title || 'Photo'}"
-                                    style="object-fit: cover; opacity: 0;">
-                            </div>
-                        </div>`;
-                } else {
-                    contentHtml += `
-                        <div class="col-lg-6 col-md-12 mb-4">
-                            <div class="video-item"><iframe src="${item.file_path}" allowfullscreen></iframe></div>
-                        </div>`;
-                }
-            });
+            if (pageItems.length === 0) {
+                contentHtml = `<div class="col-12"><p class="text-center text-muted p-5">Coming Soon...</p></div>`;
+            } else {
+                pageItems.forEach(item => {
+                    if (item.type === 'work' || sectionId === 'works' || item.type === 'album' || sectionId === 'albums') {
+                        // We use the direct file_path now because we fixed the DB links
+                        contentHtml += `
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="gallery-card image-skeleton">
+                                    <img class="gallery-img" 
+                                         src="${item.file_path}" 
+                                         alt="${item.title || 'Photo'}"
+                                         onload="this.classList.add('loaded'); this.parentElement.classList.remove('image-skeleton');"
+                                         onerror="this.parentElement.style.display='none';">
+                                </div>
+                            </div>`;
+                    } else {
+                        // Videos
+                        contentHtml += `
+                            <div class="col-lg-6 col-md-12 mb-4">
+                                <div class="video-container"><iframe src="${item.file_path}" allowfullscreen></iframe></div>
+                            </div>`;
+                    }
+                });
+            }
             contentHtml += '</div>';
             $(containerId).html(contentHtml);
 
             // Render Pagination
-            let paginationHtml = '';
             if (totalPages > 1) {
-                paginationHtml = `<ul class="pagination justify-content-center">`;
+                let paginationHtml = `<ul class="pagination justify-content-center">`;
                 paginationHtml += `<li class="page-item ${page === 1 ? 'disabled' : ''}" data-action="prev"><a class="page-link" href="#">«</a></li>`;
                 for (let i = 1; i <= totalPages; i++) {
                     paginationHtml += `<li class="page-item ${i === page ? 'active' : ''}" data-page="${i}"><a class="page-link" href="#">${i}</a></li>`;
                 }
                 paginationHtml += `<li class="page-item ${page === totalPages ? 'disabled' : ''}" data-action="next"><a class="page-link" href="#">»</a></li></ul>`;
+                $(paginationId).html(paginationHtml);
+            } else {
+                $(paginationId).empty();
             }
-            $(paginationId).html(paginationHtml);
-        }
-
-        // 4. THE MASTER IMAGE LOADER (Collects all targets and makes 1 request)
-        function loadAllImagesAtOnce() {
-            const allImages = $('.master-batch-target');
-            const toFetch = [];
-
-            allImages.each(function() { toFetch.push($(this).data('f-name')); });
-            const uniqueFiles = [...new Set(toFetch)];
-            if (uniqueFiles.length === 0) return;
-
-            fetch(`${API_BASE}batch_proxy.php`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420" },
-                body: JSON.stringify({ files: uniqueFiles })
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    allImages.each(function() {
-                        const f = $(this).data('f-name');
-                        if (result.images[f]) {
-                            $(this).attr('src', result.images[f])
-                                   .animate({opacity: 1}, 500)
-                                   .removeClass('master-batch-target')
-                                   .parent().removeClass('image-skeleton');
-                        }
-                    });
-                }
-            }).catch(e => console.error("Image load failed:", e));
         }
 
         // --- STANDARD UI LOGIC --- //
@@ -721,19 +672,10 @@
             $(window).scroll(function () {
                 var scroll = $(this).scrollTop();
                 if (scroll > 50) $('.navbar').addClass('scrolled'); else $('.navbar').removeClass('scrolled');
-                $('section').each(function() {
-                    var top = $(this).offset().top - 100;
-                    var bottom = top + $(this).outerHeight();
-                    var id = $(this).attr('id');
-                    if (scroll >= top && scroll <= bottom) {
-                        $('.navbar-nav .nav-link').removeClass('active');
-                        $('.navbar-nav').find('a[href="#' + id + '"]').addClass('active');
-                    }
-                });
             });
 
             // Smooth Scroll
-            $('.navbar-nav a').on('click', function(event) {
+            $('.navbar-nav a, .btn-primary').on('click', function(event) {
                 if (this.hash !== "") {
                     event.preventDefault();
                     var hash = this.hash;
@@ -755,14 +697,12 @@
                 else if ($btn.data('action') === 'next') newPage++;
                 else newPage = $btn.data('page');
 
-                // Render new skeletons and fetch images just for the new page
                 renderContent(sectionId, newPage);
-                loadAllImagesAtOnce(); 
             });
 
-            // Modal Trigger
-            $(document).on('click', '.gallery-item:not(.image-skeleton)', function() {
-                const src = $(this).find('img').attr('src');
+            // Lightbox Modal
+            $(document).on('click', '.gallery-card img', function() {
+                const src = $(this).attr('src');
                 $('#modalImage').attr('src', src);
                 $('#imageModal').modal('show');
             });
