@@ -148,60 +148,64 @@
             margin: 15px auto 0;
         }
 
-        /* --- 5. GRID SYSTEMS & SKELETON LOADER --- */
+        /* --- 5. MASONRY GRID & MODERN SKELETON LOADER --- */
         
-        /* Skeleton Animation */
-        .image-skeleton {
-            background: #eee;
-            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+        .gallery-grid {
+            column-count: 3;
+            column-gap: 20px;
+        }
+        
+        @media (max-width: 992px) { .gallery-grid { column-count: 2; } }
+        @media (max-width: 576px) { .gallery-grid { column-count: 1; } }
+
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            position: relative;
             border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+            background: #eee;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Shimmering Skeleton Animation */
+        .image-skeleton {
+            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
             background-size: 200% 100%;
             animation: 1.5s shine linear infinite;
-            min-height: 250px; 
-            width: 100%;
+            min-height: 250px; /* Gives the loader a box before the image loads */
         }
 
         @keyframes shine {
             to { background-position-x: -200%; }
         }
 
-        /* Gallery Item Card */
-        .gallery-card {
-            border: none;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 30px;
-            transition: transform 0.3s ease;
-            background: #fff;
-        }
-
-        .gallery-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        /* The Image itself */
+        /* Image Fade In */
         .gallery-img {
             width: 100%;
-            height: 250px; /* Fixed height for perfect grid */
-            object-fit: cover; /* Prevents stretching */
             display: block;
-            opacity: 0; /* Hidden until loaded */
-            transition: opacity 0.5s ease;
+            opacity: 0; /* Hidden initially */
+            transition: opacity 0.5s ease-in; /* Smooth fade in */
         }
 
         .gallery-img.loaded {
-            opacity: 1;
+            opacity: 1; /* Triggered by javascript onload */
         }
 
+        /* Video Container inside Masonry */
         .video-container {
             position: relative;
             padding-bottom: 56.25%; 
             height: 0;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             background: #000;
         }
         .video-container iframe {
@@ -226,7 +230,7 @@
         .stats-box h2 { font-size: 2.5rem; color: var(--primary); margin: 0; }
         
         /* --- 7. PAGINATION --- */
-        .pagination { margin-top: 20px; }
+        .pagination { margin-top: 30px; }
         .page-link {
             color: var(--dark);
             border: none;
@@ -559,7 +563,7 @@
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-body p-0 text-center position-relative">
-                    <button type="button" class="close text-white" data-dismiss="modal" style="position: absolute; right: 0; top: -30px; opacity: 1; font-size: 2rem;">&times;</button>
+                    <button type="button" class="close text-white" data-dismiss="modal" style="position: absolute; right: 0; top: -30px; opacity: 1; font-size: 2rem;">×</button>
                     <img id="modalImage" src="" alt="Full size" class="img-fluid rounded shadow-lg">
                 </div>
             </div>
@@ -575,14 +579,13 @@
     <script>
         /* --- CORE CONFIGURATION --- */
         const API_BASE = "https://supriyadigitals.store/api/";
-        const ITEMS_PER_PAGE = 9; // Grid of 3x3 looks best
+        const ITEMS_PER_PAGE = 9; 
         
         let mediaData = { works: [], albums: [], teasers: [], live: [] };
 
         // 1. FETCH ALL METADATA
         async function fetchAllMediaData() {
             try {
-                // Fetch direct from your NAS via new domain
                 const response = await fetch(`${API_BASE}fetch.php?mode=public&type=all`, {
                     method: "GET",
                     headers: { "Content-Type": "application/json" }
@@ -608,7 +611,7 @@
             renderContent('live', 1);
         }
 
-        // 3. RENDER CONTENT (Modern Loading with Skeletons)
+        // 3. RENDER CONTENT (Modern Loading with Skeletons + Masonry Grid)
         function renderContent(sectionId, page) {
             const containerId = `#${sectionId}-grid-container`;
             const paginationId = `#${sectionId}-pagination-nav`;
@@ -617,29 +620,28 @@
             const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
             const pageItems = data.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-            let contentHtml = '<div class="row">'; 
+            // Replaced Bootstrap rows with Masonry Grid container
+            let contentHtml = '<div class="gallery-grid">'; 
 
             if (pageItems.length === 0) {
-                contentHtml = `<div class="col-12"><p class="text-center text-muted p-5">Coming Soon...</p></div>`;
+                contentHtml = `<p class="text-center text-muted p-5" style="column-span: all;">Coming Soon...</p>`;
             } else {
                 pageItems.forEach(item => {
                     if (item.type === 'work' || sectionId === 'works' || item.type === 'album' || sectionId === 'albums') {
-                        // We use the direct file_path now because we fixed the DB links
                         contentHtml += `
-                            <div class="col-lg-4 col-md-6 mb-4">
-                                <div class="gallery-card image-skeleton">
-                                    <img class="gallery-img" 
-                                         src="${item.file_path}" 
-                                         alt="${item.title || 'Photo'}"
-                                         onload="this.classList.add('loaded'); this.parentElement.classList.remove('image-skeleton');"
-                                         onerror="this.parentElement.style.display='none';">
-                                </div>
+                            <div class="gallery-item image-skeleton">
+                                <img class="gallery-img" 
+                                     src="${item.file_path}" 
+                                     alt="${item.title || 'Photo'}"
+                                     loading="lazy"
+                                     onload="this.classList.add('loaded'); this.parentElement.classList.remove('image-skeleton');"
+                                     onerror="this.parentElement.style.display='none';">
                             </div>`;
                     } else {
                         // Videos
                         contentHtml += `
-                            <div class="col-lg-6 col-md-12 mb-4">
-                                <div class="video-container"><iframe src="${item.file_path}" allowfullscreen></iframe></div>
+                            <div class="gallery-item video-container">
+                                <iframe src="${item.file_path}" allowfullscreen></iframe>
                             </div>`;
                     }
                 });
@@ -701,7 +703,7 @@
             });
 
             // Lightbox Modal
-            $(document).on('click', '.gallery-card img', function() {
+            $(document).on('click', '.gallery-item:not(.video-container) img', function() {
                 const src = $(this).attr('src');
                 $('#modalImage').attr('src', src);
                 $('#imageModal').modal('show');
