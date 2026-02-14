@@ -93,15 +93,26 @@
         .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; }
         .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         
-        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; }
+        .lb-header { 
+            position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; 
+            display: flex; justify-content: space-between; align-items: center; z-index: 1060; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); /* Adds protective dark shadow */
+            pointer-events: none; /* Lets clicks pass through the shadow */
+        }
+        .lb-header > * { pointer-events: auto; } /* Keeps buttons clickable */
         .lb-title { color: #fff; font-size: 1.1rem; opacity: 0.8; }
         .lb-actions { display: flex; align-items: center; }
         
         .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
         .lb-icon:hover { opacity: 1; color: var(--primary); }
         
-        #lightboxImage { max-height: 90vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
-        
+        #lightboxImage { 
+            max-height: 80vh; /* Reduced from 90 to leave room for header */
+            max-width: 95vw; 
+            margin-top: 60px; /* Pushes image down below the text */
+            object-fit: contain; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); 
+        }
         /* NAVIGATION ARROWS */
         .lb-control { 
             position: absolute; top: 50%; transform: translateY(-50%); 
