@@ -239,8 +239,9 @@
         function renderGallery() {
             let html = '';
             galleryData.forEach((item, index) => {
+                // Direct URL logic (no proxy)
+                const imgUrl = item.file_path; 
                 const fname = item.clean_name || item.file_path.split('/').pop();
-                const imgUrl = `${API_BASE}image_proxy.php?f=${fname}`;
                 
                 galleryData[index].fullUrl = imgUrl; 
                 galleryData[index].filename = fname;
@@ -269,11 +270,11 @@
             const item = galleryData[index];
             const $el = $(`#item-${index}`);
             
-            if (selectedFiles.has(item.filename)) {
-                selectedFiles.delete(item.filename);
+            if (selectedFiles.has(item.fullUrl)) {
+                selectedFiles.delete(item.fullUrl);
                 $el.removeClass('selected');
             } else {
-                selectedFiles.add(item.filename);
+                selectedFiles.add(item.fullUrl);
                 $el.addClass('selected');
             }
             updateFloatingBar();
@@ -292,13 +293,13 @@
             else $('#selection-bar').removeClass('visible');
         }
 
-        // --- DOWNLOAD LOGIC (RESTORED FEATURES) ---
+        // --- DOWNLOAD LOGIC ---
         function downloadAllImages() {
             if(!canDownload) return alert("Download not allowed.");
             if(!confirm(`Download all ${galleryData.length} images? This might take a moment.`)) return;
             
-            const allFiles = galleryData.map(i => i.filename);
-            postDownload(allFiles);
+            // Post Full URLs to the downloader
+            postDownload(galleryData.map(i => i.fullUrl));
         }
 
         function downloadSelectedBatch() {
@@ -328,13 +329,13 @@
                 // Fast Browser Download
                 const link = document.createElement('a');
                 link.href = item.fullUrl;
-                link.download = item.filename;
+                link.download = item.title_from_filename || item.filename;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             } else {
                 // Forced Server Download (Full Quality)
-                window.location.href = `${API_BASE}download.php?f=${item.filename}`;
+                window.location.href = `${API_BASE}download.php?f=${encodeURIComponent(item.fullUrl)}`;
             }
         }
 
