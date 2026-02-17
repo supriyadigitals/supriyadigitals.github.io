@@ -2,552 +2,526 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Supriya Digitals | Client Gallery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Event | Supriya Digitals</title>
+    <link href="img/icon1.png" rel="icon">
     
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+
     <style>
-        /* --- CORE STYLES --- */
-        :root { 
-            --primary: #D4AF37; 
-            --primary-hover: #b8962e;
-            --bg: #0a0a0a; 
-            --surface: #1a1a1a;
-            --text-main: #ffffff; 
-            --text-sub: #a1a1aa;
-            --danger: #ef4444;
-        }
+        :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
         
+        /* CORE SETTINGS */
         body { 
-            margin: 0; 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg); 
-            color: var(--text-main); 
-            padding-bottom: 80px; 
-            -webkit-font-smoothing: antialiased;
+            background-color: var(--bg); color: var(--text); 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; padding: 0; overflow-x: hidden;
+            user-select: none; -webkit-user-select: none; /* Privacy */
         }
-        
-        /* --- HERO SECTION --- */
-        .hero { 
-            text-align: center; 
-            padding: 80px 20px 60px; 
-            background: linear-gradient(180deg, #111111 0%, var(--bg) 100%); 
-            border-bottom: 1px solid #222; 
-        }
-        
-        .hero h1 { 
-            font-family: 'Playfair Display', serif; 
-            color: var(--primary); 
-            font-size: 3rem; 
-            margin: 0 0 15px 0; 
-            letter-spacing: 1px;
-        }
-        
-        .hero p { 
-            color: var(--text-sub); 
-            margin: 0; 
-            letter-spacing: 3px; 
-            text-transform: uppercase; 
-            font-size: 0.85rem; 
-            font-weight: 500;
-        }
+        img { pointer-events: none; } 
 
-        .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 0 20px; 
+        /* LOADER */
+        #main-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        
-        .section-title { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 2rem;
-            border-bottom: 1px solid #333; 
-            padding-bottom: 15px; 
-            margin-top: 60px; 
-            margin-bottom: 30px;
-            color: var(--primary); 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .spinner {
+            width: 50px; height: 50px; border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
         }
-
-        /* --- GRID & CARDS --- */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 30px; 
-        }
-        
-        .card { 
-            background: var(--surface); 
-            border-radius: 12px; 
-            overflow: hidden; 
-            border: 1px solid #2a2a2a; 
-            transition: transform 0.3s ease, border-color 0.3s ease; 
-        }
-        
-        .card:hover { 
-            border-color: var(--primary); 
-            transform: translateY(-5px); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        
-        /* --- SMART LAZY LOAD IMAGES --- */
-        .photo-wrapper { 
-            background: #222; 
-            width: 100%; 
-            aspect-ratio: 3/2; 
-            overflow: hidden; 
-            position: relative; 
-        }
-        
-        .smart-image { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            opacity: 0; 
-            filter: blur(10px); 
-            transition: opacity 0.6s ease-out, filter 0.6s ease-out; 
-        }
-        
-        .smart-image.is-loaded { 
-            opacity: 1; 
-            filter: blur(0); 
-        }
-        
-        /* --- VIDEOS --- */
-        .video-wrapper { 
-            position: relative; 
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-            height: 0; 
-            overflow: hidden; 
-        }
-        
-        .video-wrapper iframe { 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-        }
-
-        .card-body { 
-            padding: 20px; 
-            text-align: center; 
-        }
-        
-        .card-title { 
-            font-weight: 600; 
-            font-size: 1rem; 
-            margin-bottom: 20px; 
-            color: var(--text-main); 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* --- BUTTONS --- */
-        .btn-group { 
-            display: flex; 
-            gap: 10px; 
-        }
-        
-        .btn { 
-            flex: 1; 
-            padding: 12px 10px; 
-            border: none; 
-            border-radius: 6px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            font-size: 0.85rem; 
-            text-decoration: none; 
-            display: inline-flex; 
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-gold { 
-            background: var(--primary); 
-            color: #000; 
-        }
-        
-        .btn-gold:hover { 
-            background: var(--primary-hover); 
-        }
-        
-        .btn-outline { 
-            background: transparent; 
-            border: 1px solid #555; 
-            color: #ddd; 
-        }
-        
-        .btn-outline:hover { 
-            border-color: var(--primary); 
-            color: var(--primary); 
-        }
-
-        .btn-danger {
-            background: transparent;
-            border: 1px solid var(--danger);
-            color: var(--danger);
-        }
-
-        .btn-danger:hover {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        /* --- QUEUE / DOWNLOAD OVERLAY --- */
-        #queue-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            display: none;
-        }
-
-        .queue-box {
-            background: var(--surface);
-            padding: 30px;
-            border-radius: 12px;
-            border: 1px solid var(--primary);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .loader-spinner {
-            border: 4px solid #333;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- ERROR STATE --- */
-        .error-state {
-            text-align: center;
-            padding: 100px 20px;
-            color: var(--text-sub);
+        /* HEADER */
+        .gallery-header { 
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; 
+            background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+            position: sticky; top: 0; z-index: 100; 
+        }
+        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
+        .brand-title span { color: var(--primary); }
+        
+        .btn-header { 
+            border: 1px solid #eee; color: #555; border-radius: 50px; 
+            padding: 8px 20px; font-size: 0.85rem; transition: 0.3s; 
+            background: #fff; cursor: pointer; display: inline-flex; align-items: center; 
+            margin-left: 10px; font-weight: 600;
+        }
+        .btn-header:hover, .btn-header.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+        /* EVENT SECTIONS (NEW) */
+        .section-header {
+            margin: 40px 30px 20px; font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px;
+        }
+
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 0 30px; margin-bottom: 40px; }
+        
+        .media-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .card-details { padding: 15px; text-align: center; font-weight: 600; font-size: 0.9rem; }
+
+        /* GALLERY GRID (ORIGINAL MASONRY) */
+        .container-fluid { padding: 30px; padding-bottom: 120px; }
+        .gallery-grid { column-count: 4; column-gap: 20px; }
+        
+        @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
+        @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } .media-grid { padding: 0 15px; } }
+        @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
+        
+        .gallery-item { 
+            break-inside: avoid; margin-bottom: 20px; position: relative; 
+            border-radius: 8px; overflow: hidden; cursor: pointer; 
+            background: #f0f0f0; transition: transform 0.2s; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         
-        .error-state i {
-            font-size: 4rem;
-            color: #555;
-            margin-bottom: 20px;
+        /* SMART LAZY LOAD CSS */
+        .lazy-image { width: 100%; display: block; opacity: 0; filter: blur(5px); transition: opacity 0.5s ease-in, filter 0.5s ease-in; }
+        .lazy-image.loaded { opacity: 1; filter: blur(0); }
+
+        /* SELECTION MODE */
+        .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
+        .gallery-item.selected::after {
+            content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900;
+            position: absolute; top: 10px; right: 10px;
+            background: var(--primary); color: #fff;
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .section-title { flex-direction: column; align-items: flex-start; gap: 15px; font-size: 1.5rem; }
-            .btn-group { flex-direction: column; }
+        /* FLOATING ACTION BAR */
+        #selection-bar {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px);
+            background: #222; color: #fff; padding: 12px 30px; border-radius: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050;
+            display: flex; align-items: center; gap: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        #selection-bar.visible { transform: translateX(-50%) translateY(0); }
+        .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
+
+        /* QUEUE OVERLAY (NEW) */
+        #queue-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9); z-index: 9999; display: none;
+            flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+        }
+        .queue-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 100%; border: 1px solid #eee; }
+
+        /* LIGHTBOX */
+        .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; }
+        .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        
+        .lb-header { 
+            position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; 
+            display: flex; justify-content: space-between; align-items: center; z-index: 1060; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); 
+            pointer-events: none; 
+        }
+        .lb-header > * { pointer-events: auto; } 
+        .lb-title { color: #fff; font-size: 1.1rem; opacity: 0.8; }
+        .lb-actions { display: flex; align-items: center; }
+        
+        .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
+        .lb-icon:hover { opacity: 1; color: var(--primary); }
+        
+        #lightboxImage { 
+            max-height: 80vh; max-width: 95vw; margin-top: 60px; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); 
+        }
+        
+        /* NAVIGATION ARROWS */
+        .lb-control { 
+            position: absolute; top: 50%; transform: translateY(-50%); 
+            width: 50px; height: 50px; background: rgba(255,255,255,0.1); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #fff; cursor: pointer; transition: 0.3s; 
+        }
+        .lb-control:hover { background: var(--primary); }
+        .lb-prev { left: 20px; } .lb-next { right: 20px; }
+
+        /* DROPDOWN MENU */
+        .dropdown-menu-dark { background: #222; border: 1px solid #444; }
+        .dropdown-item { color: #eee; padding: 10px 20px; border-bottom: 1px solid #333; }
+        .dropdown-item:last-child { border: 0; }
+        .dropdown-item:hover { background: var(--primary); color: #fff; }
     </style>
 </head>
-
 <body oncontextmenu="return false;">
+
+    <div id="main-loader">
+        <div class="spinner"></div>
+        <p class="text-muted small font-weight-bold" id="loader-text">CONNECTING TO STUDIO</p>
+    </div>
 
     <div id="queue-overlay">
         <div class="queue-box">
-            <div class="loader-spinner"></div>
-            <h3 style="margin-top: 0; color: var(--primary);">Preparing Download</h3>
-            <p style="color: var(--text-sub); font-size: 0.9rem;">
-                Your NAS server is gathering the files. This heavy process runs in the background.
-            </p>
-            <button class="btn btn-danger w-100 mt-3" onclick="cancelQueue()">Cancel Request</button>
+            <div class="spinner" style="margin: 0 auto 20px;"></div>
+            <h4 style="margin-top: 0; color: #111;">Preparing Download</h4>
+            <p style="color: #666; font-size: 0.9rem;">Your Synology NAS is gathering the files. This process runs safely in the background.</p>
+            <button class="btn btn-danger w-100 mt-3 font-weight-bold" style="border-radius: 20px;" onclick="cancelQueue()">Cancel Request</button>
         </div>
     </div>
 
-    <div class="hero">
-        <h1 id="eventTitleDisplay">Loading Portal...</h1>
-        <p>Supriya Digitals Exclusive Client Portal</p>
+    <div class="gallery-header">
+        <div class="d-flex align-items-center">
+            <h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1>
+        </div>
+        
+        <div>
+            <button class="btn-header" id="btnSelectMode" onclick="toggleSelectMode()">
+                <i class="far fa-check-circle mr-2"></i> Select
+            </button>
+            
+            <button class="btn-header download-ui d-none" onclick="downloadAllImages()">
+                <i class="fas fa-download mr-2"></i> All
+            </button>
+        </div>
     </div>
 
-    <div class="container" id="portalContent">
-        <div style="text-align: center; padding: 100px 0;">
-            <div class="loader-spinner"></div>
-            <p style="color: var(--text-sub);">Connecting to Studio Server...</p>
+    <div id="event-content"></div>
+
+    <div class="container-fluid">
+        <div id="gallery" class="gallery-grid"></div>
+    </div>
+
+    <div id="selection-bar">
+        <span class="selection-count text-white font-weight-bold">0 Selected</span>
+        <button class="btn-download-batch download-ui d-none" onclick="downloadSelectedBatch()">
+            <i class="fas fa-cloud-download-alt mr-2"></i> Download
+        </button>
+        <button class="btn btn-sm btn-outline-light rounded-circle border-0" onclick="clearSelection()" title="Clear">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
+        <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    
+                    <div class="lb-header">
+                        <div class="lb-title" id="lbFileName">image.jpg</div>
+                        <div class="lb-actions">
+                            <div class="dropdown download-ui d-none">
+                                <span class="lb-icon" data-toggle="dropdown">
+                                    <i class="fas fa-download"></i>
+                                </span>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
+                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('normal')">
+                                        <i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web Size)
+                                    </a>
+                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full')">
+                                        <i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <span class="lb-icon" data-dismiss="modal"><i class="fas fa-times"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
+                    <img id="lightboxImage" src="" alt="Gallery">
+                    <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
+
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // CONFIGURATION
         const API_BASE = "https://supriyadigitals.store/api/";
+        const params = new URLSearchParams(window.location.search);
         
-        // Extract the Event Name from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const eventNameRaw = urlParams.get('event');
+        let galleryData = []; 
+        let selectedFiles = new Set();
+        let isSelectMode = false;
+        let currentIndex = 0;
+        let canDownload = false;
 
-        // Sanitizer to prevent XSS attacks via file names
         function escapeHtml(unsafe) {
-            return (unsafe || "").toString()
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
+            return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        const eventName = escapeHtml(eventNameRaw);
+        async function initializeGallery() {
+            try {
+                let url = `${API_BASE}fetch.php?mode=shared`;
+                const eventName = params.get('event');
+                const batchId = params.get('batch_id');
 
-        $(document).ready(function() {
-            if (!eventName) {
-                $('#eventTitleDisplay').text("Event Not Found");
-                $('#portalContent').html(`
-                    <div class="error-state">
-                        <i class="fas fa-search"></i>
-                        <h2>Link Invalid</h2>
-                        <p>We couldn't find an event attached to this link. Please check the URL.</p>
-                    </div>
-                `);
-            } else {
-                $('#eventTitleDisplay').text(eventName);
-                loadPortalData();
-            }
-        });
-
-        // --- FETCH DATA FROM SYNOLOGY NAS ---
-        function loadPortalData() {
-            // Added timeout (10 seconds) to detect if Synology NAS is offline/power cut
-            $.ajax({
-                url: API_BASE + 'fetch.php?mode=client&type=all',
-                type: 'GET',
-                timeout: 10000, 
-                success: function(res) {
-                    if(!res.success || res.data.length === 0) {
-                        $('#portalContent').html(`
-                            <div class="error-state">
-                                <i class="fas fa-folder-open"></i>
-                                <h2>No Media Yet</h2>
-                                <p>There is currently no public media available for this event.</p>
-                            </div>
-                        `);
-                        return;
-                    }
-
-                    // Filter out only the items that belong to this specific Event
-                    const eventData = res.data.filter(item => item.title === eventNameRaw);
-                    
-                    if(eventData.length === 0) {
-                        $('#portalContent').html(`
-                            <div class="error-state">
-                                <i class="fas fa-folder-open"></i>
-                                <h2>No Media Found</h2>
-                                <p>We could not find any media assigned to this event name.</p>
-                            </div>
-                        `);
-                        return;
-                    }
-
-                    // Sort items by Admin's Drag-and-Drop order
-                    eventData.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
-
-                    // Group by Media Type
-                    const videos = eventData.filter(i => i.type === 'teaser');
-                    const albums = eventData.filter(i => i.type === 'album');
-                    const photos = eventData.filter(i => i.type === 'work');
-
-                    let html = '';
-
-                    // 1. RENDER VIDEOS
-                    if (videos.length > 0) {
-                        html += `
-                        <div class="section-title">
-                            <span><i class="fas fa-film"></i> Event Films</span>
-                        </div>
-                        <div class="grid">`;
-                        
-                        videos.forEach(v => {
-                            // Extract YouTube ID safely for embedding
-                            let ytId = "";
-                            if(v.file_path) {
-                                ytId = v.file_path.split('v=')[1] || v.file_path.split('youtu.be/')[1] || "";
-                                ytId = ytId.split('&')[0];
-                            }
-                            
-                            const catText = v.video_category ? `${escapeHtml(v.video_category)}` : 'Event Video';
-                            
-                            html += `
-                            <div class="card">
-                                <div class="video-wrapper">
-                                    <iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen></iframe>
-                                </div>
-                                <div class="card-body">
-                                    <div class="card-title">${catText}</div>
-                                </div>
-                            </div>`;
-                        });
-                        html += `</div>`;
-                    }
-
-                    // 2. RENDER DIGITAL ALBUMS (GOOGLE DRIVE LINKS)
-                    if (albums.length > 0) {
-                        html += `
-                        <div class="section-title">
-                            <span><i class="fas fa-book-open"></i> Digital Albums</span>
-                        </div>
-                        <div class="grid">`;
-                        
-                        albums.forEach(a => {
-                            html += `
-                            <div class="card" style="text-align: center; padding: 50px 20px;">
-                                <i class="fas fa-book-reader" style="font-size: 3.5rem; color: var(--primary); margin-bottom: 25px;"></i>
-                                <div class="card-title">Premium Karizma Album</div>
-                                <p style="color: var(--text-sub); font-size: 0.85rem; margin-bottom: 25px;">High Quality PDF Format</p>
-                                <a href="${escapeHtml(a.file_path)}" target="_blank" class="btn btn-gold" style="width: 80%; margin: 0 auto;">
-                                    <i class="fab fa-google-drive"></i> View Album
-                                </a>
-                            </div>`;
-                        });
-                        html += `</div>`;
-                    }
-
-                    // 3. RENDER PHOTO GALLERY
-                    if (photos.length > 0) {
-                        
-                        // Check if any photo allows downloading to show the "Download All" button
-                        const canDownloadAny = photos.some(p => p.can_download == 1);
-                        let downloadAllHtml = '';
-                        
-                        if (canDownloadAny) {
-                            downloadAllHtml = `
-                                <div>
-                                    <button class="btn btn-outline" onclick="requestFullGalleryZip()" style="font-size: 0.8rem; padding: 8px 15px;">
-                                        <i class="fas fa-file-archive"></i> Download All (ZIP)
-                                    </button>
-                                </div>
-                            `;
-                        }
-
-                        html += `
-                        <div class="section-title">
-                            <span><i class="fas fa-camera"></i> Photo Gallery</span>
-                            ${downloadAllHtml}
-                        </div>
-                        <div class="grid">`;
-                        
-                        photos.forEach(p => {
-                            // Only render download buttons if the admin allowed it for this batch
-                            const dlBtns = p.can_download == 1 ? `
-                                <div class="btn-group">
-                                    <button class="btn btn-gold" onclick="downloadFast('${escapeHtml(p.file_path)}')">
-                                        <i class="fas fa-bolt"></i> Fast Save
-                                    </button>
-                                    <button class="btn btn-outline" onclick="downloadOriginal('${escapeHtml(p.file_path)}')">
-                                        <i class="fas fa-download"></i> Original
-                                    </button>
-                                </div>` : `<p style="color: var(--text-sub); font-size: 0.8rem; margin: 0;">Protected Image</p>`;
-
-                            const cleanName = escapeHtml(p.title_from_filename || "Captured Moment");
-
-                            html += `
-                            <div class="card">
-                                <div class="photo-wrapper">
-                                    <img class="smart-image" data-src="${API_BASE}serve_image.php?file=${encodeURIComponent(p.file_path)}" loading="lazy" decoding="async" alt="Event Photo">
-                                </div>
-                                <div class="card-body">
-                                    <div class="card-title">${cleanName}</div>
-                                    ${dlBtns}
-                                </div>
-                            </div>`;
-                        });
-                        html += `</div>`;
-                    }
-
-                    // Inject all HTML into the DOM at once
-                    $('#portalContent').html(html);
-
-                    // Initialize the Smart Lazy Loader immediately after DOM insertion
-                    initLazyLoader();
-                },
-                error: function(xhr, status, error) {
-                    // SERVER NOT AVAILABLE CATCH
-                    $('#portalContent').html(`
-                        <div class="error-state">
-                            <i class="fas fa-server text-danger"></i>
-                            <h2 class="text-danger">Server Currently Unavailable</h2>
-                            <p>The Studio's primary server is currently undergoing maintenance or restarting.</p>
-                            <p>Please try refreshing the page in a few minutes.</p>
-                            <button class="btn btn-outline mt-3" onclick="location.reload()"><i class="fas fa-sync"></i> Refresh Page</button>
-                        </div>
-                    `);
+                if (eventName) {
+                    $('#pageTitleDisplay').html(`<span>Event:</span> ${escapeHtml(eventName)}`);
+                    url = `${API_BASE}fetch.php?mode=client&type=all`; // Fetch all to filter by event
+                } else if (batchId) {
+                    url += `&batch_id=${batchId}`;
                 }
-            });
+
+                // 15-second timeout to handle Synology connection issues safely
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+                const response = await fetch(url, { signal: controller.signal, headers: { "ngrok-skip-browser-warning": "69420" } });
+                clearTimeout(timeoutId);
+                const result = await response.json();
+
+                if (!result.success || result.data.length === 0) {
+                    $('#main-loader').html('<h4 class="text-danger">Gallery Not Found</h4>');
+                    return;
+                }
+
+                let finalData = result.data;
+
+                // If loading a Master Event Link, filter the data
+                if (eventName) {
+                    finalData = result.data.filter(item => item.title === eventName);
+                    if(finalData.length === 0) {
+                        $('#main-loader').html('<h4 class="text-danger">Event Not Found</h4>');
+                        return;
+                    }
+                    // Sort using Admin's drag-and-drop order
+                    finalData.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+                    renderEventSections(finalData); // Renders Videos and Albums at the top
+                }
+
+                // Filter down to just photos for the Masonry Grid
+                galleryData = finalData.filter(i => i.type === 'work' || !i.type); // Fallback for old data
+                
+                canDownload = galleryData.some(item => item.can_download == 1);
+                if (canDownload) {
+                    $('.download-ui').removeClass('d-none');
+                }
+
+                renderGallery();
+                $('#main-loader').fadeOut(500);
+
+            } catch (e) {
+                console.error(e);
+                $('#main-loader').html(`
+                    <i class="fas fa-server text-danger" style="font-size: 3rem; margin-bottom:15px;"></i>
+                    <h5 class="text-danger">Server Not Available</h5>
+                    <p class="text-muted small">Please try refreshing in a few minutes.</p>
+                `);
+            }
         }
 
-        // --- SMART LAZY LOADER ENGINE ---
+        // --- RENDER VIDEOS AND ALBUMS (MASTER EVENT) ---
+        function renderEventSections(data) {
+            const videos = data.filter(i => i.type === 'teaser');
+            const albums = data.filter(i => i.type === 'album');
+            let html = '';
+
+            if (videos.length > 0) {
+                html += `<div class="section-header">Event Films</div><div class="media-grid">`;
+                videos.forEach(v => {
+                    let ytId = v.file_path ? (v.file_path.split('v=')[1] || v.file_path.split('youtu.be/')[1] || "").split('&')[0] : "";
+                    const catText = v.video_category ? escapeHtml(v.video_category) : 'Video';
+                    html += `
+                    <div class="media-card">
+                        <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen></iframe></div>
+                        <div class="card-details">${catText}</div>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+
+            if (albums.length > 0) {
+                html += `<div class="section-header">Digital Albums</div><div class="media-grid">`;
+                albums.forEach(a => {
+                    html += `
+                    <div class="media-card" style="padding: 30px 15px; text-align: center;">
+                        <i class="fas fa-book-reader" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <div class="card-details" style="padding-bottom: 5px;">Karizma Album</div>
+                        <a href="${escapeHtml(a.file_path)}" target="_blank" class="btn-header" style="background:var(--primary); color:#fff; text-decoration:none;">View Album</a>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+
+            if(galleryData.length > 0) {
+                html += `<div class="section-header">Photo Gallery</div>`;
+            }
+
+            $('#event-content').html(html);
+        }
+
+        // --- RENDER MASONRY PHOTO GRID ---
+        function renderGallery() {
+            let html = '';
+            galleryData.forEach((item, index) => {
+                const imgUrl = item.file_path; 
+                const fname = item.clean_name || item.file_path.split('/').pop();
+                
+                galleryData[index].fullUrl = imgUrl; 
+                galleryData[index].filename = fname;
+
+                // SMART LAZY LOAD IMPLEMENTATION
+                // Uses serve_image.php to compress huge Synology files on-the-fly to tiny web JPEGs
+                const smartUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
+
+                html += `
+                    <div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})">
+                        <img data-src="${smartUrl}" class="lazy-image" alt="Photo" decoding="async">
+                    </div>`;
+            });
+            document.getElementById('gallery').innerHTML = html;
+
+            // Trigger the Lazy Loader
+            initLazyLoader();
+        }
+
+        // --- LAZY LOADER ENGINE ---
         function initLazyLoader() {
-            // Uses IntersectionObserver to only load images when they are about to enter the screen
             const imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
-                        
-                        // Set actual source. This triggers the Synology NAS to compress and send the JPEG
                         img.src = img.getAttribute('data-src');
-                        
-                        // Once downloaded, fade it in smoothly
-                        img.onload = () => {
-                            img.classList.add('is-loaded');
-                        };
-                        
-                        // Stop watching this image
-                        observer.unobserve(img);
+                        img.onload = () => img.classList.add('loaded');
+                        observer.unobserve(img); // Stop watching once loaded
                     }
                 });
-            }, { 
-                // Starts loading the image when the user scrolls within 400px of it
-                rootMargin: "0px 0px 400px 0px" 
-            });
+            }, { rootMargin: "0px 0px 500px 0px" }); // Load when 500px away from viewport
 
-            // Attach observer to all smart images
-            document.querySelectorAll('.smart-image').forEach(img => {
-                imageObserver.observe(img);
-            });
+            document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img));
         }
 
-        // --- DUAL DOWNLOAD SYSTEM ---
-        function downloadFast(path) {
-            // Hits serve_image.php with dl=1 to trigger an instant download of the small cached Web JPEG
-            window.location.href = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(path)}`;
+        // --- INTERACTION ---
+        function toggleSelectMode() {
+            isSelectMode = !isSelectMode;
+            $('#btnSelectMode').toggleClass('active');
+            if(!isSelectMode) clearSelection();
         }
 
-        function downloadOriginal(path) {
-            // Hits the background-killer script for heavy RAW/Original files
-            window.location.href = `${API_BASE}download_full.php?file=${encodeURIComponent(path)}`;
+        function handleItemClick(index) {
+            if (isSelectMode) toggleSelection(index);
+            else openLightbox(index);
         }
 
-        // --- QUEUE UI (For Heavy Tasks) ---
-        function requestFullGalleryZip() {
-            // Shows the queue/processing overlay
-            document.getElementById('queue-overlay').style.display = 'flex';
+        function toggleSelection(index) {
+            const item = galleryData[index];
+            const $el = $(`#item-${index}`);
             
-            // In a fully built backend, this would trigger an AJAX request to a ZIP generator.
-            // For now, we simulate the UI response.
+            if (selectedFiles.has(item.fullUrl)) {
+                selectedFiles.delete(item.fullUrl);
+                $el.removeClass('selected');
+            } else {
+                selectedFiles.add(item.fullUrl);
+                $el.addClass('selected');
+            }
+            updateFloatingBar();
+        }
+
+        function clearSelection() {
+            selectedFiles.clear();
+            $('.gallery-item').removeClass('selected');
+            updateFloatingBar();
+        }
+
+        function updateFloatingBar() {
+            const count = selectedFiles.size;
+            $('.selection-count').text(count + " Selected");
+            if (count > 0) $('#selection-bar').addClass('visible');
+            else $('#selection-bar').removeClass('visible');
+        }
+
+        // --- QUEUED DOWNLOAD LOGIC ---
+        function downloadAllImages() {
+            if(!canDownload) return alert("Download not allowed.");
+            if(!confirm(`Download all ${galleryData.length} images? This process will run in the background.`)) return;
+            
+            $('#queue-overlay').css('display', 'flex');
+            
+            // Post Full URLs to the batch downloader script
+            postDownload(galleryData.map(i => i.fullUrl));
+        }
+
+        function downloadSelectedBatch() {
+            if (selectedFiles.size === 0) return;
+            $('#queue-overlay').css('display', 'flex');
+            postDownload(Array.from(selectedFiles));
+        }
+
+        function postDownload(filesArray) {
+            // Uses your existing download.php to handle the batch ZIP logic
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = `${API_BASE}download.php`;
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "files";
+            input.value = JSON.stringify(filesArray);
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            
+            // Hide queue UI after submission initiates
             setTimeout(() => {
-                // Simulation of NAS telling the user it is too large and will take time
-                console.log("NAS Processing ZIP in background...");
-            }, 1000);
+                document.body.removeChild(form);
+                $('#queue-overlay').fadeOut();
+                clearSelection();
+            }, 3000);
         }
 
         function cancelQueue() {
-            // Allows the user to bail out of a heavy request
-            document.getElementById('queue-overlay').style.display = 'none';
-            // In a fully built backend, you would send an AJAX abort signal to the NAS here.
-            alert("Download Request Cancelled.");
+            $('#queue-overlay').fadeOut();
         }
+
+        // --- DUAL DOWNLOAD FOR SINGLE IMAGES ---
+        function downloadSingleImage(type) {
+            const item = galleryData[currentIndex];
+            if(item.can_download != 1) return;
+
+            if (type === 'normal') {
+                // Fast Download: Triggers serve_image.php with dl=1
+                window.location.href = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
+            } else {
+                // Original Quality: Triggers download_full.php (Handles background kills if aborted)
+                window.location.href = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
+            }
+        }
+
+        // --- LIGHTBOX ---
+        function openLightbox(index) {
+            currentIndex = index;
+            updateLightbox();
+            $('#lightboxModal').modal('show');
+        }
+
+        function updateLightbox() {
+            const item = galleryData[currentIndex];
+            
+            // Lightbox uses the smart compressed image to load instantly, saving GBs of data transfer
+            const smartUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.fullUrl)}`;
+            $('#lightboxImage').attr('src', smartUrl);
+            
+            $('#lbFileName').text(item.filename || `Image ${currentIndex + 1}`);
+            
+            if (item.can_download == 1) $('.download-ui').removeClass('d-none');
+            else $('.download-ui').addClass('d-none');
+        }
+
+        function changeImage(dir) {
+            currentIndex += dir;
+            if (currentIndex >= galleryData.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = galleryData.length - 1;
+            updateLightbox();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if ($('#lightboxModal').is(':visible')) {
+                if (e.key === "ArrowLeft") changeImage(-1);
+                if (e.key === "ArrowRight") changeImage(1);
+            }
+        });
+
+        initializeGallery();
     </script>
 </body>
 </html>
