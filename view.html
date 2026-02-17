@@ -20,7 +20,7 @@
             margin: 0; padding: 0; overflow-x: hidden;
             user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none;
         }
-        img { pointer-events: none; -webkit-user-drag: none; } /* Stops dragging images to desktop */
+        img { pointer-events: none; -webkit-user-drag: none; }
 
         /* LOADER */
         #main-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -39,7 +39,7 @@
         .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 0 30px; margin-bottom: 40px; }
         .media-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } /* Allow clicking on videos */
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
         .card-details { padding: 15px; text-align: center; font-weight: 600; font-size: 0.9rem; }
 
         /* GALLERY GRID */
@@ -49,9 +49,9 @@
         @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } .media-grid { padding: 0 15px; } }
         @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
         
-        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .lazy-image { width: 100%; display: block; opacity: 0; filter: blur(5px); transition: opacity 0.5s ease-in, filter 0.5s ease-in; }
-        .lazy-image.loaded { opacity: 1; filter: blur(0); }
+        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); min-height: 250px; }
+        .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.6s ease-in; }
+        .lazy-image.loaded { opacity: 1; }
 
         /* SELECTION & FLOATING BAR */
         .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
@@ -60,7 +60,7 @@
         #selection-bar.visible { transform: translateX(-50%) translateY(0); }
         .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
 
-        /* QUEUE OVERLAY (Real Synology Connection) */
+        /* QUEUE OVERLAY */
         #queue-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; pointer-events: auto;}
         .queue-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 100%; border: 1px solid #eee; }
 
@@ -151,11 +151,10 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // --- ABSOLUTE THEFT PROTECTION ---
-        document.addEventListener('contextmenu', event => event.preventDefault()); // Hard blocks right click
-        document.addEventListener('dragstart', event => event.preventDefault()); // Hard blocks image dragging
+        // ANTI-THEFT
+        document.addEventListener('contextmenu', event => event.preventDefault()); 
+        document.addEventListener('dragstart', event => event.preventDefault()); 
         document.addEventListener('keydown', event => {
-            // Blocks F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S
             if (event.keyCode == 123 || 
                (event.ctrlKey && event.shiftKey && (event.keyCode == 73 || event.keyCode == 74)) || 
                (event.ctrlKey && event.keyCode == 85) || 
@@ -165,7 +164,6 @@
             }
         });
 
-        // --- CONFIGURATION ---
         const API_BASE = "https://supriyadigitals.store/api/";
         const params = new URLSearchParams(window.location.search);
         
@@ -174,7 +172,7 @@
         let isSelectMode = false;
         let currentIndex = 0;
         let canDownload = false;
-        let currentDownloadReq = null; // Holds the queue request
+        let currentDownloadReq = null; 
 
         function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
@@ -198,8 +196,7 @@
                 const result = await response.json();
 
                 if (!result.success || result.data.length === 0) {
-                    $('#main-loader').html('<h4 class="text-danger">Gallery Not Found</h4>');
-                    return;
+                    $('#main-loader').html('<h4 class="text-danger">Gallery Not Found</h4>'); return;
                 }
 
                 let finalData = result.data;
@@ -250,19 +247,51 @@
             $('#event-content').html(html);
         }
 
+        // ADAPTIVE NETWORK CHECK
+        function getNetworkStatus() {
+            if (navigator.connection) {
+                const type = navigator.connection.effectiveType;
+                const downlink = navigator.connection.downlink; 
+                if (type === 'slow-2g' || type === '2g' || type === '3g' || downlink < 1.5) return 'slow';
+            }
+            return 'fast'; 
+        }
+
         function renderGallery() {
             let html = '';
+            const netSpeed = getNetworkStatus(); 
+            
             galleryData.forEach((item, index) => {
                 const imgUrl = item.file_path; 
                 const fname = item.clean_name || item.file_path.split('/').pop();
                 galleryData[index].fullUrl = imgUrl; 
                 galleryData[index].filename = fname;
-                const smartUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
+                
+                const smartUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&net=${netSpeed}`;
 
-                html += `<div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})"><img data-src="${smartUrl}" class="lazy-image" alt="Photo" decoding="async"></div>`;
+                html += `<div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})">
+                            <img data-src="${smartUrl}" class="lazy-image" alt="Photo" decoding="async">
+                         </div>`;
             });
             document.getElementById('gallery').innerHTML = html;
             initLazyLoader();
+        }
+
+        // QUEUED LAZY LOADER (Prevents Synology Overload while staying invisible to user)
+        let imageLoadQueue = [];
+        let activeDownloads = 0;
+        const MAX_PARALLEL_DOWNLOADS = 4; // Only 4 images at a time to save NAS CPU
+
+        function processImageLoadQueue() {
+            if (imageLoadQueue.length === 0 || activeDownloads >= MAX_PARALLEL_DOWNLOADS) return;
+            
+            const img = imageLoadQueue.shift();
+            activeDownloads++;
+
+            img.onload = () => { img.classList.add('loaded'); activeDownloads--; processImageLoadQueue(); };
+            img.onerror = () => { activeDownloads--; processImageLoadQueue(); };
+
+            img.src = img.getAttribute('data-src');
         }
 
         function initLazyLoader() {
@@ -270,12 +299,13 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
-                        img.src = img.getAttribute('data-src');
-                        img.onload = () => img.classList.add('loaded');
+                        imageLoadQueue.push(img);
+                        processImageLoadQueue();
                         observer.unobserve(img); 
                     }
                 });
-            }, { rootMargin: "0px 0px 500px 0px" });
+            }, { rootMargin: "0px 0px 500px 0px" }); // 500px invisible preload margin
+
             document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img));
         }
 
@@ -293,7 +323,6 @@
             if (count > 0) $('#selection-bar').addClass('visible'); else $('#selection-bar').removeClass('visible');
         }
 
-        // --- REAL QUEUE SUBMISSION TO SYNOLOGY ---
         function downloadAllImages() {
             if(!canDownload) return alert("Download not allowed.");
             if(!confirm(`Download all ${galleryData.length} images?`)) return;
@@ -324,13 +353,11 @@
                         $('#queue-spinner').hide();
                         $('#queue-cancel-btn').hide();
                         
-                        // Instantly trigger browser to download the finished ZIP
                         window.location.href = res.download_url;
-                        
                         setTimeout(() => { $('#queue-overlay').fadeOut(); clearSelection(); }, 2000);
                     } else if (res.status === 'queued') {
                         $('#queue-title').text('Server Busy');
-                        $('#queue-text').text(res.message); // Tells them to wait 30 seconds
+                        $('#queue-text').text(res.message); 
                         $('#queue-spinner').hide();
                     } else {
                         $('#queue-title').text('Error');
