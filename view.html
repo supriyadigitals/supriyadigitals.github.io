@@ -160,8 +160,8 @@
                             <div class="dropdown download-ui d-none">
                                 <span class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></span>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
-                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('normal')"><i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web Size)</a>
-                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full')"><i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)</a>
+                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('normal', event)"><i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web Size)</a>
+                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full', event)"><i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)</a>
                                 </div>
                             </div>
                             <span class="lb-icon" data-dismiss="modal"><i class="fas fa-times"></i></span>
@@ -190,7 +190,7 @@
         const API_BASE = "https://supriyadigitals.store/api/";
         const params = new URLSearchParams(window.location.search);
         
-        let fullEventData = []; // Stores everything so we can go back and forth!
+        let fullEventData = []; 
         let galleryData = []; 
         let selectedFiles = new Set();
         let isSelectMode = false;
@@ -229,10 +229,8 @@
                     fullEventData = fullEventData.filter(item => item.title === eventName);
                     if(fullEventData.length === 0) { $('#main-loader').html('<h4 class="text-danger">Event Not Found</h4>'); return; }
                     
-                    // IF EVENT LINK: Render Dashboard!
                     renderFolderDashboard();
                 } else {
-                    // IF BATCH LINK: Render direct grid!
                     galleryData = fullEventData.filter(i => i.type === 'work' || i.type === 'link');
                     canDownload = galleryData.some(item => item.can_download == 1);
                     if (canDownload) $('.download-ui').removeClass('d-none').show();
@@ -245,9 +243,8 @@
             } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
         }
 
-        // --- THE NEW DIRECTORY DASHBOARD RENDERER ---
         function renderFolderDashboard() {
-            $('#gallery').empty(); // Clear photos
+            $('#gallery').empty(); 
             $('#btnSelectMode').hide(); 
             $('.download-ui').addClass('d-none').hide(); 
             $('#btnBackToFolders').hide();
@@ -267,7 +264,6 @@
 
             let html = '<div class="section-header">Collections</div><div class="media-grid">';
 
-            // 1. Render Photo Folders
             Object.keys(groups).forEach(bId => {
                 const g = groups[bId];
                 const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
@@ -281,7 +277,6 @@
                 </div>`;
             });
 
-            // 2. Render Videos
             videos.forEach(v => {
                 let ytId = v.file_path ? (v.file_path.split('v=')[1] || v.file_path.split('youtu.be/')[1] || "").split('&')[0] : "";
                 html += `
@@ -297,7 +292,6 @@
                 </div>`;
             });
 
-            // 3. Render Albums (PDFs)
             albums.forEach(a => {
                 html += `
                 <div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;">
@@ -313,17 +307,12 @@
             $('#event-content').html(html);
         }
 
-        // --- DASHBOARD NAVIGATION ---
         function openFolder(batchId, folderName) {
-            // Filter just this specific batch
             galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
-            
-            // Re-evaluate Download Permissions
             canDownload = galleryData.some(item => item.can_download == 1);
             if (canDownload) $('.download-ui').removeClass('d-none').show();
             else $('.download-ui').addClass('d-none').hide();
 
-            // Swap UI
             $('#event-content').empty();
             $('#btnSelectMode').show();
             $('#btnBackToFolders').show();
@@ -344,11 +333,9 @@
         }
 
         $('#videoModal').on('hidden.bs.modal', function () {
-            $('#ytIframe').attr('src', ''); // Stop audio when closed
+            $('#ytIframe').attr('src', ''); 
         });
 
-
-        // --- GALLERY RENDERER ---
         function renderGallery() {
             let html = '';
             galleryData.forEach((item, index) => {
@@ -412,6 +399,7 @@
             $('#quality-overlay').css('display', 'flex');
         }
 
+        // --- GHOST LINK BATCH FIX ---
         function executeBatchDownload(qualityChoice) {
             $('#quality-overlay').fadeOut();
             $('#queue-overlay').css('display', 'flex');
@@ -427,10 +415,18 @@
                 success: function(res) {
                     if (res.success && res.status === 'ready') {
                         $('#queue-title').text('Download Ready!');
-                        $('#queue-text').text('Your file has been generated.');
+                        $('#queue-text').text('Starting download automatically...');
                         $('#queue-spinner').hide(); $('#queue-cancel-btn').hide();
-                        window.location.href = res.download_url;
-                        setTimeout(() => { $('#queue-overlay').fadeOut(); clearSelection(); }, 2000);
+                        
+                        // Creates an invisible link to bypass popup blockers/page jumps
+                        const link = document.createElement('a');
+                        link.href = res.download_url;
+                        link.setAttribute('download', 'Supriya_Gallery.zip');
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        setTimeout(() => { $('#queue-overlay').fadeOut(); clearSelection(); }, 2500);
                     } else if (res.status === 'queued') {
                         $('#queue-title').text('Server Busy'); $('#queue-text').text(res.message); $('#queue-spinner').hide();
                     } else {
@@ -446,11 +442,28 @@
             $('#queue-overlay').fadeOut();
         }
 
-        function downloadSingleImage(type) {
+        // --- GHOST LINK SINGLE DOWNLOAD FIX ---
+        function downloadSingleImage(type, event) {
+            if (event) event.preventDefault(); // STOPS PAGE FROM JUMPING UP!
+            
             const item = galleryData[currentIndex];
             if(item.can_download != 1) return;
-            if (type === 'normal') window.location.href = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
-            else window.location.href = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
+            
+            let dlUrl = '';
+            if (type === 'normal') {
+                dlUrl = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
+            } else {
+                dlUrl = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
+            }
+            
+            // Ghost link bypassing the pop up blocker 
+            const link = document.createElement('a');
+            link.href = dlUrl;
+            link.setAttribute('download', item.filename || 'download.jpg');
+            link.setAttribute('target', '_blank');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function openLightbox(index) { currentIndex = index; updateLightbox(); $('#lightboxModal').modal('show'); }
