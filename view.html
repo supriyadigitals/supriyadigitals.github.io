@@ -253,14 +253,11 @@
             let albums = [];
 
             fullEventData.forEach(item => {
-                if (item.type === 'teaser') videos.push(item);
+                if (item.type === 'teaser' || item.type === 'live') videos.push(item);
                 else if (item.type === 'album') albums.push(item);
                 else if (item.batch_id) {
-                    // --- DYNAMIC FOLDER NAMING FIX ---
-                    // Slices the true NAS folder name right out of the file path!
                     let pathParts = item.file_path.split('/');
-                    let actualFolderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : "Photo Album";
-                    
+                    let actualFolderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : item.title;
                     if (!groups[item.batch_id]) groups[item.batch_id] = { title: actualFolderName, items: [], cover: item.file_path };
                     groups[item.batch_id].items.push(item);
                 }
@@ -282,7 +279,13 @@
             });
 
             videos.forEach(v => {
-                let ytId = v.file_path ? (v.file_path.split('v=')[1] || v.file_path.split('youtu.be/')[1] || "").split('&')[0] : "";
+                let ytId = "";
+                if (v.file_path) {
+                    if (v.file_path.includes('embed/')) { ytId = v.file_path.split('embed/')[1].split('?')[0]; } 
+                    else if (v.file_path.includes('v=')) { ytId = v.file_path.split('v=')[1].split('&')[0]; } 
+                    else if (v.file_path.includes('youtu.be/')) { ytId = v.file_path.split('youtu.be/')[1].split('?')[0]; }
+                }
+
                 html += `
                 <div class="media-card" onclick="openVideo('${ytId}')">
                     <div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');">
@@ -336,17 +339,13 @@
             $('#videoModal').modal('show');
         }
 
-        $('#videoModal').on('hidden.bs.modal', function () {
-            $('#ytIframe').attr('src', ''); 
-        });
+        $('#videoModal').on('hidden.bs.modal', function () { $('#ytIframe').attr('src', ''); });
 
         function renderGallery() {
             let html = '';
             galleryData.forEach((item, index) => {
                 const imgUrl = item.file_path; 
                 galleryData[index].fullUrl = imgUrl; 
-                
-                // --- TRUE FILENAME EXTRACTION FIX ---
                 galleryData[index].filename = item.title_from_filename || item.file_path.split('/').pop();
                 
                 const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`;
@@ -426,9 +425,7 @@
                         const link = document.createElement('a');
                         link.href = res.download_url;
                         link.setAttribute('download', 'Supriya_Gallery.zip');
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
+                        document.body.appendChild(link); link.click(); document.body.removeChild(link);
                         
                         setTimeout(() => { $('#queue-overlay').fadeOut(); clearSelection(); }, 2500);
                     } else if (res.status === 'queued') {
@@ -441,26 +438,15 @@
             });
         }
 
-        function cancelQueue() {
-            if (currentDownloadReq) { currentDownloadReq.abort(); currentDownloadReq = null; }
-            $('#queue-overlay').fadeOut();
-        }
+        function cancelQueue() { if (currentDownloadReq) { currentDownloadReq.abort(); currentDownloadReq = null; } $('#queue-overlay').fadeOut(); }
 
         function downloadSingleImage(type, event) {
             if (event) event.preventDefault(); 
-            
             const item = galleryData[currentIndex];
             if(item.can_download != 1) return;
-            
             let dlUrl = type === 'normal' ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}` : `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
-            
-            const link = document.createElement('a');
-            link.href = dlUrl;
-            link.setAttribute('download', item.filename || 'download.jpg');
-            link.setAttribute('target', '_blank');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const link = document.createElement('a'); link.href = dlUrl; link.setAttribute('download', item.filename || 'download.jpg'); link.setAttribute('target', '_blank');
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
         function openLightbox(index) { currentIndex = index; updateLightbox(); $('#lightboxModal').modal('show'); }
@@ -474,8 +460,6 @@
             currentHighResLoader.onload = function() {
                 if (galleryData[currentIndex].highResUrl === this.src) {
                     $('#lightboxImage').attr('src', this.src);
-                    
-                    // --- TRUE FILENAME EXTRACTION FIX FOR LIGHTBOX ---
                     $('#lbFileName').text(item.filename);
                 }
             };
@@ -483,7 +467,6 @@
 
             let nextIndex = (currentIndex + 1) % galleryData.length; let preloadNext = new Image(); preloadNext.src = galleryData[nextIndex].highResUrl;
             let prevIndex = currentIndex - 1; if (prevIndex < 0) prevIndex = galleryData.length - 1; let preloadPrev = new Image(); preloadPrev.src = galleryData[prevIndex].highResUrl;
-            
             if (item.can_download == 1) $('.download-ui').removeClass('d-none'); else $('.download-ui').addClass('d-none');
         }
 
