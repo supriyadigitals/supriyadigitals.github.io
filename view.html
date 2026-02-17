@@ -26,7 +26,6 @@
         .btn-header { border: 1px solid #eee; color: #555; border-radius: 50px; padding: 8px 20px; font-size: 0.85rem; transition: 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; margin-left: 10px; font-weight: 600; }
         .btn-header:hover, .btn-header.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-        /* DIRECTORY DASHBOARD STYLES */
         .section-header { margin: 40px 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 0 30px; margin-bottom: 40px; }
         .media-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
@@ -257,7 +256,12 @@
                 if (item.type === 'teaser') videos.push(item);
                 else if (item.type === 'album') albums.push(item);
                 else if (item.batch_id) {
-                    if (!groups[item.batch_id]) groups[item.batch_id] = { title: item.title, items: [], cover: item.file_path };
+                    // --- DYNAMIC FOLDER NAMING FIX ---
+                    // Slices the true NAS folder name right out of the file path!
+                    let pathParts = item.file_path.split('/');
+                    let actualFolderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : "Photo Album";
+                    
+                    if (!groups[item.batch_id]) groups[item.batch_id] = { title: actualFolderName, items: [], cover: item.file_path };
                     groups[item.batch_id].items.push(item);
                 }
             });
@@ -341,7 +345,9 @@
             galleryData.forEach((item, index) => {
                 const imgUrl = item.file_path; 
                 galleryData[index].fullUrl = imgUrl; 
-                galleryData[index].filename = item.clean_name || item.file_path.split('/').pop();
+                
+                // --- TRUE FILENAME EXTRACTION FIX ---
+                galleryData[index].filename = item.title_from_filename || item.file_path.split('/').pop();
                 
                 const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`;
                 const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
@@ -399,7 +405,6 @@
             $('#quality-overlay').css('display', 'flex');
         }
 
-        // --- GHOST LINK BATCH FIX ---
         function executeBatchDownload(qualityChoice) {
             $('#quality-overlay').fadeOut();
             $('#queue-overlay').css('display', 'flex');
@@ -418,7 +423,6 @@
                         $('#queue-text').text('Starting download automatically...');
                         $('#queue-spinner').hide(); $('#queue-cancel-btn').hide();
                         
-                        // Creates an invisible link to bypass popup blockers/page jumps
                         const link = document.createElement('a');
                         link.href = res.download_url;
                         link.setAttribute('download', 'Supriya_Gallery.zip');
@@ -442,21 +446,14 @@
             $('#queue-overlay').fadeOut();
         }
 
-        // --- GHOST LINK SINGLE DOWNLOAD FIX ---
         function downloadSingleImage(type, event) {
-            if (event) event.preventDefault(); // STOPS PAGE FROM JUMPING UP!
+            if (event) event.preventDefault(); 
             
             const item = galleryData[currentIndex];
             if(item.can_download != 1) return;
             
-            let dlUrl = '';
-            if (type === 'normal') {
-                dlUrl = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
-            } else {
-                dlUrl = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
-            }
+            let dlUrl = type === 'normal' ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}` : `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
             
-            // Ghost link bypassing the pop up blocker 
             const link = document.createElement('a');
             link.href = dlUrl;
             link.setAttribute('download', item.filename || 'download.jpg');
@@ -477,7 +474,9 @@
             currentHighResLoader.onload = function() {
                 if (galleryData[currentIndex].highResUrl === this.src) {
                     $('#lightboxImage').attr('src', this.src);
-                    $('#lbFileName').text(item.filename || `Image ${currentIndex + 1}`);
+                    
+                    // --- TRUE FILENAME EXTRACTION FIX FOR LIGHTBOX ---
+                    $('#lbFileName').text(item.filename);
                 }
             };
             currentHighResLoader.src = item.highResUrl;
