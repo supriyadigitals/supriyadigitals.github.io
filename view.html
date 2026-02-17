@@ -44,8 +44,23 @@
         @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } .media-grid { padding: 0 15px; } }
         @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
         
-        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); min-height: 250px; }
-        .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.6s ease-in; }
+        /* THE GPU ACCELERATION & RENDER-SKIP TRICKS */
+        .gallery-item { 
+            break-inside: avoid; margin-bottom: 20px; position: relative; 
+            border-radius: 8px; overflow: hidden; cursor: pointer; 
+            background: #f0f0f0; transition: transform 0.2s; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            min-height: 250px; 
+            /* Forces browser to skip drawing off-screen elements: */
+            content-visibility: auto;
+            contain-intrinsic-size: 250px; 
+            will-change: transform; /* Uses GPU */
+        }
+        .lazy-image { 
+            width: 100%; display: block; opacity: 0; 
+            transition: opacity 0.5s ease-out; 
+            will-change: opacity; /* Uses GPU */
+        }
         .lazy-image.loaded { opacity: 1; }
 
         .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
@@ -65,7 +80,7 @@
         .lb-actions { display: flex; align-items: center; }
         .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
         .lb-icon:hover { opacity: 1; color: var(--primary); }
-        #lightboxImage { max-height: 80vh; max-width: 95vw; margin-top: 60px; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); pointer-events: none;}
+        #lightboxImage { max-height: 80vh; max-width: 95vw; margin-top: 60px; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); pointer-events: none; will-change: transform;}
         .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.3s; pointer-events: auto;}
         .lb-control:hover { background: var(--primary); }
         .lb-prev { left: 20px; } .lb-next { right: 20px; }
@@ -192,18 +207,13 @@
 
                 let finalData = result.data;
 
-                // --- NEW FIX: NATURAL SORTER APPLIED HERE ---
-                // This perfectly organizes files like 1, 2, 3, 10 instead of 1, 10, 2
+                // NATURAL SORTER
                 finalData.sort((a, b) => {
-                    // Check custom drag-and-drop order first
                     const orderA = parseInt(a.order_index) || 0;
                     const orderB = parseInt(b.order_index) || 0;
                     if (orderA !== orderB) return orderA - orderB;
-                    
-                    // Fallback to reading the filenames naturally
                     const nameA = a.title_from_filename || a.file_path.split('/').pop() || "";
                     const nameB = b.title_from_filename || b.file_path.split('/').pop() || "";
-                    
                     return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
                 });
 
@@ -218,7 +228,7 @@
                 if (canDownload) $('.download-ui').removeClass('d-none');
 
                 renderGallery();
-                $('#main-loader').fadeOut(500);
+                $('#main-loader').fadeOut(300);
 
             } catch (e) {
                 console.error(e);
@@ -276,9 +286,10 @@
             initLazyLoader();
         }
 
+        // QUEUED LAZY LOADER
         let imageLoadQueue = [];
         let activeDownloads = 0;
-        const MAX_PARALLEL_DOWNLOADS = 4;
+        const MAX_PARALLEL_DOWNLOADS = 6; // slightly increased for speed
 
         function processImageLoadQueue() {
             if (imageLoadQueue.length === 0 || activeDownloads >= MAX_PARALLEL_DOWNLOADS) return;
@@ -302,7 +313,8 @@
                         observer.unobserve(img); 
                     }
                 });
-            }, { rootMargin: "0px 0px 500px 0px" });
+            // AGGRESSIVE MARGIN: Asks the server to start loading images 1200px before you even see them!
+            }, { rootMargin: "0px 0px 1200px 0px" });
 
             document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img));
         }
@@ -382,15 +394,19 @@
             else window.location.href = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
         }
 
+        // --- THE NEIGHBOR-PRELOADING LIGHTBOX ---
         function openLightbox(index) { currentIndex = index; updateLightbox(); $('#lightboxModal').modal('show'); }
+        
         function updateLightbox() {
             const item = galleryData[currentIndex];
             
+            // Instantly show grid thumbnail
             $('#lightboxImage').attr('src', item.thumbUrl).css('opacity', '1');
             $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2" style="font-size: 0.8rem;"></i> Enhancing...`);
             
             if (currentHighResLoader) { currentHighResLoader.onload = null; }
 
+            // Upgrade to high-res
             currentHighResLoader = new Image();
             currentHighResLoader.onload = function() {
                 if (galleryData[currentIndex].highResUrl === this.src) {
@@ -399,6 +415,17 @@
                 }
             };
             currentHighResLoader.src = item.highResUrl;
+
+            // BACKGROUND PRELOADER: Silently download the NEXT image so it's instant when they click ">"
+            let nextIndex = (currentIndex + 1) % galleryData.length;
+            let preloadNext = new Image();
+            preloadNext.src = galleryData[nextIndex].highResUrl;
+            
+            // BACKGROUND PRELOADER: Silently download the PREVIOUS image
+            let prevIndex = currentIndex - 1;
+            if (prevIndex < 0) prevIndex = galleryData.length - 1;
+            let preloadPrev = new Image();
+            preloadPrev.src = galleryData[prevIndex].highResUrl;
 
             if (item.can_download == 1) $('.download-ui').removeClass('d-none'); 
             else $('.download-ui').addClass('d-none');
