@@ -143,7 +143,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // ANTI-THEFT
         document.addEventListener('contextmenu', event => event.preventDefault()); 
         document.addEventListener('dragstart', event => event.preventDefault()); 
         document.addEventListener('keydown', event => {
@@ -192,10 +191,25 @@
                 }
 
                 let finalData = result.data;
+
+                // --- NEW FIX: NATURAL SORTER APPLIED HERE ---
+                // This perfectly organizes files like 1, 2, 3, 10 instead of 1, 10, 2
+                finalData.sort((a, b) => {
+                    // Check custom drag-and-drop order first
+                    const orderA = parseInt(a.order_index) || 0;
+                    const orderB = parseInt(b.order_index) || 0;
+                    if (orderA !== orderB) return orderA - orderB;
+                    
+                    // Fallback to reading the filenames naturally
+                    const nameA = a.title_from_filename || a.file_path.split('/').pop() || "";
+                    const nameB = b.title_from_filename || b.file_path.split('/').pop() || "";
+                    
+                    return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
+                });
+
                 if (eventName) {
-                    finalData = result.data.filter(item => item.title === eventName);
+                    finalData = finalData.filter(item => item.title === eventName);
                     if(finalData.length === 0) { $('#main-loader').html('<h4 class="text-danger">Event Not Found</h4>'); return; }
-                    finalData.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
                     renderEventSections(finalData);
                 }
 
@@ -239,7 +253,6 @@
             $('#event-content').html(html);
         }
 
-        // --- PROGRESSIVE THUMBNAIL RENDERER ---
         function renderGallery() {
             let html = '';
             
@@ -249,7 +262,6 @@
                 galleryData[index].fullUrl = imgUrl; 
                 galleryData[index].filename = fname;
                 
-                // Pre-calculate both URLs and save them to the data object
                 const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`;
                 const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
                 
@@ -264,10 +276,9 @@
             initLazyLoader();
         }
 
-        // --- 4-IMAGE QUEUED LAZY LOADER ---
         let imageLoadQueue = [];
         let activeDownloads = 0;
-        const MAX_PARALLEL_DOWNLOADS = 4; // Protects Synology CPU
+        const MAX_PARALLEL_DOWNLOADS = 4;
 
         function processImageLoadQueue() {
             if (imageLoadQueue.length === 0 || activeDownloads >= MAX_PARALLEL_DOWNLOADS) return;
@@ -371,22 +382,17 @@
             else window.location.href = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
         }
 
-        // --- INSTANT PROGRESSIVE LIGHTBOX ---
         function openLightbox(index) { currentIndex = index; updateLightbox(); $('#lightboxModal').modal('show'); }
         function updateLightbox() {
             const item = galleryData[currentIndex];
             
-            // 1. INSTANT LOAD: Immediately show the thumbnail already stored in browser RAM
             $('#lightboxImage').attr('src', item.thumbUrl).css('opacity', '1');
             $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2" style="font-size: 0.8rem;"></i> Enhancing...`);
             
-            // 2. Cancel pending high-res downloads from the previous image
             if (currentHighResLoader) { currentHighResLoader.onload = null; }
 
-            // 3. BACKGROUND UPGRADE: Secretly fetch the high-res version
             currentHighResLoader = new Image();
             currentHighResLoader.onload = function() {
-                // Swap it in smoothly!
                 if (galleryData[currentIndex].highResUrl === this.src) {
                     $('#lightboxImage').attr('src', this.src);
                     $('#lbFileName').text(item.filename || `Image ${currentIndex + 1}`);
