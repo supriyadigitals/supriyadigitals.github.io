@@ -13,7 +13,6 @@
     <style>
         :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
         
-        /* THEFT PROTECTION CSS */
         body { 
             background-color: var(--bg); color: var(--text); 
             font-family: 'Montserrat', sans-serif; 
@@ -22,19 +21,16 @@
         }
         img { pointer-events: none; -webkit-user-drag: none; }
 
-        /* LOADER */
         #main-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* HEADER */
         .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
         .brand-title span { color: var(--primary); }
         .btn-header { border: 1px solid #eee; color: #555; border-radius: 50px; padding: 8px 20px; font-size: 0.85rem; transition: 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; margin-left: 10px; font-weight: 600; }
         .btn-header:hover, .btn-header.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-        /* MASTER EVENT SECTIONS */
         .section-header { margin: 40px 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 0 30px; margin-bottom: 40px; }
         .media-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
@@ -42,7 +38,6 @@
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
         .card-details { padding: 15px; text-align: center; font-weight: 600; font-size: 0.9rem; }
 
-        /* GALLERY GRID */
         .container-fluid { padding: 30px; padding-bottom: 120px; }
         .gallery-grid { column-count: 4; column-gap: 20px; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
@@ -53,18 +48,15 @@
         .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.6s ease-in; }
         .lazy-image.loaded { opacity: 1; }
 
-        /* SELECTION & FLOATING BAR */
         .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
         .gallery-item.selected::after { content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; top: 10px; right: 10px; background: var(--primary); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         #selection-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #222; color: #fff; padding: 12px 30px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; gap: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto;}
         #selection-bar.visible { transform: translateX(-50%) translateY(0); }
         .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
 
-        /* QUEUE OVERLAY */
         #queue-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; pointer-events: auto;}
         .queue-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 100%; border: 1px solid #eee; }
 
-        /* LIGHTBOX */
         .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; pointer-events: auto;}
         .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
@@ -159,8 +151,7 @@
                (event.ctrlKey && event.shiftKey && (event.keyCode == 73 || event.keyCode == 74)) || 
                (event.ctrlKey && event.keyCode == 85) || 
                (event.ctrlKey && event.keyCode == 83)) {
-                event.preventDefault();
-                return false;
+                event.preventDefault(); return false;
             }
         });
 
@@ -173,6 +164,7 @@
         let currentIndex = 0;
         let canDownload = false;
         let currentDownloadReq = null; 
+        let currentHighResLoader = null;
 
         function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
@@ -247,19 +239,9 @@
             $('#event-content').html(html);
         }
 
-        // ADAPTIVE NETWORK CHECK
-        function getNetworkStatus() {
-            if (navigator.connection) {
-                const type = navigator.connection.effectiveType;
-                const downlink = navigator.connection.downlink; 
-                if (type === 'slow-2g' || type === '2g' || type === '3g' || downlink < 1.5) return 'slow';
-            }
-            return 'fast'; 
-        }
-
+        // --- PROGRESSIVE THUMBNAIL RENDERER ---
         function renderGallery() {
             let html = '';
-            const netSpeed = getNetworkStatus(); 
             
             galleryData.forEach((item, index) => {
                 const imgUrl = item.file_path; 
@@ -267,20 +249,25 @@
                 galleryData[index].fullUrl = imgUrl; 
                 galleryData[index].filename = fname;
                 
-                const smartUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&net=${netSpeed}`;
+                // Pre-calculate both URLs and save them to the data object
+                const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`;
+                const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
+                
+                galleryData[index].thumbUrl = thumbUrl;
+                galleryData[index].highResUrl = highResUrl;
 
                 html += `<div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})">
-                            <img data-src="${smartUrl}" class="lazy-image" alt="Photo" decoding="async">
+                            <img data-src="${thumbUrl}" class="lazy-image" alt="Photo" decoding="async">
                          </div>`;
             });
             document.getElementById('gallery').innerHTML = html;
             initLazyLoader();
         }
 
-        // QUEUED LAZY LOADER (Prevents Synology Overload while staying invisible to user)
+        // --- 4-IMAGE QUEUED LAZY LOADER ---
         let imageLoadQueue = [];
         let activeDownloads = 0;
-        const MAX_PARALLEL_DOWNLOADS = 4; // Only 4 images at a time to save NAS CPU
+        const MAX_PARALLEL_DOWNLOADS = 4; // Protects Synology CPU
 
         function processImageLoadQueue() {
             if (imageLoadQueue.length === 0 || activeDownloads >= MAX_PARALLEL_DOWNLOADS) return;
@@ -304,7 +291,7 @@
                         observer.unobserve(img); 
                     }
                 });
-            }, { rootMargin: "0px 0px 500px 0px" }); // 500px invisible preload margin
+            }, { rootMargin: "0px 0px 500px 0px" });
 
             document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img));
         }
@@ -352,7 +339,6 @@
                         $('#queue-text').text('Your file has been generated.');
                         $('#queue-spinner').hide();
                         $('#queue-cancel-btn').hide();
-                        
                         window.location.href = res.download_url;
                         setTimeout(() => { $('#queue-overlay').fadeOut(); clearSelection(); }, 2000);
                     } else if (res.status === 'queued') {
@@ -385,14 +371,33 @@
             else window.location.href = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
         }
 
+        // --- INSTANT PROGRESSIVE LIGHTBOX ---
         function openLightbox(index) { currentIndex = index; updateLightbox(); $('#lightboxModal').modal('show'); }
         function updateLightbox() {
             const item = galleryData[currentIndex];
-            const smartUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.fullUrl)}`;
-            $('#lightboxImage').attr('src', smartUrl);
-            $('#lbFileName').text(item.filename || `Image ${currentIndex + 1}`);
-            if (item.can_download == 1) $('.download-ui').removeClass('d-none'); else $('.download-ui').addClass('d-none');
+            
+            // 1. INSTANT LOAD: Immediately show the thumbnail already stored in browser RAM
+            $('#lightboxImage').attr('src', item.thumbUrl).css('opacity', '1');
+            $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2" style="font-size: 0.8rem;"></i> Enhancing...`);
+            
+            // 2. Cancel pending high-res downloads from the previous image
+            if (currentHighResLoader) { currentHighResLoader.onload = null; }
+
+            // 3. BACKGROUND UPGRADE: Secretly fetch the high-res version
+            currentHighResLoader = new Image();
+            currentHighResLoader.onload = function() {
+                // Swap it in smoothly!
+                if (galleryData[currentIndex].highResUrl === this.src) {
+                    $('#lightboxImage').attr('src', this.src);
+                    $('#lbFileName').text(item.filename || `Image ${currentIndex + 1}`);
+                }
+            };
+            currentHighResLoader.src = item.highResUrl;
+
+            if (item.can_download == 1) $('.download-ui').removeClass('d-none'); 
+            else $('.download-ui').addClass('d-none');
         }
+
         function changeImage(dir) {
             currentIndex += dir;
             if (currentIndex >= galleryData.length) currentIndex = 0;
