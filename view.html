@@ -13,68 +13,49 @@
     <style>
         :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
         
-        /* THEFT PROTECTION CSS */
-        body { 
-            background-color: var(--bg); color: var(--text); 
-            font-family: 'Montserrat', sans-serif; 
-            margin: 0; padding: 0; overflow-x: hidden; 
-            user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; 
-        }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; }
         img { pointer-events: none; -webkit-user-drag: none; }
 
-        /* LOADER */
         #main-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* HEADER */
         .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
         .brand-title span { color: var(--primary); }
         .btn-header { border: 1px solid #eee; color: #555; border-radius: 50px; padding: 8px 20px; font-size: 0.85rem; transition: 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; margin-left: 10px; font-weight: 600; }
         .btn-header:hover, .btn-header.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-        /* MASTER EVENT SECTIONS */
+        /* DIRECTORY DASHBOARD STYLES */
         .section-header { margin: 40px 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 0 30px; margin-bottom: 40px; }
-        .media-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 0 30px; margin-bottom: 40px; }
+        .media-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .media-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .folder-cover { height: 200px; background-size: cover; background-position: center; position: relative; }
+        .folder-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); }
+        .card-details { padding: 20px; text-align: left; }
+        .card-details h5 { margin: 0 0 5px 0; font-weight: 700; font-size: 1.1rem; color: #111; }
+        .card-details small { color: #666; font-weight: 500; }
+
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
-        .card-details { padding: 15px; text-align: center; font-weight: 600; font-size: 0.9rem; }
 
-        /* GALLERY GRID */
         .container-fluid { padding: 30px; padding-bottom: 120px; }
         .gallery-grid { column-count: 4; column-gap: 20px; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
         @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } .media-grid { padding: 0 15px; } }
         @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
         
-        /* HARDWARE GPU ACCELERATION & RENDER-SKIP TRICKS */
-        .gallery-item { 
-            break-inside: avoid; margin-bottom: 20px; position: relative; 
-            border-radius: 8px; overflow: hidden; cursor: pointer; 
-            background: #f0f0f0; transition: transform 0.2s; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-            min-height: 250px; 
-            content-visibility: auto; /* Drops off-screen math */
-            contain-intrinsic-size: 250px; 
-            will-change: transform; 
-        }
-        .lazy-image { 
-            width: 100%; display: block; opacity: 0; 
-            transition: opacity 0.5s ease-out; 
-            will-change: opacity; 
-        }
+        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); min-height: 250px; content-visibility: auto; contain-intrinsic-size: 250px; will-change: transform; }
+        .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-out; will-change: opacity; }
         .lazy-image.loaded { opacity: 1; }
 
-        /* SELECTION & FLOATING BAR */
         .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
         .gallery-item.selected::after { content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; top: 10px; right: 10px; background: var(--primary); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         #selection-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #222; color: #fff; padding: 12px 30px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; gap: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto;}
         #selection-bar.visible { transform: translateX(-50%) translateY(0); }
         .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
 
-        /* MODALS & OVERLAYS */
         .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; pointer-events: auto;}
         .overlay-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; border: 1px solid #eee; }
         
@@ -82,7 +63,6 @@
         .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; }
         .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
 
-        /* LIGHTBOX */
         .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; pointer-events: auto;}
         .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
@@ -109,7 +89,6 @@
     <div id="quality-overlay" class="overlay-screen">
         <div class="overlay-box">
             <h4 style="margin-top: 0; color: #111; margin-bottom: 20px;">Choose Download Quality</h4>
-            
             <button class="dl-opt-btn" onclick="executeBatchDownload('low')">
                 <i class="fas fa-bolt"></i>
                 <div>
@@ -117,7 +96,6 @@
                     <div style="font-size: 0.8rem; color: #666;">Small KB size. Perfect for sharing on Social Media and WhatsApp.</div>
                 </div>
             </button>
-
             <button class="dl-opt-btn" onclick="executeBatchDownload('high')">
                 <i class="fas fa-star"></i>
                 <div>
@@ -125,7 +103,6 @@
                     <div style="font-size: 0.8rem; color: #666;">Massive MB size. Recommended only for high-end printing.</div>
                 </div>
             </button>
-
             <button class="btn btn-light w-100 mt-2 font-weight-bold" onclick="$('#quality-overlay').fadeOut();">Cancel</button>
         </div>
     </div>
@@ -142,7 +119,8 @@
     <div class="gallery-header">
         <div class="d-flex align-items-center"><h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1></div>
         <div>
-            <button class="btn-header" id="btnSelectMode" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-2"></i> Select</button>
+            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-2"></i> Select</button>
             <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-2"></i> All</button>
         </div>
     </div>
@@ -155,6 +133,21 @@
         <span class="selection-count text-white font-weight-bold">0 Selected</span>
         <button class="btn-download-batch download-ui d-none" onclick="promptDownloadSelected()"><i class="fas fa-cloud-download-alt mr-2"></i> Download</button>
         <button class="btn btn-sm btn-outline-light rounded-circle border-0" onclick="clearSelection()" title="Clear"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="modal fade" id="videoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="background: #000;">
+                <div class="modal-header border-0 p-2" style="position: absolute; right: 0; z-index: 10;">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="video-wrapper">
+                        <iframe id="ytIframe" src="" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
@@ -186,7 +179,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // --- ANTI THEFT ---
         document.addEventListener('contextmenu', event => event.preventDefault()); 
         document.addEventListener('dragstart', event => event.preventDefault()); 
         document.addEventListener('keydown', event => {
@@ -195,10 +187,10 @@
             }
         });
 
-        // --- SETUP ---
         const API_BASE = "https://supriyadigitals.store/api/";
         const params = new URLSearchParams(window.location.search);
         
+        let fullEventData = []; // Stores everything so we can go back and forth!
         let galleryData = []; 
         let selectedFiles = new Set();
         let isSelectMode = false;
@@ -206,7 +198,7 @@
         let canDownload = false;
         let currentDownloadReq = null; 
         let currentHighResLoader = null;
-        let pendingDownloadArray = []; // Temporarily stores files before quality choice
+        let pendingDownloadArray = []; 
 
         function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
@@ -216,7 +208,7 @@
                 const eventName = params.get('event');
                 const batchId = params.get('batch_id');
 
-                if (eventName) { $('#pageTitleDisplay').html(`<span>Event:</span> ${escapeHtml(eventName)}`); url = `${API_BASE}fetch.php?mode=client&type=all`; } 
+                if (eventName) { url = `${API_BASE}fetch.php?mode=client&type=all`; } 
                 else if (batchId) { url += `&batch_id=${batchId}`; }
 
                 const response = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } });
@@ -224,10 +216,8 @@
 
                 if (!result.success || result.data.length === 0) { $('#main-loader').html('<h4 class="text-danger">Gallery Not Found</h4>'); return; }
 
-                let finalData = result.data;
-                
-                // --- NATURAL SORTER ---
-                finalData.sort((a, b) => {
+                fullEventData = result.data;
+                fullEventData.sort((a, b) => {
                     const orderA = parseInt(a.order_index) || 0; const orderB = parseInt(b.order_index) || 0;
                     if (orderA !== orderB) return orderA - orderB;
                     const nameA = a.title_from_filename || a.file_path.split('/').pop() || ""; const nameB = b.title_from_filename || b.file_path.split('/').pop() || "";
@@ -235,39 +225,130 @@
                 });
 
                 if (eventName) {
-                    finalData = finalData.filter(item => item.title === eventName);
-                    if(finalData.length === 0) { $('#main-loader').html('<h4 class="text-danger">Event Not Found</h4>'); return; }
-                    renderEventSections(finalData);
+                    $('#pageTitleDisplay').html(`<span>Event:</span> ${escapeHtml(eventName)}`);
+                    fullEventData = fullEventData.filter(item => item.title === eventName);
+                    if(fullEventData.length === 0) { $('#main-loader').html('<h4 class="text-danger">Event Not Found</h4>'); return; }
+                    
+                    // IF EVENT LINK: Render Dashboard!
+                    renderFolderDashboard();
+                } else {
+                    // IF BATCH LINK: Render direct grid!
+                    galleryData = fullEventData.filter(i => i.type === 'work' || i.type === 'link');
+                    canDownload = galleryData.some(item => item.can_download == 1);
+                    if (canDownload) $('.download-ui').removeClass('d-none').show();
+                    renderGallery();
+                    $('#btnSelectMode').show();
                 }
 
-                galleryData = finalData.filter(i => i.type === 'work' || !i.type);
-                canDownload = galleryData.some(item => item.can_download == 1);
-                if (canDownload) $('.download-ui').removeClass('d-none');
-
-                renderGallery();
                 $('#main-loader').fadeOut(300);
 
             } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
         }
 
-        function renderEventSections(data) {
-            const videos = data.filter(i => i.type === 'teaser'); const albums = data.filter(i => i.type === 'album'); let html = '';
-            if (videos.length > 0) {
-                html += `<div class="section-header">Event Films</div><div class="media-grid">`;
-                videos.forEach(v => {
-                    let ytId = v.file_path ? (v.file_path.split('v=')[1] || v.file_path.split('youtu.be/')[1] || "").split('&')[0] : "";
-                    html += `<div class="media-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen></iframe></div><div class="card-details">${escapeHtml(v.video_category || 'Video')}</div></div>`;
-                }); html += `</div>`;
-            }
-            if (albums.length > 0) {
-                html += `<div class="section-header">Digital Albums</div><div class="media-grid">`;
-                albums.forEach(a => { html += `<div class="media-card" style="padding: 30px 15px; text-align: center; pointer-events:auto;"><i class="fas fa-book-reader" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i><div class="card-details" style="padding-bottom: 5px;">Karizma Album</div><a href="${escapeHtml(a.file_path)}" target="_blank" class="btn-header" style="background:var(--primary); color:#fff; text-decoration:none;">View Album</a></div>`; });
-                html += `</div>`;
-            }
-            if(galleryData.length > 0) html += `<div class="section-header">Photo Gallery</div>`;
+        // --- THE NEW DIRECTORY DASHBOARD RENDERER ---
+        function renderFolderDashboard() {
+            $('#gallery').empty(); // Clear photos
+            $('#btnSelectMode').hide(); 
+            $('.download-ui').addClass('d-none').hide(); 
+            $('#btnBackToFolders').hide();
+
+            let groups = {};
+            let videos = [];
+            let albums = [];
+
+            fullEventData.forEach(item => {
+                if (item.type === 'teaser') videos.push(item);
+                else if (item.type === 'album') albums.push(item);
+                else if (item.batch_id) {
+                    if (!groups[item.batch_id]) groups[item.batch_id] = { title: item.title, items: [], cover: item.file_path };
+                    groups[item.batch_id].items.push(item);
+                }
+            });
+
+            let html = '<div class="section-header">Collections</div><div class="media-grid">';
+
+            // 1. Render Photo Folders
+            Object.keys(groups).forEach(bId => {
+                const g = groups[bId];
+                const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
+                html += `
+                <div class="media-card" onclick="openFolder('${bId}', '${escapeHtml(g.title).replace(/'/g, "\\'")}')">
+                    <div class="folder-cover" style="background-image: url('${coverUrl}');"></div>
+                    <div class="card-details">
+                        <h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(g.title)}</h5>
+                        <small><i class="fas fa-image mr-1"></i> ${g.items.length} Photos</small>
+                    </div>
+                </div>`;
+            });
+
+            // 2. Render Videos
+            videos.forEach(v => {
+                let ytId = v.file_path ? (v.file_path.split('v=')[1] || v.file_path.split('youtu.be/')[1] || "").split('&')[0] : "";
+                html += `
+                <div class="media-card" onclick="openVideo('${ytId}')">
+                    <div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');">
+                        <div class="folder-overlay"></div>
+                        <i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i>
+                    </div>
+                    <div class="card-details">
+                        <h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5>
+                        <small>Tap to Play Video</small>
+                    </div>
+                </div>`;
+            });
+
+            // 3. Render Albums (PDFs)
+            albums.forEach(a => {
+                html += `
+                <div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;">
+                    <i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i>
+                    <div class="card-details" style="text-align:center; padding:0;">
+                        <h5>${escapeHtml(a.title || 'Digital Album')}</h5>
+                        <small>View PDF Document</small>
+                    </div>
+                </div>`;
+            });
+
+            html += '</div>';
             $('#event-content').html(html);
         }
 
+        // --- DASHBOARD NAVIGATION ---
+        function openFolder(batchId, folderName) {
+            // Filter just this specific batch
+            galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
+            
+            // Re-evaluate Download Permissions
+            canDownload = galleryData.some(item => item.can_download == 1);
+            if (canDownload) $('.download-ui').removeClass('d-none').show();
+            else $('.download-ui').addClass('d-none').hide();
+
+            // Swap UI
+            $('#event-content').empty();
+            $('#btnSelectMode').show();
+            $('#btnBackToFolders').show();
+            $('#pageTitleDisplay').html(`<i class="fas fa-folder-open text-warning mr-2"></i> ${folderName}`);
+            
+            renderGallery();
+        }
+
+        function goBackToFolders() {
+            $('#pageTitleDisplay').html(`<span>Event:</span> ${escapeHtml(params.get('event'))}`);
+            clearSelection();
+            renderFolderDashboard();
+        }
+
+        function openVideo(ytId) {
+            $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1`);
+            $('#videoModal').modal('show');
+        }
+
+        $('#videoModal').on('hidden.bs.modal', function () {
+            $('#ytIframe').attr('src', ''); // Stop audio when closed
+        });
+
+
+        // --- GALLERY RENDERER ---
         function renderGallery() {
             let html = '';
             galleryData.forEach((item, index) => {
@@ -275,11 +356,8 @@
                 galleryData[index].fullUrl = imgUrl; 
                 galleryData[index].filename = item.clean_name || item.file_path.split('/').pop();
                 
-                // Triggers fast 400px thumbnail loader
                 const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`;
-                // Standard 1000px viewer loader
                 const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
-                
                 galleryData[index].thumbUrl = thumbUrl; galleryData[index].highResUrl = highResUrl;
 
                 html += `<div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})"><img data-src="${thumbUrl}" class="lazy-image" alt="Photo" decoding="async"></div>`;
@@ -288,7 +366,6 @@
             initLazyLoader();
         }
 
-        // --- SMART LAZY LOADER ---
         let imageLoadQueue = []; let activeDownloads = 0; const MAX_PARALLEL_DOWNLOADS = 6;
         function processImageLoadQueue() {
             if (imageLoadQueue.length === 0 || activeDownloads >= MAX_PARALLEL_DOWNLOADS) return;
@@ -309,7 +386,6 @@
             document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img));
         }
 
-        // --- SELECTION LOGIC ---
         function toggleSelectMode() { isSelectMode = !isSelectMode; $('#btnSelectMode').toggleClass('active'); if(!isSelectMode) clearSelection(); }
         function handleItemClick(index) { if (isSelectMode) toggleSelection(index); else openLightbox(index); }
         function toggleSelection(index) {
@@ -324,7 +400,6 @@
             if (count > 0) $('#selection-bar').addClass('visible'); else $('#selection-bar').removeClass('visible');
         }
 
-        // --- DOWNLOAD QUALITY PROMPTS & QUEUEING ---
         function promptDownloadAll() {
             if(!canDownload) return alert("Download not allowed.");
             pendingDownloadArray = galleryData.map(i => i.fullUrl);
@@ -378,20 +453,13 @@
             else window.location.href = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
         }
 
-        // --- PROGRESSIVE LIGHTBOX ---
         function openLightbox(index) { currentIndex = index; updateLightbox(); $('#lightboxModal').modal('show'); }
-        
         function updateLightbox() {
             const item = galleryData[currentIndex];
-            
-            // Instantly load the tiny grid thumbnail first
             $('#lightboxImage').attr('src', item.thumbUrl).css('opacity', '1');
             $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2" style="font-size: 0.8rem;"></i> Enhancing...`);
             
-            // Cancel background loads if you're clicking fast
             if (currentHighResLoader) { currentHighResLoader.onload = null; }
-            
-            // Then silently pull in the high resolution
             currentHighResLoader = new Image();
             currentHighResLoader.onload = function() {
                 if (galleryData[currentIndex].highResUrl === this.src) {
@@ -401,7 +469,6 @@
             };
             currentHighResLoader.src = item.highResUrl;
 
-            // Background pre-fetch the next and previous image
             let nextIndex = (currentIndex + 1) % galleryData.length; let preloadNext = new Image(); preloadNext.src = galleryData[nextIndex].highResUrl;
             let prevIndex = currentIndex - 1; if (prevIndex < 0) prevIndex = galleryData.length - 1; let preloadPrev = new Image(); preloadPrev.src = galleryData[prevIndex].highResUrl;
             
