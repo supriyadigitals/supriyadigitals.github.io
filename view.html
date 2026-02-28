@@ -8,26 +8,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
         :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; }
         img { pointer-events: none; -webkit-user-drag: none; }
 
-        /* OVERLAYS & LOADING SCREENS */
         .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* CUSTOM CACHE PROGRESS BAR */
         .progress-container { width: 100%; max-width: 400px; background: #eee; border-radius: 20px; overflow: hidden; height: 15px; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
         
         .overlay-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; border: 1px solid #eee; }
         .dl-opt-btn { display: flex; align-items: center; width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; background: #fff; cursor: pointer; transition: 0.2s; text-align: left; }
-        .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; transform: translateY(-2px); }
         .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
 
         .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
@@ -38,13 +35,12 @@
 
         .section-header { margin: 40px 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 0 30px; margin-bottom: 40px; margin-top:30px; }
-        .media-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
-        .media-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .media-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; cursor: pointer; transition: transform 0.2s;}
+        .media-card:hover { transform: translateY(-5px); border-color: var(--primary); }
         .folder-cover { height: 200px; background-size: cover; background-position: center; position: relative; }
         .folder-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); }
         .card-details { padding: 20px; text-align: left; }
         .card-details h5 { margin: 0 0 5px 0; font-weight: 700; font-size: 1.1rem; color: #111; }
-        .card-details small { color: #666; font-weight: 500; }
 
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
@@ -52,8 +48,7 @@
         .container-fluid { padding: 30px; padding-bottom: 120px; }
         .gallery-grid { column-count: 4; column-gap: 20px; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } .media-grid { padding: 0 15px; } }
-        @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
+        @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .media-grid { padding: 0 15px; } }
         
         .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; min-height: 250px; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-out; }
@@ -61,11 +56,10 @@
         .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
         .gallery-item.selected::after { content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; top: 10px; right: 10px; background: var(--primary); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         
-        #selection-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #222; color: #fff; padding: 12px 30px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; gap: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto;}
+        #selection-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #222; color: #fff; padding: 12px 30px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; gap: 20px; transition: 0.4s;}
         #selection-bar.visible { transform: translateX(-50%) translateY(0); }
         .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
 
-        /* ZOOMABLE LIGHTBOX CSS */
         .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; overflow: hidden; pointer-events: auto;}
         .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden;}
         .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
@@ -74,9 +68,7 @@
         .lb-actions { display: flex; align-items: center; }
         .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
         .lb-icon:hover { opacity: 1; color: var(--primary); }
-        
-        #lightboxImage { max-height: 80vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: transform 0.15s ease-out; transform-origin: center center; cursor: zoom-in; will-change: transform;}
-        
+        #lightboxImage { max-height: 80vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: transform 0.15s ease-out; transform-origin: center center; cursor: zoom-in;}
         .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.3s; z-index:1050; pointer-events: auto;}
         .lb-control:hover { background: var(--primary); }
         .lb-prev { left: 20px; } .lb-next { right: 20px; }
@@ -93,17 +85,17 @@
     </div>
 
     <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
-        <i class="fas fa-cogs text-warning mb-3" style="font-size: 3rem;"></i>
+        <i class="fas fa-microchip text-warning mb-3" style="font-size: 3rem;"></i>
         <h3 style="color: #111; font-weight:800; margin-bottom:5px;">Optimizing Gallery</h3>
-        <p style="color: #666; font-size:0.9rem; max-width: 400px;">The studio is preparing high-quality files for your device.</p>
+        <p style="color: #666; font-size:0.9rem; max-width: 400px;">Using Multi-Core Processing to prepare high-quality files.</p>
         
         <div class="progress-container"><div class="progress-fill" id="cache-fill"></div></div>
         
         <h5 id="cache-percent" style="font-weight:700; color:var(--primary);">0% Loaded</h5>
-        <small id="cache-stats" class="text-muted font-weight-bold mt-1">0 / 0 Images</small>
+        <small id="cache-stats" class="text-muted font-weight-bold mt-1">0 / 0 Images Ready</small>
         
         <div class="mt-4 p-3 bg-light rounded text-left" style="max-width: 400px; border:1px solid #e5e7eb;">
-            <p style="margin:0; font-size: 0.85rem; color:#444;"><i class="fas fa-info-circle text-primary mr-2"></i> <b>Safe to close!</b> You can close this page safely. The server will continue generating images in the background. Check back in a few minutes.</p>
+            <p style="margin:0; font-size: 0.85rem; color:#444;"><i class="fas fa-info-circle text-primary mr-2"></i> <b>Safe to close!</b> You can close this page safely. The system will save your progress.</p>
         </div>
     </div>
 
@@ -203,15 +195,21 @@
         
         let fullEventData = []; let galleryData = []; let selectedFiles = new Set();
         let isSelectMode = false; let currentIndex = 0; let canDownload = 0; 
-        let pendingDownloadArray = []; let cacheCheckInterval;
+        let pendingDownloadArray = [];
+
+        // AJAX Worker Variables
+        let cacheMissingUrls = [];
+        let cacheTotal = 0;
+        let cacheCompleted = 0;
+        let cacheWorkersActive = 0;
+        const MAX_WORKERS = 4; // Uses 4 CPU cores on your NAS simultaneously!
 
         function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
-        // --- DEVICE TRACKING LOGIC ---
         let deviceId = localStorage.getItem('supriya_device_id');
         if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('supriya_device_id', deviceId); }
         function pingServer() { fetch(API_BASE + 'ping.php?device=' + deviceId).catch(()=>{}); }
-        pingServer(); setInterval(pingServer, 20000); // Ping every 20 seconds to keep traffic alive
+        pingServer(); setInterval(pingServer, 20000);
 
         async function initializeGallery() {
             try {
@@ -223,23 +221,21 @@
                 const result = await response.json();
 
                 if (!result.success || result.data.length === 0) { 
-                    $('#main-loader').html('<div class="text-center p-4"><h3 class="text-danger font-weight-bold mb-2"><i class="fas fa-exclamation-triangle"></i> Link Expired or Private</h3><p class="text-muted">The gallery you are looking for is currently unavailable.</p></div>'); 
+                    $('#main-loader').html('<div class="text-center p-4"><h3 class="text-danger font-weight-bold mb-2">Link Expired or Private</h3><p class="text-muted">The gallery you are looking for is currently unavailable.</p></div>'); 
                     return; 
                 }
 
                 fullEventData = result.data;
-                fullEventData.sort((a, b) => {
-                    const orderA = parseInt(a.order_index) || 0; const orderB = parseInt(b.order_index) || 0;
-                    if (orderA !== orderB) return orderA - orderB;
-                    const nameA = a.title_from_filename || a.file_path.split('/').pop() || ""; const nameB = b.title_from_filename || b.file_path.split('/').pop() || "";
-                    return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
-                });
                 
                 if (eventName) {
-                    const targetEvent = eventName.trim().toLowerCase();
-                    fullEventData = fullEventData.filter(item => (item.title || "").trim().toLowerCase() === targetEvent);
+                    const targetEvent = decodeURIComponent(eventName).trim().toLowerCase().replace(/\s+/g, ' ');
+                    fullEventData = fullEventData.filter(item => {
+                        let dbTitle = (item.title || "").trim().toLowerCase().replace(/\s+/g, ' ');
+                        return dbTitle === targetEvent;
+                    });
+                    
                     if(fullEventData.length === 0) { 
-                        $('#main-loader').html('<div class="text-center p-4"><h3 class="text-danger font-weight-bold mb-2"><i class="fas fa-exclamation-triangle"></i> Event Not Found</h3><p class="text-muted">This event is marked as private or has been removed.</p></div>'); 
+                        $('#main-loader').html('<div class="text-center p-4"><h3 class="text-danger font-weight-bold mb-2">Event Not Found</h3><p class="text-muted">This event is marked as private or has been removed.</p></div>'); 
                         return; 
                     }
                     $('#main-loader').fadeOut(300);
@@ -248,7 +244,7 @@
                     galleryData = fullEventData.filter(i => i.type === 'work' || i.type === 'link');
                     canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
                     $('#main-loader').fadeOut(300);
-                    if (galleryData.length > 0) openFolder(galleryData[0].batch_id); // Bypass Dashboard if it's a direct batch link
+                    if (galleryData.length > 0) openFolder(galleryData[0].batch_id); 
                 }
             } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
         }
@@ -292,47 +288,77 @@
             html += '</div>'; $('#event-content').html(html);
         }
 
-        // --- BACKGROUND CACHE MANAGER UI ---
+        // --- NEW: BROWSER-CONTROLLED PARALLEL CACHE WORKER ---
         function openFolder(batchId) {
             galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
             canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
             
             $('#event-content').hide(); 
-            checkCacheStatus(batchId); // Initiates the background check before showing images!
-        }
-
-        function checkCacheStatus(batchId) {
+            
             $('#cache-progress-screen').fadeIn();
             
-            $.get(API_BASE + 'cache_manager.php?action=status&batch_id=' + batchId, function(data) {
-                let res = JSON.parse(data);
-                let pct = res.total > 0 ? Math.round((res.cached / res.total) * 100) : 100;
-                
-                $('#cache-fill').css('width', pct + '%');
-                $('#cache-percent').text(pct + '% Loaded');
-                $('#cache-stats').text(res.cached + ' / ' + res.total + ' Images Ready');
+            // 1. Ask PHP exactly what files are missing
+            $.get(API_BASE + 'cache_manager.php?batch_id=' + batchId, function(res) {
+                let data = JSON.parse(res);
+                cacheTotal = data.total;
+                cacheCompleted = data.cached;
+                cacheMissingUrls = data.missing;
 
-                if (pct >= 99 || res.total === 0) {
-                    clearInterval(cacheCheckInterval);
-                    cacheCheckInterval = null;
-                    $('#cache-progress-screen').fadeOut();
-                    if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
-                    $('#btnSelectMode').show(); $('#btnBackToFolders').show(); $('#gallery').show();
-                    renderGallery();
+                updateCacheUI();
+
+                if (cacheMissingUrls.length === 0) {
+                    // Fix applied: Everything is already cached, jump to gallery instantly!
+                    finishCacheOptimizer();
                 } else {
-                    if(!res.is_running) $.get(API_BASE + 'cache_manager.php?action=start&batch_id=' + batchId);
-                    if(!cacheCheckInterval) cacheCheckInterval = setInterval(()=>checkCacheStatus(batchId), 3000);
+                    // 2. Start Parallel Workers to build the missing ones
+                    for(let i=0; i<MAX_WORKERS; i++) {
+                        runCacheWorker();
+                    }
                 }
-            }).fail(function() {
-                // Failsafe: if the cache manager script is missing, just load the gallery normally
-                $('#cache-progress-screen').fadeOut();
-                if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
-                $('#btnSelectMode').show(); $('#btnBackToFolders').show(); $('#gallery').show();
-                renderGallery();
-            });
+            }).fail(function() { finishCacheOptimizer(); });
         }
 
-        function goBackToFolders() { clearInterval(cacheCheckInterval); cacheCheckInterval = null; clearSelection(); renderFolderDashboard(); }
+        function updateCacheUI() {
+            let pct = cacheTotal > 0 ? Math.round((cacheCompleted / cacheTotal) * 100) : 100;
+            $('#cache-fill').css('width', pct + '%');
+            $('#cache-percent').text(pct + '% Loaded');
+            $('#cache-stats').text(cacheCompleted + ' / ' + cacheTotal + ' Images Ready');
+        }
+
+        function runCacheWorker() {
+            if(cacheMissingUrls.length === 0) return;
+            
+            cacheWorkersActive++;
+            const url = cacheMissingUrls.shift();
+            
+            // Force the NAS CPU to compress the image
+            const buildUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1';
+            
+            fetch(buildUrl)
+                .then(() => {
+                    cacheCompleted++;
+                    updateCacheUI();
+                    cacheWorkersActive--;
+                    
+                    if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) {
+                        finishCacheOptimizer();
+                    } else {
+                        runCacheWorker();
+                    }
+                })
+                .catch(() => {
+                    cacheCompleted++; updateCacheUI(); cacheWorkersActive--; runCacheWorker();
+                });
+        }
+
+        function finishCacheOptimizer() {
+            $('#cache-progress-screen').fadeOut();
+            if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
+            $('#btnSelectMode').show(); $('#btnBackToFolders').show(); $('#gallery').show();
+            renderGallery();
+        }
+
+        function goBackToFolders() { clearSelection(); renderFolderDashboard(); }
 
         function renderGallery() {
             let html = '';
@@ -347,8 +373,8 @@
             document.getElementById('gallery').innerHTML = html; initLazyLoader();
         }
 
-        let imageLoadQueue = []; let activeDownloads = 0; const MAX_PARALLEL_DOWNLOADS = 6;
-        function processImageLoadQueue() { if (imageLoadQueue.length === 0 || activeDownloads >= MAX_PARALLEL_DOWNLOADS) return; const img = imageLoadQueue.shift(); activeDownloads++; img.onload = () => { img.classList.add('loaded'); activeDownloads--; processImageLoadQueue(); }; img.onerror = () => { activeDownloads--; processImageLoadQueue(); }; img.src = img.getAttribute('data-src'); }
+        let imageLoadQueue = []; let activeDownloads = 0; const MAX_LAZY_DOWNLOADS = 6;
+        function processImageLoadQueue() { if (imageLoadQueue.length === 0 || activeDownloads >= MAX_LAZY_DOWNLOADS) return; const img = imageLoadQueue.shift(); activeDownloads++; img.onload = () => { img.classList.add('loaded'); activeDownloads--; processImageLoadQueue(); }; img.onerror = () => { activeDownloads--; processImageLoadQueue(); }; img.src = img.getAttribute('data-src'); }
         function initLazyLoader() { const imageObserver = new IntersectionObserver((entries, observer) => { entries.forEach(entry => { if (entry.isIntersecting) { imageLoadQueue.push(entry.target); processImageLoadQueue(); observer.unobserve(entry.target); } }); }, { rootMargin: "0px 0px 1200px 0px" }); document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img)); }
 
         function toggleSelectMode() { isSelectMode = !isSelectMode; $('#btnSelectMode').toggleClass('active'); if(!isSelectMode) clearSelection(); }
@@ -357,19 +383,9 @@
         function clearSelection() { selectedFiles.clear(); $('.gallery-item').removeClass('selected'); updateFloatingBar(); }
         function updateFloatingBar() { const count = selectedFiles.size; $('.selection-count').text(count + " Selected"); if (count > 0) $('#selection-bar').addClass('visible'); else $('#selection-bar').removeClass('visible'); }
 
-        // --- DOWNLOAD MANAGER (ZERO NAS STORAGE) ---
-        function promptDownloadAll() { 
-            if (canDownload == 0) return alert("Download not allowed."); 
-            pendingDownloadArray = galleryData.map(i => i.fullUrl); 
-            if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); 
-        }
-        function promptDownloadSelected() { 
-            if (selectedFiles.size === 0) return; 
-            pendingDownloadArray = Array.from(selectedFiles); 
-            if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); 
-        }
+        function promptDownloadAll() { pendingDownloadArray = galleryData.map(i => i.fullUrl); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
+        function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
 
-        // 1. CLIENT-SIDE ZIP (Fast Web Quality)
         async function executeWebDownload() {
             $('#quality-overlay').fadeOut(); $('#queue-overlay').css('display', 'flex'); $('#queue-title').text('Zipping on Device...');
             const zip = new JSZip();
@@ -388,14 +404,10 @@
             });
         }
 
-        // 2. SERVER-STREAM ZIP (Original Quality)
         function executeOriginalDownload() {
             $('#quality-overlay').fadeOut(); $('#queue-overlay').css('display', 'flex'); $('#queue-title').text('Connecting to NAS Vault...'); $('#queue-text').text('Streaming original files directly...');
-            
-            fetch(API_BASE + 'stream_zip.php', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ files: pendingDownloadArray })
-            }).then(response => response.blob()).then(blob => {
+            fetch(API_BASE + 'stream_zip.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files: pendingDownloadArray }) })
+            .then(response => response.blob()).then(blob => {
                 const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = "Supriya_Originals.zip"; link.click();
                 $('#queue-overlay').fadeOut(); clearSelection();
             }).catch(()=> { $('#queue-title').text('Error connecting to vault.'); setTimeout(()=>$('#queue-overlay').fadeOut(), 3000); });
@@ -405,19 +417,13 @@
             if (event) event.preventDefault(); 
             const item = galleryData[currentIndex];
             if(item.can_download == 0) return;
-            
             let dlUrl = type === 'normal' ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}` : `${API_BASE}stream_zip.php?single=${encodeURIComponent(item.fullUrl)}`;
-            // Fallback for full quality if stream_zip single isn't implemented:
-            if(type === 'full') {
-                dlUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.fullUrl)}`; // Direct link to bypass thumb logic if needed, or use your download_full.php
-            }
-            
+            if(type === 'full') dlUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.fullUrl)}`;
             const link = document.createElement('a'); link.href = dlUrl; link.setAttribute('download', item.filename || 'download.jpg'); link.setAttribute('target', '_blank');
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
-        // --- ZOOM LIGHTBOX ---
-        let currentZoom = 1;
+        let currentZoom = 1; let currentHighResLoader = null;
         function openLightbox(index) { currentIndex = index; currentZoom = 1; updateLightbox(); $('#lightboxModal').modal('show'); }
         function updateLightbox() {
             const item = galleryData[currentIndex];
@@ -426,12 +432,7 @@
             
             if (currentHighResLoader) currentHighResLoader.onload = null;
             currentHighResLoader = new Image();
-            currentHighResLoader.onload = function() { 
-                if (galleryData[currentIndex].highResUrl === this.src) { 
-                    $('#lightboxImage').attr('src', this.src); 
-                    $('#lbFileName').text(item.filename); 
-                } 
-            };
+            currentHighResLoader.onload = function() { if (galleryData[currentIndex].highResUrl === this.src) { $('#lightboxImage').attr('src', this.src); $('#lbFileName').text(item.filename); } };
             currentHighResLoader.src = item.highResUrl;
 
             let itemDlState = parseInt(item.can_download) || 0;
@@ -441,17 +442,15 @@
         function changeImage(dir) { currentIndex += dir; currentZoom = 1; $('#lightboxImage').css('transform', `scale(1)`); if (currentIndex >= galleryData.length) currentIndex = 0; if (currentIndex < 0) currentIndex = galleryData.length - 1; updateLightbox(); }
         document.addEventListener('keydown', (e) => { if ($('#lightboxModal').is(':visible')) { if (e.key === "ArrowLeft") changeImage(-1); if (e.key === "ArrowRight") changeImage(1); } });
         
-        // Mouse Wheel & Pinch Zooming Functionality
         const imgEl = document.getElementById('lightboxImage');
         imgEl.addEventListener('wheel', function(e) {
             e.preventDefault();
             currentZoom += e.deltaY * -0.005;
-            currentZoom = Math.min(Math.max(1, currentZoom), 4); // Limit zoom between 1x and 4x
+            currentZoom = Math.min(Math.max(1, currentZoom), 4);
             imgEl.style.transform = `scale(${currentZoom})`;
             if(currentZoom > 1) imgEl.style.cursor = 'grab'; else imgEl.style.cursor = 'zoom-in';
         }, {passive: false});
 
-        // Basic mobile pinch zoom variables
         let initialDistance = null;
         imgEl.addEventListener('touchstart', function(e) { if(e.touches.length === 2) { initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); } });
         imgEl.addEventListener('touchmove', function(e) { 
