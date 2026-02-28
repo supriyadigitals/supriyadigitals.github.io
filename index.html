@@ -111,7 +111,7 @@
         .btn-primary {
             background: var(--primary);
             border: none;
-            border-radius: 0;
+            border-radius: 50px;
             padding: 12px 35px;
             font-family: 'Montserrat', sans-serif;
             text-transform: uppercase;
@@ -124,6 +124,32 @@
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         }
+
+        /* --- CLIENT PORTAL SEARCH BAR --- */
+        .portal-section {
+            background: var(--primary);
+            padding: 40px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        .portal-input {
+            border-radius: 50px 0 0 50px !important;
+            border: none;
+            padding: 25px 20px;
+            font-weight: 600;
+        }
+        .portal-btn {
+            border-radius: 0 50px 50px 0 !important;
+            background: var(--dark);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .portal-btn:hover { background: #000; color: var(--primary); }
 
         /* --- 4. SECTIONS & HEADERS --- */
         .section-padding { padding: 80px 0; }
@@ -140,21 +166,11 @@
             position: relative;
         }
         .page-header h1::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 3px;
-            background: var(--primary);
-            margin: 15px auto 0;
+            content: ''; display: block; width: 60px; height: 3px; background: var(--primary); margin: 15px auto 0;
         }
 
-        /* --- 5. MASONRY GRID & MODERN SKELETON LOADER --- */
-        
-        .gallery-grid {
-            column-count: 3;
-            column-gap: 20px;
-        }
-        
+        /* --- 5. MASONRY GRID & MEDIA CARDS --- */
+        .gallery-grid { column-count: 3; column-gap: 20px; }
         @media (max-width: 992px) { .gallery-grid { column-count: 2; } }
         @media (max-width: 576px) { .gallery-grid { column-count: 1; } }
 
@@ -169,7 +185,6 @@
             transition: transform 0.3s ease;
             background: #eee;
         }
-
         .gallery-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
@@ -180,88 +195,36 @@
             background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
             background-size: 200% 100%;
             animation: 1.5s shine linear infinite;
-            min-height: 250px; /* Gives the loader a box before the image loads */
+            min-height: 250px; 
         }
+        @keyframes shine { to { background-position-x: -200%; } }
 
-        @keyframes shine {
-            to { background-position-x: -200%; }
-        }
+        .gallery-img { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-in; }
+        .gallery-img.loaded { opacity: 1; }
 
-        /* Image Fade In */
-        .gallery-img {
-            width: 100%;
-            display: block;
-            opacity: 0; /* Hidden initially */
-            transition: opacity 0.5s ease-in; /* Smooth fade in */
-        }
-
-        .gallery-img.loaded {
-            opacity: 1; /* Triggered by javascript onload */
-        }
-
-        /* Video Container inside Masonry */
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%; 
-            height: 0;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #000;
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%; border: 0;
-        }
+        /* Video / Album Fast Cover Logic */
+        .folder-cover { height: 250px; background-size: cover; background-position: center; position: relative; }
+        .folder-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; pointer-events: auto; }
 
         /* --- 6. ABOUT & STATS --- */
-        .about-img {
-            box-shadow: 20px 20px 0px var(--primary);
-            border-radius: 4px;
-        }
-        .stats-box {
-            text-align: center;
-            padding: 30px;
-            background: #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            border-radius: 8px;
-            transition: transform 0.3s;
-        }
-        .stats-box:hover { transform: translateY(-5px); }
+        .about-img { box-shadow: 20px 20px 0px var(--primary); border-radius: 4px; }
+        .stats-box { text-align: center; padding: 30px; background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.05); border-radius: 8px; transition: transform 0.3s; }
+        .stats-box:hover { transform: translateY(-5px); border-bottom: 3px solid var(--primary); }
         .stats-box h2 { font-size: 2.5rem; color: var(--primary); margin: 0; }
         
         /* --- 7. PAGINATION --- */
         .pagination { margin-top: 30px; }
-        .page-link {
-            color: var(--dark);
-            border: none;
-            margin: 0 5px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-        .page-item.active .page-link {
-            background-color: var(--primary);
-            color: #fff;
-        }
+        .page-link { color: var(--dark); border: none; margin: 0 5px; border-radius: 4px; font-weight: 600; }
+        .page-item.active .page-link { background-color: var(--primary); color: #fff; }
 
         /* --- 8. FOOTER --- */
-        .footer {
-            background: var(--dark);
-            color: #aaa;
-            padding: 60px 0 30px;
-        }
+        .footer { background: var(--dark); color: #aaa; padding: 60px 0 30px; }
         .footer h2 { color: #fff; }
         .footer a { color: #aaa; transition: 0.3s; }
         .footer a:hover { color: var(--primary); text-decoration: none; }
-        .footer-social a {
-            display: inline-flex;
-            width: 40px; height: 40px;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            align-items: center; justify-content: center;
-            border-radius: 50%;
-            margin-right: 10px;
-            transition: 0.3s;
-        }
+        .footer-social a { display: inline-flex; width: 40px; height: 40px; background: rgba(255,255,255,0.1); color: #fff; align-items: center; justify-content: center; border-radius: 50%; margin-right: 10px; transition: 0.3s; }
         .footer-social a:hover { background: var(--primary); }
 
         /* --- 9. MOBILE RESPONSIVE FIXES --- */
@@ -272,23 +235,14 @@
             .display-3 { font-size: 2.2rem; }
             .carousel-caption h1 { font-size: 2rem; }
             .about-img { margin-bottom: 40px; box-shadow: 10px 10px 0px var(--primary); }
+            .portal-input { border-radius: 10px !important; margin-bottom: 10px; }
+            .portal-btn { border-radius: 10px !important; width: 100%; }
+            .portal-form { flex-direction: column; }
         }
         
         /* MODAL FIX */
-        #modalImage {
-            max-height: 85vh; 
-            width: auto;      
-            max-width: 100%;  
-            object-fit: contain; 
-            border-radius: 8px;
-            border: 2px solid var(--primary); 
-        }
-
-        .modal-dialog {
-            max-width: 90%; 
-            margin: 1.75rem auto;
-        }
-
+        #modalImage { max-height: 85vh; width: auto; max-width: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .modal-dialog-custom { max-width: 95vw; margin: 1.75rem auto; display: flex; justify-content: center; }
     </style>
 </head>
 
@@ -309,7 +263,6 @@
                     <a href="#works" class="nav-item nav-link">Works</a>
                     <a href="#albums" class="nav-item nav-link">Albums</a>
                     <a href="#teasers" class="nav-item nav-link">Teasers</a>
-                    <a href="#live" class="nav-item nav-link">Live</a>
                     <a href="#contact" class="nav-item nav-link">Contact</a>
                 </div>
             </div>
@@ -326,7 +279,7 @@
                             <h5 class="text-uppercase text-white font-weight-bold mb-3" style="letter-spacing: 2px;">Welcome To</h5>
                             <h1 class="display-3 text-white mb-4">Supriya Digitals Studio</h1>
                             <p class="lead text-white mb-4 d-none d-md-block">Capturing life's best moments since 2001 with passion and perfection.</p>
-                            <a href="#contact" class="btn btn-primary">Book Now</a>
+                            <a href="#works" class="btn btn-primary">View Portfolio</a>
                         </div>
                     </div>
                 </div>
@@ -336,7 +289,7 @@
                         <div class="container">
                             <h5 class="text-uppercase text-white font-weight-bold mb-3" style="letter-spacing: 2px;">Professional Team</h5>
                             <h1 class="display-3 text-white mb-4">We Create Memories</h1>
-                            <a href="#works" class="btn btn-primary">View Portfolio</a>
+                            <a href="#contact" class="btn btn-primary">Book Now</a>
                         </div>
                     </div>
                 </div>
@@ -347,6 +300,20 @@
             <a class="carousel-control-next" href="#header-carousel" role="button" data-slide="next">
                 <span class="carousel-control-next-icon"></span>
             </a>
+        </div>
+    </section>
+
+    <section class="portal-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h3 class="text-dark font-weight-bold mb-3">Find Your Event Gallery</h3>
+                    <form class="d-flex portal-form" onsubmit="event.preventDefault(); openClientGallery();">
+                        <input type="text" id="clientEventName" class="form-control portal-input" placeholder="Enter your Event Name..." required>
+                        <button type="submit" class="btn portal-btn"><i class="fas fa-search mr-2"></i> Open</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -423,7 +390,7 @@
         <div class="container">
             <div class="page-header">
                 <h1>Candid Shots</h1>
-                <p class="text-muted">A glimpse into our photography portfolio</p>
+                <p class="text-muted">A glimpse into our public photography portfolio</p>
             </div>
             <div id="works-grid-container"></div>
             <nav id="works-pagination-nav" class="d-flex justify-content-center"></nav>
@@ -434,7 +401,7 @@
         <div class="container">
             <div class="page-header">
                 <h1>Album Designs</h1>
-                <p class="text-muted">Click cover to view full album PDF</p>
+                <p class="text-muted">Click the cover to view the full HD PDF</p>
             </div>
             <div id="albums-grid-container"></div>
             <nav id="albums-pagination-nav" class="d-flex justify-content-center"></nav>
@@ -444,7 +411,7 @@
     <section id="teasers" class="section-padding">
         <div class="container">
             <div class="page-header">
-                <h1>Cinematic Teasers</h1>
+                <h1>Cinematic Teasers & Live</h1>
                 <p class="text-muted">Highlights of our best films</p>
             </div>
             <div id="teasers-grid-container"></div>
@@ -452,18 +419,7 @@
         </div>
     </section>
 
-    <section id="live" class="section-padding bg-light">
-        <div class="container">
-            <div class="page-header">
-                <h1>Live Events</h1>
-                <p class="text-muted">Full event coverage</p>
-            </div>
-            <div id="live-grid-container"></div>
-            <nav id="live-pagination-nav" class="d-flex justify-content-center"></nav>
-        </div>
-    </section>
-
-    <section id="contact" class="section-padding">
+    <section id="contact" class="section-padding bg-light">
         <div class="container">
             <div class="page-header">
                 <h1>Get In Touch</h1>
@@ -494,20 +450,20 @@
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <form id="my-form" action="https://formspree.io/f/mqknwbbq" method="POST" class="p-4 bg-light rounded shadow-sm">
+                    <form id="my-form" action="https://formspree.io/f/mqknwbbq" method="POST" class="p-4 bg-white rounded shadow-sm">
                         <div class="form-group mb-3">
-                            <input type="text" class="form-control p-3 border-0" placeholder="Your Name" name="name" required />
+                            <input type="text" class="form-control p-3 bg-light border-0" placeholder="Your Name" name="name" required />
                         </div>
                         <div class="form-group mb-3">
-                            <input type="email" class="form-control p-3 border-0" placeholder="Your Email" name="email" required />
+                            <input type="email" class="form-control p-3 bg-light border-0" placeholder="Your Email" name="email" required />
                         </div>
                         <div class="form-group mb-3">
-                            <input type="text" class="form-control p-3 border-0" placeholder="Subject" name="subject" required />
+                            <input type="text" class="form-control p-3 bg-light border-0" placeholder="Subject" name="subject" required />
                         </div>
                         <div class="form-group mb-3">
-                            <textarea class="form-control p-3 border-0" rows="5" placeholder="Message" name="message" required></textarea>
+                            <textarea class="form-control p-3 bg-light border-0" rows="5" placeholder="Message" name="message" required></textarea>
                         </div>
-                        <button class="btn btn-primary btn-block py-3" type="submit">Send Message</button>
+                        <button class="btn btn-primary btn-block py-3" style="border-radius: 8px;" type="submit">Send Message</button>
                         <p id="my-form-status" class="mt-3 text-center"></p>
                     </form>
                 </div>
@@ -516,8 +472,7 @@
             <div class="row mt-5">
                 <div class="col-12">
                     <div class="map-container rounded overflow-hidden shadow" style="height: 400px;">
-                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3826.6642674384963!2d80.56068231486333!3d16.44192598865175!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f0a2a0d1d9d9%3A0x6b0f3b0f3b0f3b0f!2sMangalagiri%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1625634567890!5m2!1sen!2sin" 
-                         width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3826.6642674384963!2d80.56068231486333!3d16.44192598865175!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f0a2a0d1d9d9%3A0x6b0f3b0f3b0f3b0f!2sMangalagiri%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1625634567890!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                     </div>
                 </div>
             </div>
@@ -560,11 +515,26 @@
     </div>
 
     <div class="modal fade" id="imageModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-custom">
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-body p-0 text-center position-relative">
-                    <button type="button" class="close text-white" data-dismiss="modal" style="position: absolute; right: 0; top: -30px; opacity: 1; font-size: 2rem;">×</button>
-                    <img id="modalImage" src="" alt="Full size" class="img-fluid rounded shadow-lg">
+                    <button type="button" class="close text-white" data-dismiss="modal" style="position: absolute; right: -20px; top: -30px; opacity: 1; font-size: 2.5rem; text-shadow: 0 2px 10px #000;">×</button>
+                    <img id="modalImage" src="" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="videoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="background: #000;">
+                <div class="modal-header border-0 p-2" style="position: absolute; right: 0; z-index: 10;">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="video-wrapper">
+                        <iframe id="ytIframe" src="" frameborder="0" allowfullscreen></iframe>
+                    </div>
                 </div>
             </div>
         </div>
@@ -579,16 +549,25 @@
     <script>
         /* --- CORE CONFIGURATION --- */
         const API_BASE = "https://supriyadigitals.store/api/";
+        const VIEW_BASE = "view.html";
         const ITEMS_PER_PAGE = 9; 
         
-        let mediaData = { works: [], albums: [], teasers: [], live: [] };
+        let mediaData = { works: [], albums: [], teasers: [] };
 
-        // 1. FETCH ALL METADATA
+        function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+
+        // Client Portal Redirect
+        function openClientGallery() {
+            const val = $('#clientEventName').val().trim();
+            if(val) { window.location.href = `${VIEW_BASE}?event=${encodeURIComponent(val)}`; }
+        }
+
+        // 1. FETCH ALL PUBLIC DATA
         async function fetchAllMediaData() {
             try {
+                // We fetch 'public' items ONLY for the home page portfolio
                 const response = await fetch(`${API_BASE}fetch.php?mode=public&type=all`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" }
+                    headers: { "ngrok-skip-browser-warning": "69420" }
                 });
                 const result = await response.json();
                 if (result.success) distributeData(result.data);
@@ -598,20 +577,17 @@
         // 2. DISTRIBUTE DATA
         function distributeData(allData) {
             allData.forEach(item => {
-                if (item.type === 'work') mediaData.works.push(item);
-                if (item.type === 'album') mediaData.albums.push(item);
-                if (item.type === 'teaser') mediaData.teasers.push(item);
-                if (item.type === 'live') mediaData.live.push(item);
+                if (item.type === 'work' || item.type === 'link') mediaData.works.push(item);
+                else if (item.type === 'album') mediaData.albums.push(item);
+                else if (item.type === 'teaser' || item.type === 'live') mediaData.teasers.push(item);
             });
 
-            // Initial Render of Page 1
             renderContent('works', 1);
             renderContent('albums', 1);
             renderContent('teasers', 1);
-            renderContent('live', 1);
         }
 
-        // 3. RENDER CONTENT (Modern Loading with Skeletons + Masonry Grid)
+        // 3. THE HIGH-SPEED RENDERER (Uses Skeletons & Thumbnails)
         function renderContent(sectionId, page) {
             const containerId = `#${sectionId}-grid-container`;
             const paginationId = `#${sectionId}-pagination-nav`;
@@ -620,28 +596,48 @@
             const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
             const pageItems = data.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-            // Replaced Bootstrap rows with Masonry Grid container
             let contentHtml = '<div class="gallery-grid">'; 
 
             if (pageItems.length === 0) {
-                contentHtml = `<p class="text-center text-muted p-5" style="column-span: all;">Coming Soon...</p>`;
+                contentHtml = `<p class="text-center text-muted p-5 w-100">Updating portfolio soon...</p>`;
             } else {
                 pageItems.forEach(item => {
-                    if (item.type === 'work' || sectionId === 'works' || item.type === 'album' || sectionId === 'albums') {
+                    const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
+                    const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}`;
+
+                    if (sectionId === 'works') {
                         contentHtml += `
-                            <div class="gallery-item image-skeleton">
-                                <img class="gallery-img" 
-                                     src="${item.file_path}" 
-                                     alt="${item.title || 'Photo'}"
-                                     loading="lazy"
-                                     onload="this.classList.add('loaded'); this.parentElement.classList.remove('image-skeleton');"
-                                     onerror="this.parentElement.style.display='none';">
+                            <div class="gallery-item image-skeleton" onclick="openHighRes('${highResUrl}')">
+                                <img class="gallery-img" src="${thumbUrl}" alt="Photo" loading="lazy" 
+                                     onload="this.classList.add('loaded'); this.parentElement.classList.remove('image-skeleton');">
                             </div>`;
-                    } else {
-                        // Videos
+                    } 
+                    else if (sectionId === 'albums') {
+                        const targetUrl = item.pdf_link ? item.pdf_link : item.file_path;
                         contentHtml += `
-                            <div class="gallery-item video-container">
-                                <iframe src="${item.file_path}" allowfullscreen></iframe>
+                            <div class="gallery-item image-skeleton" onclick="window.open('${escapeHtml(targetUrl)}', '_blank')">
+                                <img class="gallery-img" src="${thumbUrl}" alt="Album Cover" loading="lazy" 
+                                     onload="this.classList.add('loaded'); this.parentElement.classList.remove('image-skeleton');">
+                                <div class="p-3 text-center bg-white border-top">
+                                    <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-book-open text-primary mr-2"></i>${escapeHtml(item.title || 'Digital Album')}</h6>
+                                </div>
+                            </div>`;
+                    } 
+                    else if (sectionId === 'teasers') {
+                        let ytId = "";
+                        if (item.file_path.includes('embed/')) ytId = item.file_path.split('embed/')[1].split('?')[0]; 
+                        else if (item.file_path.includes('v=')) ytId = item.file_path.split('v=')[1].split('&')[0]; 
+                        else if (item.file_path.includes('youtu.be/')) ytId = item.file_path.split('youtu.be/')[1].split('?')[0];
+                        
+                        contentHtml += `
+                            <div class="gallery-item" onclick="openVideo('${ytId}')">
+                                <div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');">
+                                    <div class="folder-overlay"></div>
+                                    <i class="fas fa-play-circle text-white" style="font-size:3.5rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i>
+                                </div>
+                                <div class="p-3 text-center bg-white border-top">
+                                    <h6 class="m-0 font-weight-bold text-dark">${escapeHtml(item.title || 'Cinematic Film')}</h6>
+                                </div>
                             </div>`;
                     }
                 });
@@ -663,29 +659,40 @@
             }
         }
 
-        // --- STANDARD UI LOGIC --- //
+        // --- UI INTERACTION LOGIC --- //
+        function openHighRes(url) {
+            $('#modalImage').attr('src', url);
+            $('#imageModal').modal('show');
+        }
+
+        function openVideo(ytId) {
+            $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1`);
+            $('#videoModal').modal('show');
+        }
+        $('#videoModal').on('hidden.bs.modal', function () { $('#ytIframe').attr('src', ''); });
+
         $(document).ready(function () {
             fetchAllMediaData();
             
-            $('#header-carousel').carousel({ interval: 5000, pause: 'hover' });
+            $('#header-carousel').carousel({ interval: 4000, pause: 'hover' });
             $('[data-toggle="counter-up"]').counterUp({ delay: 10, time: 2000 });
 
-            // Navbar Scroll Effect
+            // Glass Navbar Scroll Effect
             $(window).scroll(function () {
                 var scroll = $(this).scrollTop();
                 if (scroll > 50) $('.navbar').addClass('scrolled'); else $('.navbar').removeClass('scrolled');
             });
 
-            // Smooth Scroll
+            // Smooth Scrolling
             $('.navbar-nav a, .btn-primary').on('click', function(event) {
                 if (this.hash !== "") {
                     event.preventDefault();
                     var hash = this.hash;
-                    $('html, body').animate({ scrollTop: $(hash).offset().top }, 800, function(){ window.location.hash = hash; });
+                    $('html, body').animate({ scrollTop: $(hash).offset().top - 70 }, 800, function(){ window.location.hash = hash; });
                 }
             });
 
-            // Pagination Click Handler
+            // Pagination Clicks
             $(document).on('click', '.pagination .page-item:not(.disabled)', function(e) {
                 e.preventDefault();
                 const $btn = $(this);
@@ -700,15 +707,11 @@
                 else newPage = $btn.data('page');
 
                 renderContent(sectionId, newPage);
-            });
-
-            // Lightbox Modal
-            $(document).on('click', '.gallery-item:not(.video-container) img', function() {
-                const src = $(this).attr('src');
-                $('#modalImage').attr('src', src);
-                $('#imageModal').modal('show');
+                // Scroll back to top of the section slightly
+                $('html, body').animate({ scrollTop: $(`#${sectionId}`).offset().top - 80 }, 300);
             });
             
+            // Auto close mobile navbar
             $('.nav-link').click(function() { $('.navbar-collapse').collapse('hide'); });
         });
         
@@ -717,9 +720,10 @@
         if (form) form.addEventListener("submit", function(e) {
             e.preventDefault();
             var status = document.getElementById("my-form-status");
+            status.innerHTML = "<i class='fas fa-spinner fa-spin text-primary'></i> Sending...";
             fetch(form.action, { method: form.method, body: new FormData(form), headers: {'Accept': 'application/json'} })
-            .then(r => { if(r.ok) { status.innerHTML = "Thanks! Message sent."; form.reset(); } else { status.innerHTML = "Error."; } })
-            .catch(e => status.innerHTML = "Network error.");
+            .then(r => { if(r.ok) { status.innerHTML = "<span class='text-success font-weight-bold'><i class='fas fa-check-circle'></i> Message Sent!</span>"; form.reset(); } else { status.innerHTML = "<span class='text-danger'>Error sending.</span>"; } })
+            .catch(e => status.innerHTML = "<span class='text-danger'>Network error.</span>");
         });
     </script>
 </body>
