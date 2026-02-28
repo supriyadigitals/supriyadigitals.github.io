@@ -5,14 +5,12 @@
     <title>Supriya Digitals | Client Gallery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="img/icon1.png" rel="icon">
-    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
 
     <style>
         :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
-        
         body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; }
         img { pointer-events: none; -webkit-user-drag: none; }
 
@@ -48,16 +46,15 @@
         .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); min-height: 250px; content-visibility: auto; contain-intrinsic-size: 250px; will-change: transform; }
         .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-out; will-change: opacity; }
         .lazy-image.loaded { opacity: 1; }
-
         .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
         .gallery-item.selected::after { content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; top: 10px; right: 10px; background: var(--primary); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
         #selection-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #222; color: #fff; padding: 12px 30px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; gap: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto;}
         #selection-bar.visible { transform: translateX(-50%) translateY(0); }
         .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
 
         .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; pointer-events: auto;}
         .overlay-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; border: 1px solid #eee; }
-        
         .dl-opt-btn { display: flex; align-items: center; width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; background: #fff; cursor: pointer; transition: 0.2s; text-align: left; }
         .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; }
         .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
@@ -74,10 +71,8 @@
         .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.3s; pointer-events: auto;}
         .lb-control:hover { background: var(--primary); }
         .lb-prev { left: 20px; } .lb-next { right: 20px; }
-
         .dropdown-menu-dark { background: #222; border: 1px solid #444; }
         .dropdown-item { color: #eee; padding: 10px 20px; border-bottom: 1px solid #333; }
-        .dropdown-item:last-child { border: 0; }
         .dropdown-item:hover { background: var(--primary); color: #fff; }
     </style>
 </head>
@@ -159,7 +154,7 @@
                             <div class="dropdown download-ui d-none">
                                 <span class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></span>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
-                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('normal', event)"><i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web Size)</a>
+                                    <a class="dropdown-item fast-dl-btn" href="#" onclick="downloadSingleImage('normal', event)"><i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web Size)</a>
                                     <a class="dropdown-item" href="#" onclick="downloadSingleImage('full', event)"><i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)</a>
                                 </div>
                             </div>
@@ -189,15 +184,9 @@
         const API_BASE = "https://supriyadigitals.store/api/";
         const params = new URLSearchParams(window.location.search);
         
-        let fullEventData = []; 
-        let galleryData = []; 
-        let selectedFiles = new Set();
-        let isSelectMode = false;
-        let currentIndex = 0;
-        let canDownload = false;
-        let currentDownloadReq = null; 
-        let currentHighResLoader = null;
-        let pendingDownloadArray = []; 
+        let fullEventData = []; let galleryData = []; let selectedFiles = new Set();
+        let isSelectMode = false; let currentIndex = 0; let canDownload = 0; 
+        let currentDownloadReq = null; let currentHighResLoader = null; let pendingDownloadArray = []; 
 
         function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
@@ -227,31 +216,22 @@
                     $('#pageTitleDisplay').html(`<span>Event:</span> ${escapeHtml(eventName)}`);
                     fullEventData = fullEventData.filter(item => item.title === eventName);
                     if(fullEventData.length === 0) { $('#main-loader').html('<h4 class="text-danger">Event Not Found</h4>'); return; }
-                    
                     renderFolderDashboard();
                 } else {
                     galleryData = fullEventData.filter(i => i.type === 'work' || i.type === 'link');
-                    canDownload = galleryData.some(item => item.can_download == 1);
-                    if (canDownload) $('.download-ui').removeClass('d-none').show();
+                    canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
+                    if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
                     renderGallery();
                     $('#btnSelectMode').show();
                 }
-
                 $('#main-loader').fadeOut(300);
-
             } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
         }
 
         function renderFolderDashboard() {
-            $('#gallery').empty(); 
-            $('#btnSelectMode').hide(); 
-            $('.download-ui').addClass('d-none').hide(); 
-            $('#btnBackToFolders').hide();
+            $('#gallery').empty(); $('#btnSelectMode').hide(); $('.download-ui').addClass('d-none').hide(); $('#btnBackToFolders').hide();
 
-            let groups = {};
-            let videos = [];
-            let albums = [];
-
+            let groups = {}; let videos = []; let albums = [];
             fullEventData.forEach(item => {
                 if (item.type === 'teaser' || item.type === 'live') videos.push(item);
                 else if (item.type === 'album') albums.push(item);
@@ -266,175 +246,94 @@
             let html = '<div class="section-header">Collections</div><div class="media-grid">';
 
             Object.keys(groups).forEach(bId => {
-                const g = groups[bId];
-                const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
-                html += `
-                <div class="media-card" onclick="openFolder('${bId}', '${escapeHtml(g.title).replace(/'/g, "\\'")}')">
-                    <div class="folder-cover" style="background-image: url('${coverUrl}');"></div>
-                    <div class="card-details">
-                        <h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(g.title)}</h5>
-                        <small><i class="fas fa-image mr-1"></i> ${g.items.length} Photos</small>
-                    </div>
-                </div>`;
+                const g = groups[bId]; const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
+                html += `<div class="media-card" onclick="openFolder('${bId}', '${escapeHtml(g.title).replace(/'/g, "\\'")}')"><div class="folder-cover" style="background-image: url('${coverUrl}');"></div><div class="card-details"><h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(g.title)}</h5><small><i class="fas fa-image mr-1"></i> ${g.items.length} Photos</small></div></div>`;
             });
 
             videos.forEach(v => {
                 let ytId = "";
                 if (v.file_path) {
-                    if (v.file_path.includes('embed/')) { ytId = v.file_path.split('embed/')[1].split('?')[0]; } 
-                    else if (v.file_path.includes('v=')) { ytId = v.file_path.split('v=')[1].split('&')[0]; } 
-                    else if (v.file_path.includes('youtu.be/')) { ytId = v.file_path.split('youtu.be/')[1].split('?')[0]; }
+                    if (v.file_path.includes('embed/')) ytId = v.file_path.split('embed/')[1].split('?')[0]; 
+                    else if (v.file_path.includes('v=')) ytId = v.file_path.split('v=')[1].split('&')[0]; 
+                    else if (v.file_path.includes('youtu.be/')) ytId = v.file_path.split('youtu.be/')[1].split('?')[0];
                 }
-
-                html += `
-                <div class="media-card" onclick="openVideo('${ytId}')">
-                    <div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');">
-                        <div class="folder-overlay"></div>
-                        <i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i>
-                    </div>
-                    <div class="card-details">
-                        <h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5>
-                        <small>Tap to Play Video</small>
-                    </div>
-                </div>`;
+                html += `<div class="media-card" onclick="openVideo('${ytId}')"><div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');"><div class="folder-overlay"></div><i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i></div><div class="card-details"><h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5><small>Tap to Play Video</small></div></div>`;
             });
 
             albums.forEach(a => {
-                html += `
-                <div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;">
-                    <i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i>
-                    <div class="card-details" style="text-align:center; padding:0;">
-                        <h5>${escapeHtml(a.title || 'Digital Album')}</h5>
-                        <small>View PDF Document</small>
-                    </div>
-                </div>`;
+                html += `<div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;"><i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i><div class="card-details" style="text-align:center; padding:0;"><h5>${escapeHtml(a.title || 'Digital Album')}</h5><small>View PDF Document</small></div></div>`;
             });
 
-            html += '</div>';
-            $('#event-content').html(html);
+            html += '</div>'; $('#event-content').html(html);
         }
 
         function openFolder(batchId, folderName) {
             galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
-            canDownload = galleryData.some(item => item.can_download == 1);
-            if (canDownload) $('.download-ui').removeClass('d-none').show();
+            canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
+            if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
             else $('.download-ui').addClass('d-none').hide();
 
-            $('#event-content').empty();
-            $('#btnSelectMode').show();
-            $('#btnBackToFolders').show();
-            $('#pageTitleDisplay').html(`<i class="fas fa-folder-open text-warning mr-2"></i> ${folderName}`);
-            
+            $('#event-content').empty(); $('#btnSelectMode').show(); $('#btnBackToFolders').show(); $('#pageTitleDisplay').html(`<i class="fas fa-folder-open text-warning mr-2"></i> ${folderName}`);
             renderGallery();
         }
 
-        function goBackToFolders() {
-            $('#pageTitleDisplay').html(`<span>Event:</span> ${escapeHtml(params.get('event'))}`);
-            clearSelection();
-            renderFolderDashboard();
-        }
-
-        function openVideo(ytId) {
-            $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1`);
-            $('#videoModal').modal('show');
-        }
-
+        function goBackToFolders() { $('#pageTitleDisplay').html(`<span>Event:</span> ${escapeHtml(params.get('event'))}`); clearSelection(); renderFolderDashboard(); }
+        function openVideo(ytId) { $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1`); $('#videoModal').modal('show'); }
         $('#videoModal').on('hidden.bs.modal', function () { $('#ytIframe').attr('src', ''); });
 
         function renderGallery() {
             let html = '';
             galleryData.forEach((item, index) => {
-                const imgUrl = item.file_path; 
-                galleryData[index].fullUrl = imgUrl; 
+                const imgUrl = item.file_path; galleryData[index].fullUrl = imgUrl; 
                 galleryData[index].filename = item.title_from_filename || item.file_path.split('/').pop();
                 
-                const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`;
-                const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
+                const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`; const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
                 galleryData[index].thumbUrl = thumbUrl; galleryData[index].highResUrl = highResUrl;
 
                 html += `<div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})"><img data-src="${thumbUrl}" class="lazy-image" alt="Photo" decoding="async"></div>`;
             });
-            document.getElementById('gallery').innerHTML = html;
-            initLazyLoader();
+            document.getElementById('gallery').innerHTML = html; initLazyLoader();
         }
 
         let imageLoadQueue = []; let activeDownloads = 0; const MAX_PARALLEL_DOWNLOADS = 6;
-        function processImageLoadQueue() {
-            if (imageLoadQueue.length === 0 || activeDownloads >= MAX_PARALLEL_DOWNLOADS) return;
-            const img = imageLoadQueue.shift(); activeDownloads++;
-            img.onload = () => { img.classList.add('loaded'); activeDownloads--; processImageLoadQueue(); };
-            img.onerror = () => { activeDownloads--; processImageLoadQueue(); };
-            img.src = img.getAttribute('data-src');
-        }
-
-        function initLazyLoader() {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        imageLoadQueue.push(entry.target); processImageLoadQueue(); observer.unobserve(entry.target); 
-                    }
-                });
-            }, { rootMargin: "0px 0px 1200px 0px" });
-            document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img));
-        }
+        function processImageLoadQueue() { if (imageLoadQueue.length === 0 || activeDownloads >= MAX_PARALLEL_DOWNLOADS) return; const img = imageLoadQueue.shift(); activeDownloads++; img.onload = () => { img.classList.add('loaded'); activeDownloads--; processImageLoadQueue(); }; img.onerror = () => { activeDownloads--; processImageLoadQueue(); }; img.src = img.getAttribute('data-src'); }
+        function initLazyLoader() { const imageObserver = new IntersectionObserver((entries, observer) => { entries.forEach(entry => { if (entry.isIntersecting) { imageLoadQueue.push(entry.target); processImageLoadQueue(); observer.unobserve(entry.target); } }); }, { rootMargin: "0px 0px 1200px 0px" }); document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img)); }
 
         function toggleSelectMode() { isSelectMode = !isSelectMode; $('#btnSelectMode').toggleClass('active'); if(!isSelectMode) clearSelection(); }
         function handleItemClick(index) { if (isSelectMode) toggleSelection(index); else openLightbox(index); }
-        function toggleSelection(index) {
-            const item = galleryData[index]; const $el = $(`#item-${index}`);
-            if (selectedFiles.has(item.fullUrl)) { selectedFiles.delete(item.fullUrl); $el.removeClass('selected'); } 
-            else { selectedFiles.add(item.fullUrl); $el.addClass('selected'); }
-            updateFloatingBar();
-        }
+        function toggleSelection(index) { const item = galleryData[index]; const $el = $(`#item-${index}`); if (selectedFiles.has(item.fullUrl)) { selectedFiles.delete(item.fullUrl); $el.removeClass('selected'); } else { selectedFiles.add(item.fullUrl); $el.addClass('selected'); } updateFloatingBar(); }
         function clearSelection() { selectedFiles.clear(); $('.gallery-item').removeClass('selected'); updateFloatingBar(); }
-        function updateFloatingBar() {
-            const count = selectedFiles.size; $('.selection-count').text(count + " Selected");
-            if (count > 0) $('#selection-bar').addClass('visible'); else $('#selection-bar').removeClass('visible');
-        }
+        function updateFloatingBar() { const count = selectedFiles.size; $('.selection-count').text(count + " Selected"); if (count > 0) $('#selection-bar').addClass('visible'); else $('#selection-bar').removeClass('visible'); }
 
         function promptDownloadAll() {
-            if(!canDownload) return alert("Download not allowed.");
+            if (canDownload == 0) return alert("Download not allowed.");
             pendingDownloadArray = galleryData.map(i => i.fullUrl);
-            $('#quality-overlay').css('display', 'flex');
+            if (canDownload == 2) { executeBatchDownload('high'); } 
+            else { $('#quality-overlay').css('display', 'flex'); }
         }
 
         function promptDownloadSelected() {
             if (selectedFiles.size === 0) return;
             pendingDownloadArray = Array.from(selectedFiles);
-            $('#quality-overlay').css('display', 'flex');
+            if (canDownload == 2) { executeBatchDownload('high'); } 
+            else { $('#quality-overlay').css('display', 'flex'); }
         }
 
         function executeBatchDownload(qualityChoice) {
-            $('#quality-overlay').fadeOut();
-            $('#queue-overlay').css('display', 'flex');
+            $('#quality-overlay').fadeOut(); $('#queue-overlay').css('display', 'flex');
             $('#queue-title').text(qualityChoice === 'high' ? 'Zipping Original Quality...' : 'Zipping Web Quality...');
-            $('#queue-text').text('Waiting for NAS resources...');
-            $('#queue-spinner').show(); $('#queue-cancel-btn').show();
+            $('#queue-text').text('Waiting for NAS resources...'); $('#queue-spinner').show(); $('#queue-cancel-btn').show();
 
             currentDownloadReq = $.ajax({
-                url: `${API_BASE}download.php`,
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ files: pendingDownloadArray, quality: qualityChoice }),
+                url: `${API_BASE}download.php`, type: 'POST', contentType: 'application/json', data: JSON.stringify({ files: pendingDownloadArray, quality: qualityChoice }),
                 success: function(res) {
                     if (res.success && res.status === 'ready') {
-                        $('#queue-title').text('Download Ready!');
-                        $('#queue-text').text('Starting download automatically...');
-                        $('#queue-spinner').hide(); $('#queue-cancel-btn').hide();
-                        
-                        const link = document.createElement('a');
-                        link.href = res.download_url;
-                        link.setAttribute('download', 'Supriya_Gallery.zip');
-                        document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                        
+                        $('#queue-title').text('Download Ready!'); $('#queue-text').text('Starting download automatically...'); $('#queue-spinner').hide(); $('#queue-cancel-btn').hide();
+                        const link = document.createElement('a'); link.href = res.download_url; link.setAttribute('download', 'Supriya_Gallery.zip'); document.body.appendChild(link); link.click(); document.body.removeChild(link);
                         setTimeout(() => { $('#queue-overlay').fadeOut(); clearSelection(); }, 2500);
-                    } else if (res.status === 'queued') {
-                        $('#queue-title').text('Server Busy'); $('#queue-text').text(res.message); $('#queue-spinner').hide();
-                    } else {
-                        $('#queue-title').text('Error'); $('#queue-text').text(res.message); $('#queue-spinner').hide();
-                    }
-                },
-                error: function() { $('#queue-title').text('Connection Lost'); $('#queue-spinner').hide(); }
+                    } else if (res.status === 'queued') { $('#queue-title').text('Server Busy'); $('#queue-text').text(res.message); $('#queue-spinner').hide(); } 
+                    else { $('#queue-title').text('Error'); $('#queue-text').text(res.message); $('#queue-spinner').hide(); }
+                }, error: function() { $('#queue-title').text('Connection Lost'); $('#queue-spinner').hide(); }
             });
         }
 
@@ -443,7 +342,7 @@
         function downloadSingleImage(type, event) {
             if (event) event.preventDefault(); 
             const item = galleryData[currentIndex];
-            if(item.can_download != 1) return;
+            if(item.can_download == 0) return;
             let dlUrl = type === 'normal' ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}` : `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
             const link = document.createElement('a'); link.href = dlUrl; link.setAttribute('download', item.filename || 'download.jpg'); link.setAttribute('target', '_blank');
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
@@ -452,22 +351,26 @@
         function openLightbox(index) { currentIndex = index; updateLightbox(); $('#lightboxModal').modal('show'); }
         function updateLightbox() {
             const item = galleryData[currentIndex];
-            $('#lightboxImage').attr('src', item.thumbUrl).css('opacity', '1');
-            $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2" style="font-size: 0.8rem;"></i> Enhancing...`);
+            $('#lightboxImage').attr('src', item.thumbUrl).css('opacity', '1'); $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2" style="font-size: 0.8rem;"></i> Enhancing...`);
             
             if (currentHighResLoader) { currentHighResLoader.onload = null; }
             currentHighResLoader = new Image();
             currentHighResLoader.onload = function() {
-                if (galleryData[currentIndex].highResUrl === this.src) {
-                    $('#lightboxImage').attr('src', this.src);
-                    $('#lbFileName').text(item.filename);
-                }
+                if (galleryData[currentIndex].highResUrl === this.src) { $('#lightboxImage').attr('src', this.src); $('#lbFileName').text(item.filename); }
             };
             currentHighResLoader.src = item.highResUrl;
 
             let nextIndex = (currentIndex + 1) % galleryData.length; let preloadNext = new Image(); preloadNext.src = galleryData[nextIndex].highResUrl;
             let prevIndex = currentIndex - 1; if (prevIndex < 0) prevIndex = galleryData.length - 1; let preloadPrev = new Image(); preloadPrev.src = galleryData[prevIndex].highResUrl;
-            if (item.can_download == 1) $('.download-ui').removeClass('d-none'); else $('.download-ui').addClass('d-none');
+            
+            let itemDlState = parseInt(item.can_download) || 0;
+            if (itemDlState > 0) {
+                $('.download-ui').removeClass('d-none');
+                if (itemDlState == 2) $('.fast-dl-btn').hide(); 
+                else $('.fast-dl-btn').show();
+            } else {
+                $('.download-ui').addClass('d-none');
+            }
         }
 
         function changeImage(dir) { currentIndex += dir; if (currentIndex >= galleryData.length) currentIndex = 0; if (currentIndex < 0) currentIndex = galleryData.length - 1; updateLightbox(); }
