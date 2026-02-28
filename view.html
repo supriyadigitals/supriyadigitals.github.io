@@ -12,9 +12,10 @@
 
     <style>
         :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
         img { pointer-events: none; -webkit-user-drag: none; }
 
+        /* Full Screen Overlays */
         .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -22,11 +23,7 @@
         .progress-container { width: 100%; max-width: 400px; background: #eee; border-radius: 20px; overflow: hidden; height: 15px; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s linear; }
         
-        .overlay-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; border: 1px solid #eee; }
-        .dl-opt-btn { display: flex; align-items: center; width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; background: #fff; cursor: pointer; transition: 0.2s; text-align: left; }
-        .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
-
+        /* Dashboard & Header */
         .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px; }
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
         .brand-title span { color: var(--primary); }
@@ -35,115 +32,59 @@
 
         .section-header { margin: 40px 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 0 30px; margin-bottom: 40px; margin-top:30px; }
-        .media-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
-        .media-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .media-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; cursor: pointer; transition: transform 0.2s; }
+        .media-card:hover { transform: translateY(-5px); border-color: var(--primary); }
         .folder-cover { height: 200px; background-size: cover; background-position: center; position: relative; }
-        .folder-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); }
         .card-details { padding: 20px; text-align: left; }
-        .card-details h5 { margin: 0 0 5px 0; font-weight: 700; font-size: 1.1rem; color: #111; }
-        .card-details small { color: #666; font-weight: 500; }
+        .card-details h5 { margin: 0 0 5px 0; font-weight: 700; font-size: 1.1rem; }
 
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
-
+        /* Gallery Grid */
         .container-fluid { padding: 30px; padding-bottom: 120px; }
         .gallery-grid { column-count: 4; column-gap: 20px; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } .media-grid { padding: 0 15px; } .gallery-header { justify-content: center; } }
-        @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
+        @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .brand-title { font-size: 1.1rem; } }
         
-        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; min-height: 250px; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-out; }
+        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; transition: 0.2s; }
+        .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.5s; }
         .lazy-image.loaded { opacity: 1; }
         .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
         .gallery-item.selected::after { content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; top: 10px; right: 10px; background: var(--primary); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        
-        #selection-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #222; color: #fff; padding: 12px 30px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; gap: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto;}
-        #selection-bar.visible { transform: translateX(-50%) translateY(0); }
-        .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
 
-        /* ADVANCED ZOOM LIGHTBOX CSS */
-        .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; overflow: hidden; pointer-events: auto;}
-        .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;}
-        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
-        .lb-header > * { pointer-events: auto; } 
-        .lb-title { color: #fff; font-size: 1.1rem; opacity: 0.8; }
-        .lb-actions { display: flex; align-items: center; }
-        .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
-        .lb-icon:hover { opacity: 1; color: var(--primary); }
-        
-        #lightboxImage { max-height: 80vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: transform 0.15s ease-out; cursor: zoom-in; will-change: transform;}
-        
-        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.3s; z-index:1050; pointer-events: auto;}
+        /* Lightbox & Zoom Engine */
+        .modal-content-lb { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; overflow: hidden; }
+        .modal-body-lb { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+        #lightboxImage { max-height: 80vh; max-width: 95vw; object-fit: contain; transition: transform 0.15s ease-out; cursor: zoom-in; will-change: transform; }
+        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; z-index: 1050; font-size: 1.5rem; transition: 0.3s; }
         .lb-control:hover { background: var(--primary); }
         .lb-prev { left: 20px; } .lb-next { right: 20px; }
-        .dropdown-menu-dark { background: #222; border: 1px solid #444; }
-        .dropdown-item { color: #eee; padding: 10px 20px; border-bottom: 1px solid #333; }
-        .dropdown-item:hover { background: var(--primary); color: #fff; }
+        .zoom-overlay { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1060; display: flex; gap: 20px; background: rgba(0,0,0,0.7); padding: 10px 25px; border-radius: 50px; }
+        .zoom-overlay i { color: #fff; font-size: 1.5rem; cursor: pointer; padding: 5px; }
 
-        /* MAGNIFIER LENS UI */
-        .zoom-overlay { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1060; display: flex; gap: 20px; background: rgba(0,0,0,0.7); padding: 10px 25px; border-radius: 50px; pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .zoom-overlay i { color: #fff; font-size: 1.5rem; cursor: pointer; transition: 0.2s; padding: 5px; }
-        .zoom-overlay i:hover { color: var(--primary); transform: scale(1.1); }
+        /* Selection & Download Bar */
+        #selection-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #222; color: #fff; padding: 12px 30px; border-radius: 50px; z-index: 1050; display: flex; align-items: center; gap: 20px; transition: 0.4s; }
+        #selection-bar.visible { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div id="main-loader" class="overlay-screen">
         <div class="spinner"></div>
-        <h4 id="main-loader-text" style="color: #111; font-weight:700;">Connecting to Studio</h4>
+        <h4 id="main-loader-text">Connecting to Studio</h4>
     </div>
 
     <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
         <i class="fas fa-microchip text-warning mb-3" style="font-size: 3rem;"></i>
-        <h3 style="color: #111; font-weight:800; margin-bottom:5px;">Optimizing Gallery</h3>
-        <p style="color: #666; font-size:0.9rem; max-width: 400px;">Using Multi-Core Processing to prepare high-quality files.</p>
-        
+        <h3>Optimizing Gallery</h3>
+        <p>Using Multi-Core Processing for high-quality display.</p>
         <div class="progress-container"><div class="progress-fill" id="cache-fill"></div></div>
-        
-        <h5 id="cache-percent" style="font-weight:700; color:var(--primary);">0% Loaded</h5>
-        <small id="cache-stats" class="text-muted font-weight-bold mt-1">0 / 0 Images Ready</small>
-        
-        <div class="mt-3 p-3 bg-light rounded text-left" style="max-width: 400px; border:1px solid #e5e7eb;">
-            <p style="margin:0; font-size: 0.85rem; color:#444;"><i class="fas fa-info-circle text-primary mr-2"></i> <b>Safe to leave!</b> You do not need to stay on this page. The system will save your progress.</p>
-        </div>
-
-        <div class="mt-4 d-flex justify-content-center flex-wrap gap-3">
-            <button class="btn btn-outline-dark font-weight-bold mr-3 mb-2" style="border-radius: 50px; padding: 10px 25px;" onclick="cancelCacheAndGoBack()">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Folders
+        <h5 id="cache-percent">0% Loaded</h5>
+        <small id="cache-stats" class="text-muted">0 / 0 Ready</small>
+        <div class="mt-4 d-flex">
+            <button id="btnContinueLive" class="btn btn-primary font-weight-bold px-4 py-2 mr-3" style="border-radius:50px; display:none;" onclick="finishCacheOptimizer()">
+                <i class="fas fa-play mr-2"></i> Continue with Ready Files
             </button>
-            <a href="index.html" class="btn btn-dark font-weight-bold mb-2" style="border-radius: 50px; padding: 10px 25px;">
-                <i class="fas fa-home mr-2"></i> Home Page
-            </a>
-        </div>
-    </div>
-
-    <div id="quality-overlay" class="overlay-screen" style="display:none; background:rgba(0,0,0,0.5);">
-        <div class="overlay-box">
-            <h4 style="margin-top: 0; color: #111; margin-bottom: 20px;">Choose Download Quality</h4>
-            <button class="dl-opt-btn" onclick="executeWebDownload()">
-                <i class="fas fa-bolt"></i>
-                <div>
-                    <div style="font-weight: 700; color: #111;">Web Quality (Fast)</div>
-                    <div style="font-size: 0.8rem; color: #666;">Downloads instantly. Perfect for WhatsApp/Instagram.</div>
-                </div>
-            </button>
-            <button class="dl-opt-btn" onclick="executeOriginalDownload()">
-                <i class="fas fa-star"></i>
-                <div>
-                    <div style="font-weight: 700; color: #111;">Original Quality (Slow)</div>
-                    <div style="font-size: 0.8rem; color: #666;">Massive files. Recommended only for high-end printing.</div>
-                </div>
-            </button>
-            <button class="btn btn-light w-100 mt-2 font-weight-bold" onclick="$('#quality-overlay').fadeOut();">Cancel</button>
-        </div>
-    </div>
-
-    <div id="queue-overlay" class="overlay-screen" style="display:none; background:rgba(0,0,0,0.8);">
-        <div class="overlay-box">
-            <div class="spinner" style="margin: 0 auto 20px;" id="queue-spinner"></div>
-            <h4 style="margin-top: 0; color: #111;" id="queue-title">Preparing Files</h4>
-            <p style="color: #666; font-size: 0.9rem;" id="queue-text">Please do not close this window...</p>
+            <button class="btn btn-outline-dark font-weight-bold px-4 py-2" style="border-radius:50px;" onclick="cancelCacheAndGoBack()">Back</button>
         </div>
     </div>
 
@@ -151,11 +92,8 @@
         <div class="d-flex align-items-center"><h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1></div>
         <div>
             <a href="index.html" class="btn-header"><i class="fas fa-home mr-1"></i> Home</a>
-            
-            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-1"></i> Back</button>
-            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-1"></i> Start</button>
-            
-            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-1"></i> Select</button>
+            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display:none;"><i class="fas fa-arrow-left mr-1"></i> Folders</button>
+            <button class="btn-header" id="btnSelectMode" style="display:none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-1"></i> Select</button>
             <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-1"></i> All</button>
         </div>
     </div>
@@ -164,51 +102,25 @@
     <div class="container-fluid"><div id="gallery" class="gallery-grid" style="display:none;"></div></div>
 
     <div id="selection-bar">
-        <span class="selection-count text-white font-weight-bold">0 Selected</span>
-        <button class="btn-download-batch download-ui d-none" onclick="promptDownloadSelected()"><i class="fas fa-cloud-download-alt mr-2"></i> Download</button>
-        <button class="btn btn-sm btn-outline-light rounded-circle border-0" onclick="clearSelection()"><i class="fas fa-times"></i></button>
-    </div>
-
-    <div class="modal fade" id="videoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="background: #000;">
-                <div class="modal-header border-0 p-2" style="position: absolute; right: 0; z-index: 10;">
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body p-0">
-                    <div class="video-wrapper">
-                        <iframe id="ytIframe" src="" frameborder="0" allowfullscreen></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <span class="selection-count">0 Selected</span>
+        <button class="btn btn-warning btn-sm font-weight-bold px-3" onclick="promptDownloadSelected()">Download</button>
+        <i class="fas fa-times" onclick="clearSelection()" style="cursor:pointer;"></i>
     </div>
 
     <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
-        <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
-            <div class="modal-content">
-                <div class="modal-body" id="lb-body-container">
+        <div class="modal-dialog modal-xl" style="max-width:100%; margin:0;">
+            <div class="modal-content modal-content-lb">
+                <div class="modal-body modal-body-lb">
                     <div class="lb-header">
-                        <div class="lb-title" id="lbFileName">image.jpg</div>
-                        <div class="lb-actions">
-                            <div class="dropdown download-ui d-none">
-                                <span class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></span>
-                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
-                                    <a class="dropdown-item fast-dl-btn" href="#" onclick="downloadSingleImage('normal', event)"><i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web)</a>
-                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full', event)"><i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)</a>
-                                </div>
-                            </div>
-                            <span class="lb-icon" data-dismiss="modal" onclick="resetZoom()"><i class="fas fa-times"></i></span>
-                        </div>
+                        <div class="lb-title text-white" id="lbFileName">image.jpg</div>
+                        <span class="text-white" style="cursor:pointer; font-size:2rem;" data-dismiss="modal" onclick="resetZoom()">&times;</span>
                     </div>
-                    
                     <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
                     <img id="lightboxImage" src="">
                     <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
-                    
                     <div class="zoom-overlay d-none" id="zoom-overlay-ui">
-                        <i class="fas fa-search-minus" onclick="adjustZoom(-0.5)" title="Zoom Out"></i>
-                        <i class="fas fa-search-plus" onclick="adjustZoom(0.5)" title="Zoom In"></i>
+                        <i class="fas fa-search-minus" onclick="adjustZoom(-0.5)"></i>
+                        <i class="fas fa-search-plus" onclick="adjustZoom(0.5)"></i>
                     </div>
                 </div>
             </div>
@@ -221,358 +133,130 @@
     <script>
         const API_BASE = "https://supriyadigitals.store/api/";
         const params = new URLSearchParams(window.location.search);
-        
         let fullEventData = []; let galleryData = []; let selectedFiles = new Set();
-        let isSelectMode = false; let currentIndex = 0; let canDownload = 0; 
-        let pendingDownloadArray = [];
-
+        let isSelectMode = false; let currentIndex = 0; let canDownload = 0;
         let cacheMissingUrls = []; let cacheTotal = 0; let cacheCompleted = 0;
-        let cacheWorkersActive = 0; 
-        // THIS IS THE SPEED YOU LOVED! 4 Parallel CPU Workers blasting serve_image.php
-        const MAX_WORKERS = 4; 
-
-        function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
-
-        let deviceId = localStorage.getItem('supriya_device_id');
-        if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('supriya_device_id', deviceId); }
-        function pingServer() { fetch(API_BASE + 'ping.php?device=' + deviceId).catch(()=>{}); }
-        pingServer(); setInterval(pingServer, 20000);
 
         async function initializeGallery() {
             try {
-                let url = `${API_BASE}fetch.php?mode=client`;
-                const eventName = params.get('event');
-                if (eventName) url += `&type=all`;
-                
+                let event = params.get('event') || '';
+                let url = `${API_BASE}fetch.php?mode=client&event=${encodeURIComponent(event)}`;
                 const response = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } });
                 const result = await response.json();
-
-                if (!result.success || result.data.length === 0) { 
-                    $('#main-loader').html('<div class="text-center p-4"><h3 class="text-danger font-weight-bold mb-2">Link Expired or Private</h3><p class="text-muted">The gallery you are looking for is currently unavailable.</p></div>'); 
-                    return; 
-                }
-
+                if (!result.success || result.data.length === 0) return;
                 fullEventData = result.data;
-                
-                if (eventName) {
-                    const targetEvent = decodeURIComponent(eventName).trim().toLowerCase().replace(/\s+/g, ' ');
-                    fullEventData = fullEventData.filter(item => {
-                        let dbTitle = (item.title || "").trim().toLowerCase().replace(/\s+/g, ' ');
-                        return dbTitle === targetEvent;
-                    });
-                    
-                    if(fullEventData.length === 0) { 
-                        $('#main-loader').html('<div class="text-center p-4"><h3 class="text-danger font-weight-bold mb-2">Event Not Found</h3><p class="text-muted">This event is marked as private or has been removed.</p></div>'); 
-                        return; 
-                    }
-                    $('#main-loader').fadeOut(300);
-                    renderFolderDashboard();
-                } else {
-                    galleryData = fullEventData.filter(i => i.type === 'work' || i.type === 'link');
-                    canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
-                    $('#main-loader').fadeOut(300);
-                    if (galleryData.length > 0) openFolder(galleryData[0].batch_id); 
-                }
-            } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
+                $('#main-loader').fadeOut(300);
+                renderFolderDashboard();
+            } catch (e) { console.error(e); }
         }
 
         function renderFolderDashboard() {
-            $('#gallery').hide().empty(); $('#event-content').show(); 
-            $('#btnSelectMode').hide(); $('#btnStartViewing').hide(); $('.download-ui').hide(); $('#btnBackToFolders').hide();
-
-            let groups = {}; let videos = []; let albums = [];
+            $('#gallery').hide().empty(); $('#event-content').show(); $('.btn-header').not('[href="index.html"]').hide();
+            let groups = {};
             fullEventData.forEach(item => {
-                if (item.type === 'teaser' || item.type === 'live') videos.push(item);
-                else if (item.type === 'album') albums.push(item);
-                else if (item.batch_id) {
-                    let pathParts = item.file_path.split('/');
-                    let actualFolderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : item.title;
-                    if (!groups[item.batch_id]) groups[item.batch_id] = { title: actualFolderName, items: [], cover: item.file_path };
-                    groups[item.batch_id].items.push(item);
+                if (item.batch_id && (item.type === 'work' || item.type === 'link')) {
+                    let path = item.file_path.split('/');
+                    let name = path.length > 1 ? path[path.length - 2] : item.title;
+                    if (!groups[item.batch_id]) groups[item.batch_id] = { title: name, cover: item.file_path, count: 0 };
+                    groups[item.batch_id].count++;
                 }
             });
-
             let html = '<div class="section-header">Collections</div><div class="media-grid">';
-
-            Object.keys(groups).forEach(bId => {
-                const g = groups[bId]; const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
-                html += `<div class="media-card" onclick="openFolder('${bId}')"><div class="folder-cover" style="background-image: url('${coverUrl}');"></div><div class="card-details"><h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(g.title)}</h5><small><i class="fas fa-image mr-1"></i> ${g.items.length} Photos</small></div></div>`;
+            Object.keys(groups).forEach(id => {
+                const g = groups[id]; const cover = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
+                html += `<div class="media-card" onclick="openFolder('${id}', '${g.title}')"><div class="folder-cover" style="background-image:url('${cover}')"></div><div class="card-details"><h5>${g.title}</h5><small>${g.count} Photos</small></div></div>`;
             });
-
-            videos.forEach(v => {
-                let ytId = "";
-                if (v.file_path) {
-                    if (v.file_path.includes('embed/')) ytId = v.file_path.split('embed/')[1].split('?')[0]; 
-                    else if (v.file_path.includes('v=')) ytId = v.file_path.split('v=')[1].split('&')[0]; 
-                    else if (v.file_path.includes('youtu.be/')) ytId = v.file_path.split('youtu.be/')[1].split('?')[0];
-                }
-                html += `<div class="media-card" onclick="openVideo('${ytId}')"><div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');"><div class="folder-overlay"></div><i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i></div><div class="card-details"><h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5><small>Tap to Play Video</small></div></div>`;
-            });
-
-            albums.forEach(a => {
-                html += `<div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;"><i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i><div class="card-details" style="text-align:center; padding:0;"><h5>${escapeHtml(a.title || 'Digital Album')}</h5><small>View PDF Document</small></div></div>`;
-            });
-
-            html += '</div>'; $('#event-content').html(html);
+            $('#event-content').html(html + '</div>');
         }
 
-        function openFolder(batchId) {
-            galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
+        function openFolder(batchId, title) {
+            galleryData = fullEventData.filter(i => i.batch_id === batchId);
             canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
+            $('#pageTitleDisplay').html(`<i class="fas fa-folder-open text-warning mr-2"></i> ${title}`);
+            $('#event-content').hide(); $('#main-loader').show();
             
-            $('#event-content').hide(); 
-            $('#main-loader-text').text('Checking Gallery...');
-            $('#main-loader').show();
-            
-            $.get(API_BASE + 'cache_manager.php?batch_id=' + batchId, function(res) {
+            $.get(`${API_BASE}cache_manager.php?action=status&batch_id=${batchId}`, function(res) {
                 let data = JSON.parse(res);
-                cacheTotal = data.total;
-                cacheCompleted = data.cached;
-                cacheMissingUrls = data.missing;
-
+                cacheTotal = data.total; cacheCompleted = data.cached; cacheMissingUrls = data.missing;
                 updateCacheUI();
-
-                if (cacheMissingUrls.length === 0) {
-                    $('#main-loader').fadeOut(200);
-                    finishCacheOptimizer();
-                } else {
-                    $('#main-loader').fadeOut(200);
-                    $('#cache-progress-screen').fadeIn();
-                    for(let i=0; i<MAX_WORKERS; i++) { runCacheWorker(); }
-                }
-            }).fail(function() { 
-                $('#main-loader').fadeOut(200); 
-                finishCacheOptimizer(); 
+                $('#main-loader').hide();
+                if (cacheMissingUrls.length === 0) finishCacheOptimizer();
+                else { $('#cache-progress-screen').fadeIn(); runWorkers(); }
             });
         }
 
         function updateCacheUI() {
-            let pct = cacheTotal > 0 ? Math.round((cacheCompleted / cacheTotal) * 100) : 100;
+            let pct = Math.round((cacheCompleted / cacheTotal) * 100) || 0;
             $('#cache-fill').css('width', pct + '%');
             $('#cache-percent').text(pct + '% Loaded');
-            $('#cache-stats').text(cacheCompleted + ' / ' + cacheTotal + ' Images Ready');
+            $('#cache-stats').text(`${cacheCompleted} / ${cacheTotal} Ready`);
+            if (cacheCompleted >= 5 || pct >= 10) $('#btnContinueLive').fadeIn();
         }
 
-        function runCacheWorker() {
-            if(cacheMissingUrls.length === 0) return;
-            cacheWorkersActive++;
+        function runWorkers() { for(let i=0; i<4; i++) processNext(); }
+        function processNext() {
+            if (cacheMissingUrls.length === 0) return;
             const url = cacheMissingUrls.shift();
-            
-            // Calling serve_image.php directly uses the Synology CPU perfectly and creates the exact correct hash!
-            const buildUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1';
-            fetch(buildUrl)
-                .then(() => {
-                    cacheCompleted++; updateCacheUI(); cacheWorkersActive--;
-                    if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) finishCacheOptimizer();
-                    else runCacheWorker();
-                })
-                .catch(() => { cacheCompleted++; updateCacheUI(); cacheWorkersActive--; runCacheWorker(); });
+            fetch(`${API_BASE}serve_image.php?file=${encodeURIComponent(url)}&thumb=1`).then(() => {
+                cacheCompleted++; updateCacheUI();
+                if (cacheCompleted >= cacheTotal) finishCacheOptimizer();
+                else processNext();
+            });
         }
 
         function finishCacheOptimizer() {
             $('#cache-progress-screen').fadeOut();
-            if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
-            $('#btnStartViewing').show(); 
-            $('#btnSelectMode').show(); 
-            $('#btnBackToFolders').show(); 
-            $('#gallery').show();
+            $('#btnBackToFolders, #btnSelectMode, #gallery').show();
+            if(canDownload > 0) $('.download-ui').removeClass('d-none').show();
             renderGallery();
         }
-
-        function cancelCacheAndGoBack() { cacheMissingUrls = []; $('#cache-progress-screen').fadeOut(); goBackToFolders(); }
-        function goBackToFolders() { clearSelection(); renderFolderDashboard(); }
 
         function renderGallery() {
             let html = '';
             galleryData.forEach((item, index) => {
-                const imgUrl = item.file_path; galleryData[index].fullUrl = imgUrl; 
-                galleryData[index].filename = item.title_from_filename || item.file_path.split('/').pop();
-                const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`; 
-                const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
-                galleryData[index].thumbUrl = thumbUrl; galleryData[index].highResUrl = highResUrl;
-                html += `<div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})"><img data-src="${thumbUrl}" class="lazy-image"></div>`;
+                const thumb = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
+                html += `<div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})"><img data-src="${thumb}" class="lazy-image"></div>`;
             });
-            document.getElementById('gallery').innerHTML = html; initLazyLoader();
+            $('#gallery').html(html);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(en => { if(en.isIntersecting) { en.target.src = en.target.dataset.src; en.target.classList.add('loaded'); observer.unobserve(en.target); } });
+            }, { rootMargin: "0px 0px 1000px 0px" });
+            document.querySelectorAll('.lazy-image').forEach(img => observer.observe(img));
         }
 
-        let imageLoadQueue = []; let activeDownloads = 0; const MAX_LAZY_DOWNLOADS = 6;
-        function processImageLoadQueue() { if (imageLoadQueue.length === 0 || activeDownloads >= MAX_LAZY_DOWNLOADS) return; const img = imageLoadQueue.shift(); activeDownloads++; img.onload = () => { img.classList.add('loaded'); activeDownloads--; processImageLoadQueue(); }; img.onerror = () => { activeDownloads--; processImageLoadQueue(); }; img.src = img.getAttribute('data-src'); }
-        function initLazyLoader() { const imageObserver = new IntersectionObserver((entries, observer) => { entries.forEach(entry => { if (entry.isIntersecting) { imageLoadQueue.push(entry.target); processImageLoadQueue(); observer.unobserve(entry.target); } }); }, { rootMargin: "0px 0px 1200px 0px" }); document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img)); }
+        function handleItemClick(index) { if (isSelectMode) toggleSelection(index); else openLightbox(index); }
+        function toggleSelection(index) {
+            const path = galleryData[index].file_path; const $el = $(`#item-${index}`);
+            if (selectedFiles.has(path)) { selectedFiles.delete(path); $el.removeClass('selected'); }
+            else { selectedFiles.add(path); $el.addClass('selected'); }
+            $('.selection-count').text(selectedFiles.size + " Selected");
+            if (selectedFiles.size > 0) $('#selection-bar').addClass('visible'); else $('#selection-bar').removeClass('visible');
+        }
 
         function toggleSelectMode() { isSelectMode = !isSelectMode; $('#btnSelectMode').toggleClass('active'); if(!isSelectMode) clearSelection(); }
-        function handleItemClick(index) { if (isSelectMode) toggleSelection(index); else openLightbox(index); }
-        function toggleSelection(index) { const item = galleryData[index]; const $el = $(`#item-${index}`); if (selectedFiles.has(item.fullUrl)) { selectedFiles.delete(item.fullUrl); $el.removeClass('selected'); } else { selectedFiles.add(item.fullUrl); $el.addClass('selected'); } updateFloatingBar(); }
-        function clearSelection() { selectedFiles.clear(); $('.gallery-item').removeClass('selected'); updateFloatingBar(); }
-        function updateFloatingBar() { const count = selectedFiles.size; $('.selection-count').text(count + " Selected"); if (count > 0) $('#selection-bar').addClass('visible'); else $('#selection-bar').removeClass('visible'); }
+        function clearSelection() { selectedFiles.clear(); $('.gallery-item').removeClass('selected'); $('#selection-bar').removeClass('visible'); }
 
-        function promptDownloadAll() { pendingDownloadArray = galleryData.map(i => i.fullUrl); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
-        function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
+        // Zoom Logic
+        let currentZoom = 1; const imgEl = document.getElementById('lightboxImage');
+        function resetZoom() { currentZoom = 1; imgEl.style.transform = `scale(1)`; }
+        function adjustZoom(delta) { currentZoom = Math.min(Math.max(1, currentZoom + delta), 5); imgEl.style.transform = `scale(${currentZoom})`; }
 
-        async function executeWebDownload() {
-            $('#quality-overlay').fadeOut(); $('#queue-overlay').css('display', 'flex'); $('#queue-title').text('Zipping on Device...');
-            const zip = new JSZip();
-            for(let i=0; i<pendingDownloadArray.length; i++) {
-                $('#queue-text').text(`Compressing image ${i+1} of ${pendingDownloadArray.length}...`);
-                try {
-                    let cacheUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(pendingDownloadArray[i]) + '&thumb=1';
-                    let res = await fetch(cacheUrl); let blob = await res.blob();
-                    zip.file("Web_" + pendingDownloadArray[i].split('/').pop(), blob);
-                } catch(e) {}
-            }
-            $('#queue-text').text("Finalizing ZIP...");
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = "Supriya_Web_Photos.zip"; link.click();
-                $('#queue-overlay').fadeOut(); clearSelection();
-            });
-        }
-
-        function executeOriginalDownload() {
-            $('#quality-overlay').fadeOut(); $('#queue-overlay').css('display', 'flex'); $('#queue-title').text('Connecting to NAS Vault...'); $('#queue-text').text('Streaming original files directly...');
-            fetch(API_BASE + 'stream_zip.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files: pendingDownloadArray }) })
-            .then(response => response.blob()).then(blob => {
-                const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = "Supriya_Originals.zip"; link.click();
-                $('#queue-overlay').fadeOut(); clearSelection();
-            }).catch(()=> { $('#queue-title').text('Error connecting to vault.'); setTimeout(()=>$('#queue-overlay').fadeOut(), 3000); });
-        }
-
-        function downloadSingleImage(type, event) {
-            if (event) event.preventDefault(); 
+        function openLightbox(index) {
+            currentIndex = index; resetZoom();
             const item = galleryData[currentIndex];
-            if(item.can_download == 0) return;
-            let dlUrl = type === 'normal' ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}` : `${API_BASE}stream_zip.php?single=${encodeURIComponent(item.fullUrl)}`;
-            if(type === 'full') dlUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.fullUrl)}`;
-            const link = document.createElement('a'); link.href = dlUrl; link.setAttribute('download', item.filename || 'download.jpg'); link.setAttribute('target', '_blank');
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            $('#lbFileName').text(item.file_path.split('/').pop());
+            imgEl.src = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}`;
+            $('#lightboxModal').modal('show');
+            $('#zoom-overlay-ui').removeClass('d-none');
         }
 
-        // ==========================================
-        // ADVANCED ZOOM ENGINE & LIGHTBOX
-        // ==========================================
-        let currentZoom = 1; 
-        let imgPanX = 0, imgPanY = 0;
-        let isDragging = false;
-        let startDragX, startDragY;
-        let currentHighResLoader = null;
-        const imgEl = document.getElementById('lightboxImage');
-
-        function openLightbox(index) { 
-            currentIndex = index; 
-            resetZoom(); 
-            updateLightbox(); 
-            $('#lightboxModal').modal('show'); 
+        function changeImage(dir) {
+            currentIndex = (currentIndex + dir + galleryData.length) % galleryData.length;
+            openLightbox(currentIndex);
         }
 
-        function updateLightbox() {
-            const item = galleryData[currentIndex];
-            $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2"></i> Enhancing...`);
-            imgEl.src = item.thumbUrl;
-            imgEl.style.opacity = '1';
-            
-            if (currentHighResLoader) currentHighResLoader.onload = null;
-            currentHighResLoader = new Image();
-            currentHighResLoader.onload = function() { 
-                if (galleryData[currentIndex].highResUrl === this.src) { 
-                    imgEl.src = this.src; 
-                    $('#lbFileName').text(item.filename); 
-                    $('#zoom-overlay-ui').removeClass('d-none'); // Show magnifiers when high-res loads
-                } 
-            };
-            currentHighResLoader.src = item.highResUrl;
-
-            // Pre-Loading Next and Previous Images
-            let nextIndex = (currentIndex + 1) % galleryData.length; 
-            let preloadNext = new Image(); preloadNext.src = galleryData[nextIndex].highResUrl;
-            let prevIndex = currentIndex - 1; if (prevIndex < 0) prevIndex = galleryData.length - 1; 
-            let preloadPrev = new Image(); preloadPrev.src = galleryData[prevIndex].highResUrl;
-
-            let itemDlState = parseInt(item.can_download) || 0;
-            if (itemDlState > 0) { $('.download-ui').removeClass('d-none'); if (itemDlState == 2) $('.fast-dl-btn').hide(); else $('.fast-dl-btn').show(); } else { $('.download-ui').addClass('d-none'); }
-        }
-
-        function changeImage(dir) { 
-            currentIndex += dir; 
-            if (currentIndex >= galleryData.length) currentIndex = 0; 
-            if (currentIndex < 0) currentIndex = galleryData.length - 1; 
-            $('#zoom-overlay-ui').addClass('d-none');
-            resetZoom();
-            updateLightbox(); 
-        }
-
-        // --- ZOOM LOGIC ---
-        function resetZoom() {
-            currentZoom = 1; imgPanX = 0; imgPanY = 0;
-            applyTransform();
-        }
-
-        function adjustZoom(delta) {
-            currentZoom += delta;
-            if(currentZoom <= 1) resetZoom();
-            else {
-                if(currentZoom > 5) currentZoom = 5;
-                applyTransform();
-            }
-        }
-
-        function applyTransform() {
-            imgEl.style.transform = `translate(${imgPanX}px, ${imgPanY}px) scale(${currentZoom})`;
-            imgEl.style.cursor = currentZoom > 1 ? 'grab' : 'zoom-in';
-        }
-
-        // 1. Mouse Wheel Zoom
-        imgEl.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            adjustZoom(e.deltaY * -0.005);
-        }, {passive: false});
-
-        // 2. Pinch Zoom & Drag (Mobile)
-        let initialDistance = null;
-        let initialZoom = 1;
-
-        imgEl.addEventListener('touchstart', function(e) { 
-            if(e.touches.length === 2) { 
-                initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); 
-                initialZoom = currentZoom;
-            } else if (e.touches.length === 1 && currentZoom > 1) {
-                isDragging = true;
-                startDragX = e.touches[0].pageX - imgPanX;
-                startDragY = e.touches[0].pageY - imgPanY;
-            }
-        }, {passive: false});
-
-        imgEl.addEventListener('touchmove', function(e) { 
-            if(e.touches.length === 2 && initialDistance) {
-                e.preventDefault();
-                let currentDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-                currentZoom = Math.min(Math.max(1, initialZoom * (currentDist / initialDistance)), 5);
-                applyTransform();
-            } else if (isDragging && e.touches.length === 1 && currentZoom > 1) {
-                e.preventDefault();
-                imgPanX = e.touches[0].pageX - startDragX;
-                imgPanY = e.touches[0].pageY - startDragY;
-                applyTransform();
-            }
-        }, {passive: false});
-
-        imgEl.addEventListener('touchend', function(e) { 
-            initialDistance = null; 
-            isDragging = false;
-        });
-
-        // 3. Double Tap Zoom
-        let lastTapTime = 0;
-        imgEl.addEventListener('touchend', function(e) {
-            if (e.changedTouches.length === 1) { 
-                let currentTime = new Date().getTime();
-                let tapLength = currentTime - lastTapTime;
-                if (tapLength < 300 && tapLength > 0) {
-                    // Double tap detected!
-                    if (currentZoom > 1) { resetZoom(); }
-                    else { adjustZoom(1.5); } // Zoom in heavily
-                    e.preventDefault();
-                }
-                lastTapTime = currentTime;
-            }
-        });
+        function goBackToFolders() { clearSelection(); $('#gallery').hide(); renderFolderDashboard(); }
+        function cancelCacheAndGoBack() { $('#cache-progress-screen').hide(); goBackToFolders(); }
 
         initializeGallery();
     </script>
