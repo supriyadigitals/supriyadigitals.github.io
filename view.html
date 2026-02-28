@@ -85,7 +85,7 @@
 
     <div id="main-loader" class="overlay-screen">
         <div class="spinner"></div>
-        <h4 style="color: #111; font-weight:700;">Connecting to Studio</h4>
+        <h4 id="main-loader-text" style="color: #111; font-weight:700;">Connecting to Studio</h4>
     </div>
 
     <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
@@ -145,6 +145,9 @@
         <div class="d-flex align-items-center"><h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1></div>
         <div>
             <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+            
+            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-2"></i> Start</button>
+            
             <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-2"></i> Select</button>
             <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-2"></i> All</button>
         </div>
@@ -263,7 +266,12 @@
         }
 
         function renderFolderDashboard() {
-            $('#gallery').hide().empty(); $('#event-content').show(); $('#btnSelectMode').hide(); $('.download-ui').hide(); $('#btnBackToFolders').hide();
+            $('#gallery').hide().empty(); 
+            $('#event-content').show(); 
+            $('#btnSelectMode').hide(); 
+            $('#btnStartViewing').hide(); // Hide Start button on Dashboard
+            $('.download-ui').hide(); 
+            $('#btnBackToFolders').hide();
 
             let groups = {}; let videos = []; let albums = [];
             fullEventData.forEach(item => {
@@ -301,15 +309,16 @@
             html += '</div>'; $('#event-content').html(html);
         }
 
-        // --- BROWSER-CONTROLLED PARALLEL CACHE WORKER ---
+        // --- FIXED BROWSER-CONTROLLED PARALLEL CACHE WORKER ---
         function openFolder(batchId) {
             galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
             canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
             
             $('#event-content').hide(); 
-            $('#cache-progress-screen').fadeIn();
             
-            // 1. Ask PHP exactly what files are missing
+            $('#main-loader-text').text('Opening Folder...');
+            $('#main-loader').show();
+            
             $.get(API_BASE + 'cache_manager.php?batch_id=' + batchId, function(res) {
                 let data = JSON.parse(res);
                 cacheTotal = data.total;
@@ -319,12 +328,17 @@
                 updateCacheUI();
 
                 if (cacheMissingUrls.length === 0) {
+                    $('#main-loader').fadeOut(200);
                     finishCacheOptimizer();
                 } else {
-                    // 2. Start Parallel Workers to build the missing ones
+                    $('#main-loader').fadeOut(200);
+                    $('#cache-progress-screen').fadeIn();
                     for(let i=0; i<MAX_WORKERS; i++) { runCacheWorker(); }
                 }
-            }).fail(function() { finishCacheOptimizer(); });
+            }).fail(function() { 
+                $('#main-loader').fadeOut(200); 
+                finishCacheOptimizer(); 
+            });
         }
 
         function updateCacheUI() {
@@ -340,14 +354,16 @@
             cacheWorkersActive++;
             const url = cacheMissingUrls.shift();
             
-            // Force the NAS CPU to compress the image
-            const buildUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1';
+            const buildUrl = API_BASE + 'cache_manager.php?action=process&file=' + encodeURIComponent(url);
             
             fetch(buildUrl)
                 .then(() => {
                     cacheCompleted++; updateCacheUI(); cacheWorkersActive--;
-                    if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) finishCacheOptimizer();
-                    else runCacheWorker();
+                    if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) {
+                        finishCacheOptimizer();
+                    } else {
+                        runCacheWorker();
+                    }
                 })
                 .catch(() => {
                     cacheCompleted++; updateCacheUI(); cacheWorkersActive--; runCacheWorker();
@@ -357,13 +373,15 @@
         function finishCacheOptimizer() {
             $('#cache-progress-screen').fadeOut();
             if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
-            $('#btnSelectMode').show(); $('#btnBackToFolders').show(); $('#gallery').show();
+            $('#btnStartViewing').show(); // SHOW THE NEW START BUTTON
+            $('#btnSelectMode').show(); 
+            $('#btnBackToFolders').show(); 
+            $('#gallery').show();
             renderGallery();
         }
 
-        // Action when user clicks "Back to Folders" during optimization
         function cancelCacheAndGoBack() {
-            cacheMissingUrls = []; // Stops workers from grabbing new tasks
+            cacheMissingUrls = []; 
             $('#cache-progress-screen').fadeOut();
             goBackToFolders();
         }
@@ -444,6 +462,20 @@
             currentHighResLoader = new Image();
             currentHighResLoader.onload = function() { if (galleryData[currentIndex].highResUrl === this.src) { $('#lightboxImage').attr('src', this.src); $('#lbFileName').text(item.filename); } };
             currentHighResLoader.src = item.highResUrl;
+
+            // =========================================================================
+            // THE PRE-ENHANCEMENT (PRE-LOADING) FEATURE IS RIGHT HERE!
+            // It silently downloads the Next and Previous High-Res images in the background.
+            // =========================================================================
+            let nextIndex = (currentIndex + 1) % galleryData.length; 
+            let preloadNext = new Image(); 
+            preloadNext.src = galleryData[nextIndex].highResUrl;
+            
+            let prevIndex = currentIndex - 1; 
+            if (prevIndex < 0) prevIndex = galleryData.length - 1; 
+            let preloadPrev = new Image(); 
+            preloadPrev.src = galleryData[prevIndex].highResUrl;
+            // =========================================================================
 
             let itemDlState = parseInt(item.can_download) || 0;
             if (itemDlState > 0) { $('.download-ui').removeClass('d-none'); if (itemDlState == 2) $('.fast-dl-btn').hide(); else $('.fast-dl-btn').show(); } else { $('.download-ui').addClass('d-none'); }
