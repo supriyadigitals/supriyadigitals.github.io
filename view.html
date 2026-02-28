@@ -97,7 +97,7 @@
     <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
         <i class="fas fa-microchip text-warning mb-3" style="font-size: 3rem;"></i>
         <h3 style="color: #111; font-weight:800; margin-bottom:5px;">Optimizing Gallery</h3>
-        <p style="color: #666; font-size:0.9rem; max-width: 400px;">Preparing high-quality files. This is a one-time process.</p>
+        <p style="color: #666; font-size:0.9rem; max-width: 400px;">Using Multi-Core Processing to prepare high-quality files.</p>
         
         <div class="progress-container"><div class="progress-fill" id="cache-fill"></div></div>
         
@@ -154,6 +154,7 @@
             
             <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-1"></i> Back</button>
             <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-1"></i> Start</button>
+            
             <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-1"></i> Select</button>
             <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-1"></i> All</button>
         </div>
@@ -225,10 +226,10 @@
         let isSelectMode = false; let currentIndex = 0; let canDownload = 0; 
         let pendingDownloadArray = [];
 
-        // AJAX Worker Variables
         let cacheMissingUrls = []; let cacheTotal = 0; let cacheCompleted = 0;
         let cacheWorkersActive = 0; 
-        const MAX_WORKERS = 2; // REDUCED TO 2 WORKERS TO PREVENT NAS CHOKING!
+        // THIS IS THE SPEED YOU LOVED! 4 Parallel CPU Workers blasting serve_image.php
+        const MAX_WORKERS = 4; 
 
         function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
@@ -354,11 +355,11 @@
 
         function runCacheWorker() {
             if(cacheMissingUrls.length === 0) return;
-            
             cacheWorkersActive++;
             const url = cacheMissingUrls.shift();
             
-            const buildUrl = API_BASE + 'cache_manager.php?action=process&file=' + encodeURIComponent(url);
+            // Calling serve_image.php directly uses the Synology CPU perfectly and creates the exact correct hash!
+            const buildUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1';
             fetch(buildUrl)
                 .then(() => {
                     cacheCompleted++; updateCacheUI(); cacheWorkersActive--;
