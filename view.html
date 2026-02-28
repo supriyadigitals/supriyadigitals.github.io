@@ -12,7 +12,7 @@
 
     <style>
         :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; }
         img { pointer-events: none; -webkit-user-drag: none; }
 
         .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
@@ -27,10 +27,10 @@
         .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
 
-        .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px; }
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
         .brand-title span { color: var(--primary); }
-        .btn-header { border: 1px solid #eee; color: #555; border-radius: 50px; padding: 8px 20px; font-size: 0.85rem; transition: 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; margin-left: 10px; font-weight: 600; }
+        .btn-header { border: 1px solid #eee; color: #555; border-radius: 50px; padding: 8px 20px; font-size: 0.85rem; transition: 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; margin-left: 8px; font-weight: 600; text-decoration: none !important;}
         .btn-header:hover, .btn-header.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
         .section-header { margin: 40px 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; }
@@ -49,7 +49,7 @@
         .container-fluid { padding: 30px; padding-bottom: 120px; }
         .gallery-grid { column-count: 4; column-gap: 20px; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } .media-grid { padding: 0 15px; } }
+        @media (max-width: 768px) { .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } .media-grid { padding: 0 15px; } .gallery-header { justify-content: center; } }
         @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
         
         .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; min-height: 250px; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
@@ -62,8 +62,9 @@
         #selection-bar.visible { transform: translateX(-50%) translateY(0); }
         .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
 
+        /* ADVANCED ZOOM LIGHTBOX CSS */
         .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; overflow: hidden; pointer-events: auto;}
-        .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden;}
+        .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;}
         .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
         .lb-header > * { pointer-events: auto; } 
         .lb-title { color: #fff; font-size: 1.1rem; opacity: 0.8; }
@@ -71,7 +72,7 @@
         .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
         .lb-icon:hover { opacity: 1; color: var(--primary); }
         
-        #lightboxImage { max-height: 80vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: transform 0.15s ease-out; transform-origin: center center; cursor: zoom-in; will-change: transform;}
+        #lightboxImage { max-height: 80vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: transform 0.1s ease-out; cursor: zoom-in; will-change: transform;}
         
         .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.3s; z-index:1050; pointer-events: auto;}
         .lb-control:hover { background: var(--primary); }
@@ -79,6 +80,11 @@
         .dropdown-menu-dark { background: #222; border: 1px solid #444; }
         .dropdown-item { color: #eee; padding: 10px 20px; border-bottom: 1px solid #333; }
         .dropdown-item:hover { background: var(--primary); color: #fff; }
+
+        /* MAGNIFIER LENS UI */
+        .zoom-overlay { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1060; display: flex; gap: 20px; background: rgba(0,0,0,0.7); padding: 10px 25px; border-radius: 50px; pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .zoom-overlay i { color: #fff; font-size: 1.5rem; cursor: pointer; transition: 0.2s; padding: 5px; }
+        .zoom-overlay i:hover { color: var(--primary); transform: scale(1.1); }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -107,7 +113,7 @@
                 <i class="fas fa-arrow-left mr-2"></i> Back to Folders
             </button>
             <a href="index.html" class="btn btn-dark font-weight-bold mb-2" style="border-radius: 50px; padding: 10px 25px;">
-                <i class="fas fa-home mr-2"></i> Main Page
+                <i class="fas fa-home mr-2"></i> Home Page
             </a>
         </div>
     </div>
@@ -144,12 +150,12 @@
     <div class="gallery-header">
         <div class="d-flex align-items-center"><h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1></div>
         <div>
-            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+            <a href="index.html" class="btn-header"><i class="fas fa-home mr-1"></i> Home</a>
             
-            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-2"></i> Start</button>
-            
-            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-2"></i> Select</button>
-            <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-2"></i> All</button>
+            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-1"></i> Back</button>
+            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-1"></i> Start</button>
+            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-1"></i> Select</button>
+            <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-1"></i> All</button>
         </div>
     </div>
 
@@ -180,7 +186,7 @@
     <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
         <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
             <div class="modal-content">
-                <div class="modal-body">
+                <div class="modal-body" id="lb-body-container">
                     <div class="lb-header">
                         <div class="lb-title" id="lbFileName">image.jpg</div>
                         <div class="lb-actions">
@@ -191,12 +197,18 @@
                                     <a class="dropdown-item" href="#" onclick="downloadSingleImage('full', event)"><i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)</a>
                                 </div>
                             </div>
-                            <span class="lb-icon" data-dismiss="modal"><i class="fas fa-times"></i></span>
+                            <span class="lb-icon" data-dismiss="modal" onclick="resetZoom()"><i class="fas fa-times"></i></span>
                         </div>
                     </div>
+                    
                     <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
                     <img id="lightboxImage" src="">
                     <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
+                    
+                    <div class="zoom-overlay d-none" id="zoom-overlay-ui">
+                        <i class="fas fa-search-minus" onclick="adjustZoom(-0.5)" title="Zoom Out"></i>
+                        <i class="fas fa-search-plus" onclick="adjustZoom(0.5)" title="Zoom In"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -213,12 +225,8 @@
         let isSelectMode = false; let currentIndex = 0; let canDownload = 0; 
         let pendingDownloadArray = [];
 
-        // AJAX Worker Variables
-        let cacheMissingUrls = [];
-        let cacheTotal = 0;
-        let cacheCompleted = 0;
-        let cacheWorkersActive = 0;
-        const MAX_WORKERS = 4; // Uses 4 CPU cores on your NAS simultaneously!
+        let cacheMissingUrls = []; let cacheTotal = 0; let cacheCompleted = 0;
+        let cacheWorkersActive = 0; const MAX_WORKERS = 4;
 
         function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
@@ -266,12 +274,8 @@
         }
 
         function renderFolderDashboard() {
-            $('#gallery').hide().empty(); 
-            $('#event-content').show(); 
-            $('#btnSelectMode').hide(); 
-            $('#btnStartViewing').hide(); // Hide Start button on Dashboard
-            $('.download-ui').hide(); 
-            $('#btnBackToFolders').hide();
+            $('#gallery').hide().empty(); $('#event-content').show(); 
+            $('#btnSelectMode').hide(); $('#btnStartViewing').hide(); $('.download-ui').hide(); $('#btnBackToFolders').hide();
 
             let groups = {}; let videos = []; let albums = [];
             fullEventData.forEach(item => {
@@ -309,14 +313,12 @@
             html += '</div>'; $('#event-content').html(html);
         }
 
-        // --- FIXED BROWSER-CONTROLLED PARALLEL CACHE WORKER ---
         function openFolder(batchId) {
             galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
             canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
             
             $('#event-content').hide(); 
-            
-            $('#main-loader-text').text('Opening Folder...');
+            $('#main-loader-text').text('Loading Folder...');
             $('#main-loader').show();
             
             $.get(API_BASE + 'cache_manager.php?batch_id=' + batchId, function(res) {
@@ -350,42 +352,30 @@
 
         function runCacheWorker() {
             if(cacheMissingUrls.length === 0) return;
-            
             cacheWorkersActive++;
             const url = cacheMissingUrls.shift();
             
             const buildUrl = API_BASE + 'cache_manager.php?action=process&file=' + encodeURIComponent(url);
-            
             fetch(buildUrl)
                 .then(() => {
                     cacheCompleted++; updateCacheUI(); cacheWorkersActive--;
-                    if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) {
-                        finishCacheOptimizer();
-                    } else {
-                        runCacheWorker();
-                    }
+                    if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) finishCacheOptimizer();
+                    else runCacheWorker();
                 })
-                .catch(() => {
-                    cacheCompleted++; updateCacheUI(); cacheWorkersActive--; runCacheWorker();
-                });
+                .catch(() => { cacheCompleted++; updateCacheUI(); cacheWorkersActive--; runCacheWorker(); });
         }
 
         function finishCacheOptimizer() {
             $('#cache-progress-screen').fadeOut();
             if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
-            $('#btnStartViewing').show(); // SHOW THE NEW START BUTTON
+            $('#btnStartViewing').show(); 
             $('#btnSelectMode').show(); 
             $('#btnBackToFolders').show(); 
             $('#gallery').show();
             renderGallery();
         }
 
-        function cancelCacheAndGoBack() {
-            cacheMissingUrls = []; 
-            $('#cache-progress-screen').fadeOut();
-            goBackToFolders();
-        }
-
+        function cancelCacheAndGoBack() { cacheMissingUrls = []; $('#cache-progress-screen').fadeOut(); goBackToFolders(); }
         function goBackToFolders() { clearSelection(); renderFolderDashboard(); }
 
         function renderGallery() {
@@ -451,61 +441,134 @@
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
-        let currentZoom = 1; let currentHighResLoader = null;
-        function openLightbox(index) { currentIndex = index; currentZoom = 1; updateLightbox(); $('#lightboxModal').modal('show'); }
+        // ==========================================
+        // ADVANCED ZOOM ENGINE & LIGHTBOX
+        // ==========================================
+        let currentZoom = 1; 
+        let imgPanX = 0, imgPanY = 0;
+        let isDragging = false;
+        let startDragX, startDragY;
+        let currentHighResLoader = null;
+        const imgEl = document.getElementById('lightboxImage');
+
+        function openLightbox(index) { 
+            currentIndex = index; 
+            resetZoom(); 
+            updateLightbox(); 
+            $('#lightboxModal').modal('show'); 
+        }
+
         function updateLightbox() {
             const item = galleryData[currentIndex];
-            $('#lightboxImage').css('transform', `scale(1)`).attr('src', item.thumbUrl).css('opacity', '1'); 
             $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2"></i> Enhancing...`);
+            imgEl.src = item.thumbUrl;
+            imgEl.style.opacity = '1';
             
             if (currentHighResLoader) currentHighResLoader.onload = null;
             currentHighResLoader = new Image();
-            currentHighResLoader.onload = function() { if (galleryData[currentIndex].highResUrl === this.src) { $('#lightboxImage').attr('src', this.src); $('#lbFileName').text(item.filename); } };
+            currentHighResLoader.onload = function() { 
+                if (galleryData[currentIndex].highResUrl === this.src) { 
+                    imgEl.src = this.src; 
+                    $('#lbFileName').text(item.filename); 
+                    $('#zoom-overlay-ui').removeClass('d-none'); // Show magnifiers when high-res loads
+                } 
+            };
             currentHighResLoader.src = item.highResUrl;
 
-            // =========================================================================
-            // THE PRE-ENHANCEMENT (PRE-LOADING) FEATURE IS RIGHT HERE!
-            // It silently downloads the Next and Previous High-Res images in the background.
-            // =========================================================================
+            // Pre-Loading Next and Previous Images
             let nextIndex = (currentIndex + 1) % galleryData.length; 
-            let preloadNext = new Image(); 
-            preloadNext.src = galleryData[nextIndex].highResUrl;
-            
-            let prevIndex = currentIndex - 1; 
-            if (prevIndex < 0) prevIndex = galleryData.length - 1; 
-            let preloadPrev = new Image(); 
-            preloadPrev.src = galleryData[prevIndex].highResUrl;
-            // =========================================================================
+            let preloadNext = new Image(); preloadNext.src = galleryData[nextIndex].highResUrl;
+            let prevIndex = currentIndex - 1; if (prevIndex < 0) prevIndex = galleryData.length - 1; 
+            let preloadPrev = new Image(); preloadPrev.src = galleryData[prevIndex].highResUrl;
 
             let itemDlState = parseInt(item.can_download) || 0;
             if (itemDlState > 0) { $('.download-ui').removeClass('d-none'); if (itemDlState == 2) $('.fast-dl-btn').hide(); else $('.fast-dl-btn').show(); } else { $('.download-ui').addClass('d-none'); }
         }
 
-        function changeImage(dir) { currentIndex += dir; currentZoom = 1; $('#lightboxImage').css('transform', `scale(1)`); if (currentIndex >= galleryData.length) currentIndex = 0; if (currentIndex < 0) currentIndex = galleryData.length - 1; updateLightbox(); }
-        document.addEventListener('keydown', (e) => { if ($('#lightboxModal').is(':visible')) { if (e.key === "ArrowLeft") changeImage(-1); if (e.key === "ArrowRight") changeImage(1); } });
-        
-        const imgEl = document.getElementById('lightboxImage');
+        function changeImage(dir) { 
+            currentIndex += dir; 
+            if (currentIndex >= galleryData.length) currentIndex = 0; 
+            if (currentIndex < 0) currentIndex = galleryData.length - 1; 
+            $('#zoom-overlay-ui').addClass('d-none');
+            resetZoom();
+            updateLightbox(); 
+        }
+
+        // --- ZOOM LOGIC ---
+        function resetZoom() {
+            currentZoom = 1; imgPanX = 0; imgPanY = 0;
+            applyTransform();
+        }
+
+        function adjustZoom(delta) {
+            currentZoom += delta;
+            if(currentZoom <= 1) resetZoom();
+            else {
+                if(currentZoom > 5) currentZoom = 5;
+                applyTransform();
+            }
+        }
+
+        function applyTransform() {
+            imgEl.style.transform = `translate(${imgPanX}px, ${imgPanY}px) scale(${currentZoom})`;
+            imgEl.style.cursor = currentZoom > 1 ? 'grab' : 'zoom-in';
+        }
+
+        // 1. Mouse Wheel Zoom
         imgEl.addEventListener('wheel', function(e) {
             e.preventDefault();
-            currentZoom += e.deltaY * -0.005;
-            currentZoom = Math.min(Math.max(1, currentZoom), 4);
-            imgEl.style.transform = `scale(${currentZoom})`;
-            if(currentZoom > 1) imgEl.style.cursor = 'grab'; else imgEl.style.cursor = 'zoom-in';
+            adjustZoom(e.deltaY * -0.005);
         }, {passive: false});
 
+        // 2. Pinch Zoom & Drag (Mobile)
         let initialDistance = null;
-        imgEl.addEventListener('touchstart', function(e) { if(e.touches.length === 2) { initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); } });
+        let initialZoom = 1;
+
+        imgEl.addEventListener('touchstart', function(e) { 
+            if(e.touches.length === 2) { 
+                initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); 
+                initialZoom = currentZoom;
+            } else if (e.touches.length === 1 && currentZoom > 1) {
+                isDragging = true;
+                startDragX = e.touches[0].pageX - imgPanX;
+                startDragY = e.touches[0].pageY - imgPanY;
+            }
+        }, {passive: false});
+
         imgEl.addEventListener('touchmove', function(e) { 
             if(e.touches.length === 2 && initialDistance) {
                 e.preventDefault();
-                let currentDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-                let zoomChange = (currentDistance / initialDistance);
-                currentZoom = Math.min(Math.max(1, currentZoom * zoomChange), 4);
-                imgEl.style.transform = `scale(${currentZoom})`;
-                initialDistance = currentDistance;
+                let currentDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+                currentZoom = Math.min(Math.max(1, initialZoom * (currentDist / initialDistance)), 5);
+                applyTransform();
+            } else if (isDragging && e.touches.length === 1 && currentZoom > 1) {
+                e.preventDefault();
+                imgPanX = e.touches[0].pageX - startDragX;
+                imgPanY = e.touches[0].pageY - startDragY;
+                applyTransform();
             }
         }, {passive: false});
-        imgEl.addEventListener('touchend', function(e) { if(e.touches.length < 2) initialDistance = null; });
+
+        imgEl.addEventListener('touchend', function(e) { 
+            initialDistance = null; 
+            isDragging = false;
+        });
+
+        // 3. Double Tap Zoom
+        let lastTapTime = 0;
+        imgEl.addEventListener('touchend', function(e) {
+            if (e.changedTouches.length === 1) { 
+                let currentTime = new Date().getTime();
+                let tapLength = currentTime - lastTapTime;
+                if (tapLength < 300 && tapLength > 0) {
+                    // Double tap detected!
+                    if (currentZoom > 1) { resetZoom(); }
+                    else { adjustZoom(1.5); } // Zoom in heavily
+                    e.preventDefault();
+                }
+                lastTapTime = currentTime;
+            }
+        });
 
         initializeGallery();
     </script>
