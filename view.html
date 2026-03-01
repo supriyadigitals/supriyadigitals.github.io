@@ -450,10 +450,23 @@
             if (event) event.preventDefault(); 
             const item = galleryData[currentIndex];
             if(item.can_download == 0) return;
-            let dlUrl = type === 'normal' ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}` : `${API_BASE}stream_zip.php?single=${encodeURIComponent(item.fullUrl)}`;
-            if(type === 'full') dlUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.fullUrl)}`;
-            const link = document.createElement('a'); link.href = dlUrl; link.setAttribute('download', item.filename || 'download.jpg'); link.setAttribute('target', '_blank');
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            
+            let dlUrl = '';
+            
+            if (type === 'normal') {
+                // Web Quality: Uses serve_image with the dl=1 trigger
+                dlUrl = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
+            } else if (type === 'full') {
+                // Original Quality: Uses your dedicated force-download script
+                dlUrl = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
+            }
+            
+            const link = document.createElement('a'); 
+            link.href = dlUrl; 
+            link.setAttribute('download', item.filename || 'download.jpg'); 
+            document.body.appendChild(link); 
+            link.click(); 
+            document.body.removeChild(link);
         }
 
         // ==========================================
