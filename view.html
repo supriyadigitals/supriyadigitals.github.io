@@ -235,7 +235,6 @@
 
         function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
-        // --- VIEWER HISTORY TRACKER ---
         let deviceId = localStorage.getItem('supriya_device_id');
         if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('supriya_device_id', deviceId); }
         
@@ -250,7 +249,7 @@
         }
         
         function pingServer() { trackAction('ping'); }
-        pingServer(); setInterval(pingServer, 10000); // Pings every 10s for time tracking
+        pingServer(); setInterval(pingServer, 10000);
 
         async function initializeGallery() {
             try {
@@ -280,6 +279,7 @@
             } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
         }
 
+        // RESTORED: Videos and Albums correctly rendered in Dashboard
         function renderFolderDashboard() {
             $('#gallery').hide().empty(); $('#event-content').show(); 
             $('#btnSelectMode').hide(); $('#btnStartViewing').hide(); $('.download-ui').hide(); $('#btnBackToFolders').hide();
@@ -299,11 +299,13 @@
 
             let html = '<div class="section-header">Collections</div><div class="media-grid">';
 
+            // Image Folders
             Object.keys(groups).forEach(bId => {
                 const g = groups[bId]; const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
                 html += `<div class="media-card" onclick="openFolder('${bId}')"><div class="folder-cover" style="background-image: url('${coverUrl}');"></div><div class="card-details"><h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(g.title)}</h5><small><i class="fas fa-image mr-1"></i> ${g.items.length} Photos</small></div></div>`;
             });
 
+            // Youtube Videos
             videos.forEach(v => {
                 let ytId = "";
                 if (v.file_path) {
@@ -314,6 +316,7 @@
                 html += `<div class="media-card" onclick="openVideo('${ytId}')"><div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');"><div class="folder-overlay"></div><i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i></div><div class="card-details"><h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5><small>Tap to Play Video</small></div></div>`;
             });
 
+            // PDF Albums
             albums.forEach(a => {
                 html += `<div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;"><i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i><div class="card-details" style="text-align:center; padding:0;"><h5>${escapeHtml(a.title || 'Digital Album')}</h5><small>View PDF Document</small></div></div>`;
             });
@@ -321,17 +324,19 @@
             html += '</div>'; $('#event-content').html(html);
         }
 
+        // RESTORED: Video JS Logic
         function openVideo(ytId) {
             if (!ytId) return;
-            trackAction('viewed_video', 'YouTube ID: ' + ytId);
             $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&showinfo=0`);
             $('#videoModal').modal('show');
         }
         
+        // Stop video audio playing in the background when the modal is closed
         $('#videoModal').on('hidden.bs.modal', function () {
             $('#ytIframe').attr('src', ''); 
         });
 
+        // Folder Cache Optimizer Logic
         function openFolder(batchId) {
             galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
             canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
@@ -426,33 +431,70 @@
         function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
 
         async function executeWebDownload() {
-            trackAction('download', 'Multiple Files (Web Quality)');
-            $('#quality-overlay').fadeOut(); $('#queue-overlay').css('display', 'flex'); $('#queue-title').text('Zipping on Device...');
+            // Send the download event to your Admin Viewer History
+            if (typeof trackAction === "function") {
+                trackAction('download', 'Full Folder (Web Quality)');
+            }
+
+            $('#quality-overlay').fadeOut(); 
+            $('#queue-overlay').css('display', 'flex'); 
+            $('#queue-title').text('Zipping on Device...');
+            
             const zip = new JSZip();
             for(let i=0; i<pendingDownloadArray.length; i++) {
                 $('#queue-text').text(`Compressing image ${i+1} of ${pendingDownloadArray.length}...`);
                 try {
                     let cacheUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(pendingDownloadArray[i]) + '&thumb=1';
-                    let res = await fetch(cacheUrl); let blob = await res.blob();
+                    let res = await fetch(cacheUrl); 
+                    let blob = await res.blob();
+                    
+                    // Safely extract the filename from the path
                     let filename = pendingDownloadArray[i].split('/').pop();
                     zip.file("Web_" + filename, blob);
-                } catch(e) {}
+                } catch(e) {
+                    console.error("Skipped an image during zip creation.", e);
+                }
             }
+            
             $('#queue-text').text("Finalizing ZIP...");
             zip.generateAsync({type:"blob"}).then(function(content) {
-                const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = "Supriya_Web_Photos.zip"; link.click();
-                $('#queue-overlay').fadeOut(); clearSelection();
+                const link = document.createElement('a'); 
+                link.href = URL.createObjectURL(content); 
+                link.download = "Supriya_Web_Photos.zip"; 
+                link.click();
+                $('#queue-overlay').fadeOut(); 
+                clearSelection();
             });
         }
 
         function executeOriginalDownload() {
-            trackAction('download', 'Multiple Files (Original Quality)');
-            $('#quality-overlay').fadeOut(); $('#queue-overlay').css('display', 'flex'); $('#queue-title').text('Connecting to NAS Vault...'); $('#queue-text').text('Streaming original files directly...');
-            fetch(API_BASE + 'stream_zip.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files: pendingDownloadArray }) })
-            .then(response => response.blob()).then(blob => {
-                const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = "Supriya_Originals.zip"; link.click();
-                $('#queue-overlay').fadeOut(); clearSelection();
-            }).catch(()=> { $('#queue-title').text('Error connecting to vault.'); setTimeout(()=>$('#queue-overlay').fadeOut(), 3000); });
+            // Track the original quality batch download
+            if (typeof trackAction === "function") {
+                trackAction('download', 'Full Folder (Original Quality)');
+            }
+
+            $('#quality-overlay').fadeOut(); 
+            $('#queue-overlay').css('display', 'flex'); 
+            $('#queue-title').text('Connecting to NAS Vault...'); 
+            $('#queue-text').text('Streaming original files directly...');
+            
+            fetch(API_BASE + 'stream_zip.php', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ files: pendingDownloadArray }) 
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const link = document.createElement('a'); 
+                link.href = URL.createObjectURL(blob); 
+                link.download = "Supriya_Originals.zip"; 
+                link.click();
+                $('#queue-overlay').fadeOut(); 
+                clearSelection();
+            }).catch(()=> { 
+                $('#queue-title').text('Error connecting to vault.'); 
+                setTimeout(()=>$('#queue-overlay').fadeOut(), 3000); 
+            });
         }
 
         function downloadSingleImage(type, event) {
@@ -460,12 +502,40 @@
             const item = galleryData[currentIndex];
             if(item.can_download == 0) return;
             
-            trackAction('download', (type === 'normal' ? 'Single Web: ' : 'Single Original: ') + (item.filename || 'unknown.jpg'));
+            // Track the exact filename and quality downloaded
+            if (typeof trackAction === "function") {
+                trackAction('download', (type === 'normal' ? 'Single Web: ' : 'Single Original: ') + (item.filename || 'unknown.jpg'));
+            }
             
             let dlUrl = '';
             if (type === 'normal') {
+                // Web Quality
                 dlUrl = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
             } else if (type === 'full') {
+                // Original Quality
+                dlUrl = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
+            }
+            
+            const link = document.createElement('a'); 
+            link.href = dlUrl; 
+            link.setAttribute('download', item.filename || 'download.jpg'); 
+            document.body.appendChild(link); 
+            link.click(); 
+            document.body.removeChild(link);
+        }
+
+        function downloadSingleImage(type, event) {
+            if (event) event.preventDefault(); 
+            const item = galleryData[currentIndex];
+            if(item.can_download == 0) return;
+            
+            let dlUrl = '';
+            
+            if (type === 'normal') {
+                // Web Quality: Uses serve_image with the dl=1 trigger
+                dlUrl = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
+            } else if (type === 'full') {
+                // Original Quality: Uses your dedicated force-download script
                 dlUrl = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
             }
             
@@ -506,7 +576,7 @@
                 if (galleryData[currentIndex].highResUrl === this.src) { 
                     imgEl.src = this.src; 
                     $('#lbFileName').text(item.filename); 
-                    $('#zoom-overlay-ui').removeClass('d-none');
+                    $('#zoom-overlay-ui').removeClass('d-none'); // Show magnifiers when high-res loads
                 } 
             };
             currentHighResLoader.src = item.highResUrl;
