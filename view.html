@@ -237,8 +237,19 @@
 
         let deviceId = localStorage.getItem('supriya_device_id');
         if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('supriya_device_id', deviceId); }
-        function pingServer() { fetch(API_BASE + 'ping.php?device=' + deviceId).catch(()=>{}); }
-        pingServer(); setInterval(pingServer, 20000);
+        
+        let currentEventTracker = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root Dashboard';
+        
+        function trackAction(actionType, downloadType = '') {
+            fetch(API_BASE + 'track.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ device: deviceId, site: 'View Page', event: currentEventTracker, action: actionType, dl_type: downloadType })
+            }).catch(()=>{});
+        }
+        
+        function pingServer() { trackAction('ping'); }
+        pingServer(); setInterval(pingServer, 10000); // Ping every 10 seconds to calculate time
 
         async function initializeGallery() {
             try {
