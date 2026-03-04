@@ -431,20 +431,39 @@
         function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
 
         async function executeWebDownload() {
-            $('#quality-overlay').fadeOut(); $('#queue-overlay').css('display', 'flex'); $('#queue-title').text('Zipping on Device...');
+            // Send the download event to your Admin Viewer History
+            if (typeof trackAction === "function") {
+                trackAction('download', 'Full Folder (Web Quality)');
+            }
+
+            $('#quality-overlay').fadeOut(); 
+            $('#queue-overlay').css('display', 'flex'); 
+            $('#queue-title').text('Zipping on Device...');
+            
             const zip = new JSZip();
             for(let i=0; i<pendingDownloadArray.length; i++) {
                 $('#queue-text').text(`Compressing image ${i+1} of ${pendingDownloadArray.length}...`);
                 try {
                     let cacheUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(pendingDownloadArray[i]) + '&thumb=1';
-                    let res = await fetch(cacheUrl); let blob = await res.blob();
-                    zip.file("Web_" + pendingDownloadArray[i].split('/').pop(), blob);
-                } catch(e) {}
+                    let res = await fetch(cacheUrl); 
+                    let blob = await res.blob();
+                    
+                    // Safely extract the filename from the path
+                    let filename = pendingDownloadArray[i].split('/').pop();
+                    zip.file("Web_" + filename, blob);
+                } catch(e) {
+                    console.error("Skipped an image during zip creation.", e);
+                }
             }
+            
             $('#queue-text').text("Finalizing ZIP...");
             zip.generateAsync({type:"blob"}).then(function(content) {
-                const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = "Supriya_Web_Photos.zip"; link.click();
-                $('#queue-overlay').fadeOut(); clearSelection();
+                const link = document.createElement('a'); 
+                link.href = URL.createObjectURL(content); 
+                link.download = "Supriya_Web_Photos.zip"; 
+                link.click();
+                $('#queue-overlay').fadeOut(); 
+                clearSelection();
             });
         }
 
