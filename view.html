@@ -240,16 +240,16 @@
         
         let currentEventTracker = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root Dashboard';
         
-        function trackAction(actionType, downloadType = '') {
+        function trackAction(actionType, itemInfo = '') {
             fetch(API_BASE + 'track.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ device: deviceId, site: 'View Page', event: currentEventTracker, action: actionType, dl_type: downloadType })
+                body: JSON.stringify({ device: deviceId, site: 'View Page', event: currentEventTracker, action: actionType, item_info: itemInfo })
             }).catch(()=>{});
         }
         
         function pingServer() { trackAction('ping'); }
-        pingServer(); setInterval(pingServer, 10000); // Ping every 10 seconds to calculate time
+        pingServer(); setInterval(pingServer, 10000);
 
         async function initializeGallery() {
             try {
