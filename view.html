@@ -27,6 +27,24 @@
         .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
 
+        /* MODERN FLOATING DOWNLOAD MANAGER */
+        #floating-dl-manager {
+            position: fixed; top: 80px; right: 20px; width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); z-index: 1050; padding: 20px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
+            transform: translateY(-50px); opacity: 0; pointer-events: none;
+        }
+        #floating-dl-manager.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        .dl-title { font-weight: 700; color: #111; margin-bottom: 15px; font-size: 0.95rem; }
+        .dl-progress-bar { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; }
+        .dl-progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s linear; }
+        .dl-status-text { font-size: 0.8rem; color: #666; margin-top: 10px; display: flex; justify-content: space-between; font-weight: 600; }
+        .progress-fill-pulse { animation: progress-pulse 1.5s infinite ease-in-out; }
+        @keyframes progress-pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
         .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px; }
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
         .brand-title span { color: var(--primary); }
@@ -43,7 +61,6 @@
         .card-details h5 { margin: 0 0 5px 0; font-weight: 700; font-size: 1.1rem; color: #111; }
         .card-details small { color: #666; font-weight: 500; }
 
-        /* RESTORED: Video Player CSS */
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
 
@@ -89,9 +106,23 @@
 </head>
 <body oncontextmenu="return false;">
 
+    <iframe name="hidden_dl_iframe" style="display:none;"></iframe>
+
     <div id="main-loader" class="overlay-screen">
         <div class="spinner"></div>
         <h4 id="main-loader-text" style="color: #111; font-weight:700;">Connecting to Studio</h4>
+    </div>
+
+    <div id="floating-dl-manager">
+        <div class="dl-title" id="dl-title">
+            <span><i class="fas fa-file-archive text-warning mr-2"></i> Preparing Download...</span>
+        </div>
+        <div class="dl-progress-bar">
+            <div class="dl-progress-fill" id="dl-fill"></div>
+        </div>
+        <div class="dl-status-text">
+            <span id="dl-text">Starting...</span>
+        </div>
     </div>
 
     <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
@@ -139,14 +170,6 @@
                 </div>
             </button>
             <button class="btn btn-light w-100 mt-2 font-weight-bold" onclick="$('#quality-overlay').fadeOut();">Cancel</button>
-        </div>
-    </div>
-
-    <div id="queue-overlay" class="overlay-screen" style="display:none; background:rgba(0,0,0,0.8);">
-        <div class="overlay-box">
-            <div class="spinner" style="margin: 0 auto 20px;" id="queue-spinner"></div>
-            <h4 style="margin-top: 0; color: #111;" id="queue-title">Preparing Files</h4>
-            <p style="color: #666; font-size: 0.9rem;" id="queue-text">Please do not close this window...</p>
         </div>
     </div>
 
@@ -279,7 +302,7 @@
             } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
         }
 
-        // RESTORED: Videos and Albums correctly rendered in Dashboard
+        // Videos and Albums correctly rendered in Dashboard
         function renderFolderDashboard() {
             $('#gallery').hide().empty(); $('#event-content').show(); 
             $('#btnSelectMode').hide(); $('#btnStartViewing').hide(); $('.download-ui').hide(); $('#btnBackToFolders').hide();
@@ -324,7 +347,7 @@
             html += '</div>'; $('#event-content').html(html);
         }
 
-        // RESTORED: Video JS Logic
+        // Video JS Logic
         function openVideo(ytId) {
             if (!ytId) return;
             $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&showinfo=0`);
@@ -430,71 +453,96 @@
         function promptDownloadAll() { pendingDownloadArray = galleryData.map(i => i.fullUrl); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
         function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
 
-        async function executeWebDownload() {
-            // Send the download event to your Admin Viewer History
-            if (typeof trackAction === "function") {
-                trackAction('download', 'Full Folder (Web Quality)');
-            }
+        // ==========================================
+        // NEW FLOATING DOWNLOAD LOGIC (Non-Blocking)
+        // ==========================================
 
+        async function executeWebDownload() {
+            if (typeof trackAction === "function") trackAction('download', 'Full Folder (Web Quality)');
             $('#quality-overlay').fadeOut(); 
-            $('#queue-overlay').css('display', 'flex'); 
-            $('#queue-title').text('Zipping on Device...');
+            
+            // Activate the Modern UI
+            const dlManager = document.getElementById('floating-dl-manager');
+            const dlFill = document.getElementById('dl-fill');
+            const dlText = document.getElementById('dl-text');
+            const dlTitle = document.getElementById('dl-title');
+            
+            dlTitle.innerHTML = '<span><i class="fas fa-file-archive text-warning mr-2"></i> Zipping Photos...</span>';
+            dlFill.style.width = '0%';
+            dlText.innerText = `0 / ${pendingDownloadArray.length} Prepared`;
+            dlManager.classList.add('active');
             
             const zip = new JSZip();
             for(let i=0; i<pendingDownloadArray.length; i++) {
-                $('#queue-text').text(`Compressing image ${i+1} of ${pendingDownloadArray.length}...`);
                 try {
                     let cacheUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(pendingDownloadArray[i]) + '&thumb=1';
                     let res = await fetch(cacheUrl); 
                     let blob = await res.blob();
-                    
-                    // Safely extract the filename from the path
                     let filename = pendingDownloadArray[i].split('/').pop();
                     zip.file("Web_" + filename, blob);
-                } catch(e) {
-                    console.error("Skipped an image during zip creation.", e);
-                }
+                    
+                    // Update the Progress Bar
+                    let pct = Math.round(((i + 1) / pendingDownloadArray.length) * 100);
+                    dlFill.style.width = pct + '%';
+                    dlText.innerText = `${i + 1} / ${pendingDownloadArray.length} Prepared (${pct}%)`;
+                    
+                    // Yield to the main thread for 10ms so the user can scroll smoothly!
+                    await new Promise(r => setTimeout(r, 10));
+                } catch(e) { console.error("Skip", e); }
             }
             
-            $('#queue-text').text("Finalizing ZIP...");
+            dlTitle.innerHTML = '<span><i class="fas fa-spinner fa-spin text-primary mr-2"></i> Finalizing ZIP...</span>';
+            dlText.innerText = "Please wait...";
+            
             zip.generateAsync({type:"blob"}).then(function(content) {
                 const link = document.createElement('a'); 
                 link.href = URL.createObjectURL(content); 
                 link.download = "Supriya_Web_Photos.zip"; 
                 link.click();
-                $('#queue-overlay').fadeOut(); 
-                clearSelection();
+                
+                dlTitle.innerHTML = '<span><i class="fas fa-check-circle text-success mr-2"></i> Complete!</span>';
+                dlText.innerText = "Saved to your device.";
+                setTimeout(() => { dlManager.classList.remove('active'); clearSelection(); }, 4000);
             });
         }
 
         function executeOriginalDownload() {
-            // Track the original quality batch download
-            if (typeof trackAction === "function") {
-                trackAction('download', 'Full Folder (Original Quality)');
-            }
-
+            if (typeof trackAction === "function") trackAction('download', 'Full Folder (Original Quality)');
             $('#quality-overlay').fadeOut(); 
-            $('#queue-overlay').css('display', 'flex'); 
-            $('#queue-title').text('Connecting to NAS Vault...'); 
-            $('#queue-text').text('Streaming original files directly...');
             
-            fetch(API_BASE + 'stream_zip.php', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ files: pendingDownloadArray }) 
-            })
-            .then(response => response.blob())
-            .then(blob => {
-                const link = document.createElement('a'); 
-                link.href = URL.createObjectURL(blob); 
-                link.download = "Supriya_Originals.zip"; 
-                link.click();
-                $('#queue-overlay').fadeOut(); 
-                clearSelection();
-            }).catch(()=> { 
-                $('#queue-title').text('Error connecting to vault.'); 
-                setTimeout(()=>$('#queue-overlay').fadeOut(), 3000); 
-            });
+            // Activate the Modern UI to announce OS Handoff
+            const dlManager = document.getElementById('floating-dl-manager');
+            document.getElementById('dl-title').innerHTML = '<span><i class="fas fa-cloud-download-alt text-success mr-2"></i> Handing off to Device...</span>';
+            document.getElementById('dl-fill').style.width = '100%';
+            document.getElementById('dl-fill').classList.add('progress-fill-pulse');
+            document.getElementById('dl-text').innerText = "Downloading in background. You can lock your screen.";
+            dlManager.classList.add('active');
+            
+            // NATIVE OS HANDOFF: Uses a hidden form instead of fetch()
+            // This bypasses RAM limits and keeps downloading when the screen is off!
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = API_BASE + 'stream_zip.php';
+            // We use a hidden iframe so the page doesn't refresh
+            form.target = 'hidden_dl_iframe'; 
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'files_json';
+            input.value = JSON.stringify(pendingDownloadArray);
+            form.appendChild(input);
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+            // Dismiss the banner after a few seconds
+            setTimeout(() => {
+                document.getElementById('dl-title').innerHTML = '<span><i class="fas fa-check-circle text-success mr-2"></i> Download Started</span>';
+                document.getElementById('dl-text').innerText = "Check your device's notification panel.";
+                document.getElementById('dl-fill').classList.remove('progress-fill-pulse');
+                setTimeout(() => { dlManager.classList.remove('active'); clearSelection(); }, 5000);
+            }, 2000);
         }
 
         function downloadSingleImage(type, event) {
@@ -513,29 +561,6 @@
                 dlUrl = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
             } else if (type === 'full') {
                 // Original Quality
-                dlUrl = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
-            }
-            
-            const link = document.createElement('a'); 
-            link.href = dlUrl; 
-            link.setAttribute('download', item.filename || 'download.jpg'); 
-            document.body.appendChild(link); 
-            link.click(); 
-            document.body.removeChild(link);
-        }
-
-        function downloadSingleImage(type, event) {
-            if (event) event.preventDefault(); 
-            const item = galleryData[currentIndex];
-            if(item.can_download == 0) return;
-            
-            let dlUrl = '';
-            
-            if (type === 'normal') {
-                // Web Quality: Uses serve_image with the dl=1 trigger
-                dlUrl = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
-            } else if (type === 'full') {
-                // Original Quality: Uses your dedicated force-download script
                 dlUrl = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
             }
             
