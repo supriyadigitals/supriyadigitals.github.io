@@ -200,10 +200,7 @@
 
     <div class="gallery-header">
         <div class="d-flex align-items-center">
-            <div>
-                <h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1>
-                <div id="event-title-display" style="font-size: 0.85rem; color: #666; font-weight: 600; margin-top: -4px; display: none;"></div>
-            </div>
+            <h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1>
         </div>
         <div>
             <a href="index.html" class="btn-header"><i class="fas fa-home mr-1"></i> Home</a>
@@ -352,7 +349,6 @@
         function renderFolderDashboard() {
             $('#gallery').hide().empty(); $('#event-content').show(); 
             $('#btnSelectMode').hide(); $('#btnStartViewing').hide(); $('.download-ui').hide(); $('#btnBackToFolders').hide();
-            $('#event-title-display').hide();
 
             let groups = {}; let videos = []; let albums = [];
             
@@ -367,7 +363,24 @@
                 }
             });
 
-            let html = '<div class="section-header">Collections</div><div class="media-grid">';
+            let html = '';
+
+            // --- DISPLAY EVENT TITLE ON FIRST PAGE ONLY ---
+            let displayName = params.get('event') ? decodeURIComponent(params.get('event')) : '';
+            if (!displayName && fullEventData.length > 0) {
+                displayName = fullEventData[0].title;
+            }
+
+            if (displayName) {
+                html += `
+                <div style="text-align: center; padding: 40px 20px 0;">
+                    <h2 style="font-family: 'Playfair Display', serif; font-weight: 700; color: #111; font-size: 2.2rem; margin: 0; letter-spacing: 1px;">${escapeHtml(displayName)}</h2>
+                    <div style="width: 50px; height: 3px; background: var(--primary); margin: 15px auto 0;"></div>
+                </div>`;
+            }
+            // ----------------------------------------------
+
+            html += '<div class="section-header">Collections</div><div class="media-grid">';
 
             Object.keys(groups).forEach(bId => {
                 const g = groups[bId]; const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
@@ -476,14 +489,6 @@
             $('#gallery').show();
             renderGallery();
 
-            // --- SET THE EVENT TITLE UNDER STUDIO NAME ---
-            if (galleryData.length > 0) {
-                let pathParts = galleryData[0].file_path.split('/');
-                let folderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : galleryData[0].title;
-                let displayName = params.get('event') ? decodeURIComponent(params.get('event')) : folderName;
-                $('#event-title-display').html('<i class="fas fa-folder-open text-warning mr-1"></i> ' + escapeHtml(displayName)).fadeIn();
-            }
-
             // --- CHECK IF THEY LEFT OFF HERE PREVIOUSLY ---
             let savedBatch = localStorage.getItem('supriya_resume_batch');
             let savedIndex = parseInt(localStorage.getItem('supriya_resume_index'));
@@ -521,6 +526,10 @@
 
         function promptDownloadAll() { pendingDownloadArray = galleryData.map(i => i.fullUrl); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
         function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
+
+        // ==========================================
+        // NEW FLOATING DOWNLOAD LOGIC (Non-Blocking)
+        // ==========================================
 
         async function executeWebDownload() {
             if (typeof trackAction === "function") trackAction('download', 'Full Folder (Web Quality)');
