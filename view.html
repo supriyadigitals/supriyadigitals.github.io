@@ -359,10 +359,23 @@
             $('#ytIframe').attr('src', ''); 
         });
 
-        // Folder Cache Optimizer Logic
         function openFolder(batchId) {
             galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
             canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
+            
+            // --- THE SMART ALPHANUMERIC SORTING FIX ---
+            galleryData.sort((a, b) => {
+                // 1. If you manually arranged them in the Admin Panel, respect that first
+                let orderA = parseInt(a.order_index) || 0;
+                let orderB = parseInt(b.order_index) || 0;
+                if (orderA !== orderB) return orderA - orderB;
+                
+                // 2. Otherwise, read the filename and sort them in perfect numerical order (DSC_1, DSC_2, etc)
+                let nameA = (a.title_from_filename || a.file_path.split('/').pop()).toLowerCase();
+                let nameB = (b.title_from_filename || b.file_path.split('/').pop()).toLowerCase();
+                return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
+            });
+            // ------------------------------------------
             
             $('#event-content').hide(); 
             $('#main-loader-text').text('Checking Gallery...');
