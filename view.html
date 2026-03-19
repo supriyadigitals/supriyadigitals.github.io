@@ -109,58 +109,8 @@
         }
 
         /* ==========================================================================
-           HEADER & PILL NAVIGATION MENU
+           SMART PILL MENU (STICKY FILTERS)
            ========================================================================== */
-        .gallery-header { 
-            padding: 15px 30px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: #fff; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            flex-wrap: wrap; 
-            gap: 15px; 
-        }
-        
-        .brand-title { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 1.4rem; 
-            color: #000; 
-            margin: 0; 
-            font-weight: 700; 
-            letter-spacing: 1px; 
-        }
-        
-        .brand-title span { 
-            color: var(--primary); 
-        }
-        
-        .btn-header { 
-            border: 1px solid #eee; 
-            color: #555; 
-            border-radius: 50px; 
-            padding: 8px 20px; 
-            font-size: 0.85rem; 
-            transition: 0.3s; 
-            background: #fff; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            margin-left: 8px; 
-            font-weight: 600; 
-            text-decoration: none !important;
-        }
-        
-        .btn-header:hover, .btn-header.active { 
-            background: var(--primary); 
-            border-color: var(--primary); 
-            color: #fff; 
-        }
-
-        /* --- STICKY PILL MENU --- */
         #sticky-pill-menu {
             position: sticky; 
             top: 66px; 
@@ -201,239 +151,8 @@
         }
 
         /* ==========================================================================
-           GRID LAYOUTS (DASHBOARD & GALLERY)
+           CUSTOM RIGHT CLICK MENU & LASSO
            ========================================================================== */
-        .section-header { 
-            margin: 40px 30px 20px; 
-            font-family: 'Playfair Display', serif; 
-            font-size: 1.8rem; 
-            color: #111; 
-            border-bottom: 2px solid #eee; 
-            padding-bottom: 10px; 
-        }
-        
-        .media-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 25px; 
-            padding: 0 30px; 
-            margin-bottom: 40px; 
-            margin-top:30px; 
-        }
-        
-        .media-card { 
-            background: #fff; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-            border: 1px solid #eee; 
-            cursor: pointer; 
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .media-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
-            border-color: var(--primary); 
-        }
-        
-        .folder-cover { 
-            height: 200px; 
-            background-size: cover; 
-            background-position: center; 
-            position: relative; 
-        }
-        
-        .folder-overlay { 
-            position: absolute; 
-            top:0; 
-            left:0; 
-            width:100%; 
-            height:100%; 
-            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); 
-        }
-        
-        .card-details { 
-            padding: 20px; 
-            text-align: left; 
-        }
-        
-        .card-details h5 { 
-            margin: 0 0 5px 0; 
-            font-weight: 700; 
-            font-size: 1.1rem; 
-            color: #111; 
-        }
-        
-        .card-details small { 
-            color: #666; 
-            font-weight: 500; 
-        }
-
-        .container-fluid { 
-            padding: 30px; 
-            padding-bottom: 120px; 
-        }
-        
-        .gallery-grid { 
-            column-count: 4; 
-            column-gap: 20px; 
-        }
-        
-        .gallery-item { 
-            break-inside: avoid; 
-            margin-bottom: 20px; 
-            position: relative; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            cursor: pointer; 
-            background: #f0f0f0; 
-            min-height: 250px; 
-            transition: transform 0.2s; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-        }
-        
-        .lazy-image { 
-            width: 100%; 
-            display: block; 
-            opacity: 0; 
-            transition: opacity 0.5s ease-out; 
-        }
-        
-        .lazy-image.loaded { 
-            opacity: 1; 
-        }
-
-        /* --- RESPONSIVE MEDIA QUERIES --- */
-        @media (max-width: 1200px) { 
-            .gallery-grid { column-count: 3; } 
-        }
-        
-        @media (max-width: 768px) { 
-            .gallery-grid { column-count: 2; column-gap: 10px; } 
-            .container-fluid { padding: 15px; } 
-            .brand-title { font-size: 1.1rem; } 
-            .section-header { margin: 20px 15px 15px; } 
-            .media-grid { padding: 0 15px; } 
-            .gallery-header { justify-content: center; } 
-            #sticky-pill-menu { top: 104px; } 
-        }
-        
-        @media (max-width: 480px) { 
-            .gallery-grid { column-count: 1; } 
-        }
-
-        /* ==========================================================================
-           INTERACTIVE SELECTION STYLING (LASSO, HEARTS, CART)
-           ========================================================================== */
-        
-        /* Highlighted selection state for images */
-        .gallery-item.selected { 
-            transform: scale(0.96); 
-            box-shadow: 0 0 0 3px var(--primary); 
-            border-radius: 12px; 
-        }
-        
-        .gallery-item.selected::after { 
-            content: "\f004"; 
-            font-family: "Font Awesome 5 Free"; 
-            font-weight: 900; 
-            position: absolute; 
-            top: 10px; 
-            right: 10px; 
-            background: #ef4444; 
-            color: #fff; 
-            width: 32px; 
-            height: 32px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 14px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
-        }
-
-        /* Flying Heart Animation for Double Tap */
-        .flying-heart { 
-            position: fixed; 
-            font-size: 5rem; 
-            color: #ef4444; 
-            z-index: 9999; 
-            animation: floatUp 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
-            pointer-events: none; 
-            text-shadow: 0 10px 25px rgba(0,0,0,0.3); 
-        }
-        
-        @keyframes floatUp { 
-            0% { transform: scale(0.5) translateY(0); opacity: 1; } 
-            100% { transform: scale(1.5) translateY(-150px); opacity: 0; } 
-        }
-
-        /* Desktop Lasso Drag Box */
-        #lasso-box {
-            position: absolute; 
-            background: rgba(59, 130, 246, 0.2); 
-            border: 1px solid #3b82f6; 
-            display: none; 
-            z-index: 1000; 
-            pointer-events: none; 
-            border-radius: 4px;
-        }
-
-        /* Floating Selection / WhatsApp Cart Bar */
-        #selection-bar { 
-            position: fixed; 
-            bottom: 30px; 
-            left: 50%; 
-            transform: translateX(-50%) translateY(150px); 
-            background: #222; 
-            color: #fff; 
-            padding: 12px 25px; 
-            border-radius: 50px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4); 
-            z-index: 1050; 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            pointer-events: auto;
-        }
-        
-        #selection-bar.visible { 
-            transform: translateX(-50%) translateY(0); 
-        }
-        
-        .btn-download-batch { 
-            background: #3b82f6; 
-            color: #fff; 
-            border: none; 
-            padding: 8px 20px; 
-            border-radius: 20px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: 0.2s;
-        }
-        
-        .btn-download-batch:hover { 
-            background: #2563eb; 
-        }
-        
-        .btn-send-studio { 
-            background: #10b981; 
-            color: #fff; 
-            border: none; 
-            padding: 8px 20px; 
-            border-radius: 20px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: 0.2s;
-        }
-        
-        .btn-send-studio:hover { 
-            background: #059669; 
-        }
-
-        /* Contextual Right Click Menu */
         #custom-context-menu {
             position: absolute; 
             background: #fff; 
@@ -462,9 +181,34 @@
             background: #f9fafb; 
             color: var(--primary); 
         }
+        
+        #lasso-box {
+            position: absolute; 
+            background: rgba(59, 130, 246, 0.2); 
+            border: 1px solid #3b82f6; 
+            display: none; 
+            z-index: 1000; 
+            pointer-events: none; 
+            border-radius: 4px;
+        }
+
+        .flying-heart { 
+            position: fixed; 
+            font-size: 5rem; 
+            color: #ef4444; 
+            z-index: 9999; 
+            animation: floatUp 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+            pointer-events: none; 
+            text-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+        }
+        
+        @keyframes floatUp { 
+            0% { transform: scale(0.5) translateY(0); opacity: 1; } 
+            100% { transform: scale(1.5) translateY(-150px); opacity: 0; } 
+        }
 
         /* ==========================================================================
-           DOWNLOAD MANAGER & MODALS
+           DOWNLOAD MANAGER & TOASTS
            ========================================================================== */
         .overlay-box { 
             background: #fff; 
@@ -535,8 +279,359 @@
         .dl-status-text { font-size: 0.8rem; color: #666; margin-top: 10px; display: flex; justify-content: space-between; font-weight: 600; }
         .progress-fill-pulse { animation: progress-pulse 1.5s infinite ease-in-out; }
 
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
+        /* RESUME VIEWING TOAST */
+        #resume-toast {
+            position: fixed; 
+            bottom: 30px; 
+            left: 30px; 
+            z-index: 1060; 
+            background: #fff; 
+            padding: 15px 20px; 
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+            border-left: 4px solid var(--primary); 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+            transform: translateY(150px); 
+            opacity: 0; 
+            pointer-events: none;
+        }
+        
+        #resume-toast.show { 
+            transform: translateY(0); 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+
+        /* ==========================================================================
+           HEADER & NAVIGATION
+           ========================================================================== */
+        .gallery-header { 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #fff; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+        
+        .brand-title { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.4rem; 
+            color: #000; 
+            margin: 0; 
+            font-weight: 700; 
+            letter-spacing: 1px; 
+        }
+        
+        .brand-title span { 
+            color: var(--primary); 
+        }
+        
+        .btn-header { 
+            border: 1px solid #eee; 
+            color: #555; 
+            border-radius: 50px; 
+            padding: 8px 20px; 
+            font-size: 0.85rem; 
+            transition: 0.3s; 
+            background: #fff; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            margin-left: 8px; 
+            font-weight: 600; 
+            text-decoration: none !important;
+        }
+        
+        .btn-header:hover, .btn-header.active { 
+            background: var(--primary); 
+            border-color: var(--primary); 
+            color: #fff; 
+        }
+
+        /* HIGH VISIBILITY START BUTTON */
+        #btnStartViewing { 
+            background: var(--primary) !important; 
+            color: #fff !important; 
+            border: none !important; 
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); 
+        }
+        
+        #btnStartViewing:hover { 
+            background: #b5952f !important; 
+            transform: translateY(-2px); 
+        }
+
+        /* DEDICATED HEADER CART BUTTON */
+        #btnViewCart { 
+            border-color: #ef4444; 
+            color: #ef4444; 
+            font-weight: 700; 
+        }
+        
+        #btnViewCart:hover { 
+            background: #ef4444; 
+            color: #fff; 
+        }
+
+        /* ==========================================================================
+           GRID & CARD LAYOUTS
+           ========================================================================== */
+        .section-header { 
+            margin: 40px 30px 20px; 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.8rem; 
+            color: #111; 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 10px; 
+        }
+        
+        .media-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+            padding: 0 30px; 
+            margin-bottom: 40px; 
+            margin-top:30px; 
+        }
+        
+        .media-card { 
+            background: #fff; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            border: 1px solid #eee; 
+            cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .media-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
+            border-color: var(--primary); 
+        }
+        
+        .folder-cover { 
+            height: 200px; 
+            background-size: cover; 
+            background-position: center; 
+            position: relative; 
+        }
+        
+        .folder-overlay { 
+            position: absolute; 
+            top:0; 
+            left:0; 
+            width:100%; 
+            height:100%; 
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); 
+        }
+        
+        .card-details { 
+            padding: 20px; 
+            text-align: left; 
+        }
+        
+        .card-details h5 { 
+            margin: 0 0 5px 0; 
+            font-weight: 700; 
+            font-size: 1.1rem; 
+            color: #111; 
+        }
+        
+        .card-details small { 
+            color: #666; 
+            font-weight: 500; 
+        }
+
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 56.25%; 
+            height: 0; 
+            overflow: hidden; 
+        }
+        
+        .video-wrapper iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            pointer-events: auto; 
+        } 
+
+        .container-fluid { 
+            padding: 30px; 
+            padding-bottom: 120px; 
+        }
+        
+        .gallery-grid { 
+            column-count: 4; 
+            column-gap: 20px; 
+        }
+
+        @media (max-width: 1200px) { 
+            .gallery-grid { column-count: 3; } 
+        }
+        
+        @media (max-width: 768px) { 
+            .gallery-grid { column-count: 2; column-gap: 10px; } 
+            .container-fluid { padding: 15px; } 
+            .brand-title { font-size: 1.1rem; } 
+            .section-header { margin: 20px 15px 15px; } 
+            .media-grid { padding: 0 15px; } 
+            .gallery-header { justify-content: center; } 
+            #resume-toast { left: 15px; right: 15px; bottom: 20px; flex-wrap: wrap; justify-content: center; text-align: center; }
+            #sticky-pill-menu { top: 104px; } 
+        }
+        
+        @media (max-width: 480px) { 
+            .gallery-grid { column-count: 1; } 
+        }
+        
+        /* ==========================================================================
+           GALLERY ITEMS & SELECTION UI
+           ========================================================================== */
+        .gallery-item { 
+            break-inside: avoid; 
+            margin-bottom: 20px; 
+            position: relative; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            cursor: pointer; 
+            background: #f0f0f0; 
+            min-height: 250px; 
+            transition: transform 0.2s; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+        }
+        
+        .lazy-image { 
+            width: 100%; 
+            display: block; 
+            opacity: 0; 
+            transition: opacity 0.5s ease-out; 
+        }
+        
+        .lazy-image.loaded { 
+            opacity: 1; 
+        }
+        
+        /* Selection Frame */
+        .gallery-item.selected { 
+            transform: scale(0.96); 
+            box-shadow: 0 0 0 3px var(--primary); 
+            border-radius: 12px; 
+        }
+        
+        /* Selection Heart Icon Overlay */
+        .gallery-item.selected::after { 
+            content: "\f004"; 
+            font-family: "Font Awesome 5 Free"; 
+            font-weight: 900; 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            background: #ef4444; 
+            color: #fff; 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 14px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+        }
+        
+        /* ==========================================================================
+           FLOATING SELECTION BAR & VIEW CART MODAL
+           ========================================================================== */
+        #selection-bar { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%) translateY(150px); 
+            background: #222; 
+            color: #fff; 
+            padding: 12px 25px; 
+            border-radius: 50px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); 
+            z-index: 1050; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            pointer-events: auto;
+        }
+        
+        #selection-bar.visible { 
+            transform: translateX(-50%) translateY(0); 
+        }
+        
+        .btn-download-batch { 
+            background: #3b82f6; 
+            color: #fff; 
+            border: none; 
+            padding: 8px 20px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: 0.2s;
+        }
+        
+        .btn-download-batch:hover { 
+            background: #2563eb; 
+        }
+        
+        .btn-send-studio { 
+            background: #10b981; 
+            color: #fff; 
+            border: none; 
+            padding: 8px 20px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: 0.2s;
+        }
+        
+        .btn-send-studio:hover { 
+            background: #059669; 
+        }
+
+        /* Cart Modal Elements */
+        .cart-folder-header { 
+            background: #fff; 
+            padding: 10px 15px; 
+            border-radius: 8px; 
+            border-left: 4px solid var(--primary); 
+            margin-top: 15px; 
+            margin-bottom: 15px; 
+            font-weight: 700; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        }
+        
+        .cart-item-card { 
+            border-radius: 8px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            background: #fff; 
+            margin-bottom: 15px; 
+            border: 1px solid #eee; 
+        }
+        
+        .cart-item-img { 
+            width: 100%; 
+            height: 120px; 
+            object-fit: cover; 
+        }
 
         /* ==========================================================================
            ADVANCED ZOOM LIGHTBOX
@@ -574,11 +669,34 @@
             pointer-events: none; 
         }
         
-        .lb-header > * { pointer-events: auto; } 
-        .lb-title { color: #fff; font-size: 1.1rem; opacity: 0.8; }
-        .lb-actions { display: flex; align-items: center; }
-        .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
-        .lb-icon:hover { opacity: 1; color: var(--primary); }
+        .lb-header > * { 
+            pointer-events: auto; 
+        } 
+        
+        .lb-title { 
+            color: #fff; 
+            font-size: 1.1rem; 
+            opacity: 0.8; 
+        }
+        
+        .lb-actions { 
+            display: flex; 
+            align-items: center; 
+        }
+        
+        .lb-icon { 
+            font-size: 1.4rem; 
+            color: #fff; 
+            cursor: pointer; 
+            margin-left: 25px; 
+            opacity: 0.7; 
+            transition: 0.3s; 
+        }
+        
+        .lb-icon:hover { 
+            opacity: 1; 
+            color: var(--primary); 
+        }
         
         #lightboxImage { 
             max-height: 80vh; 
@@ -608,7 +726,10 @@
             pointer-events: auto;
         }
         
-        .lb-control:hover { background: var(--primary); }
+        .lb-control:hover { 
+            background: var(--primary); 
+        }
+        
         .lb-prev { left: 20px; } 
         .lb-next { right: 20px; }
         
@@ -622,11 +743,19 @@
     <iframe name="hidden_dl_iframe" style="display:none;"></iframe>
 
     <div id="custom-context-menu">
-        <div class="ctx-item" id="ctx-view"><i class="fas fa-expand text-primary"></i> View High-Res</div>
-        <div class="ctx-item" id="ctx-select"><i class="fas fa-heart text-danger"></i> Select for Album</div>
+        <div class="ctx-item" id="ctx-view">
+            <i class="fas fa-expand text-primary"></i> View High-Res
+        </div>
+        <div class="ctx-item" id="ctx-select">
+            <i class="fas fa-heart text-danger"></i> Select for Album
+        </div>
         <div style="height:1px; background:#eee; margin: 5px 0;"></div>
-        <div class="ctx-item" id="ctx-dl"><i class="fas fa-bolt text-warning"></i> Fast Download</div>
-        <div class="ctx-item" id="ctx-dl-full"><i class="fas fa-cloud-download-alt text-success"></i> Original Quality</div>
+        <div class="ctx-item" id="ctx-dl">
+            <i class="fas fa-bolt text-warning"></i> Fast Download
+        </div>
+        <div class="ctx-item" id="ctx-dl-full">
+            <i class="fas fa-cloud-download-alt text-success"></i> Original Quality
+        </div>
     </div>
 
     <div id="lasso-box"></div>
@@ -637,18 +766,38 @@
     </div>
 
     <div id="floating-dl-manager">
-        <div class="dl-title" id="dl-title"><span><i class="fas fa-file-archive text-warning mr-2"></i> Preparing Download...</span></div>
-        <div class="dl-progress-bar"><div class="dl-progress-fill" id="dl-fill"></div></div>
-        <div class="dl-status-text"><span id="dl-text">Starting...</span></div>
+        <div class="dl-title" id="dl-title">
+            <span><i class="fas fa-file-archive text-warning mr-2"></i> Preparing Download...</span>
+        </div>
+        <div class="dl-progress-bar">
+            <div class="dl-progress-fill" id="dl-fill"></div>
+        </div>
+        <div class="dl-status-text">
+            <span id="dl-text">Starting...</span>
+        </div>
+    </div>
+
+    <div id="resume-toast">
+        <div style="flex-grow: 1;">
+            <h6 style="margin:0; font-weight:700; color:#111; font-size: 0.95rem;">Welcome Back!</h6>
+            <small style="color:#666; font-size: 0.8rem;">Continue from where you left off?</small>
+        </div>
+        <button class="btn btn-sm btn-primary" style="border-radius:20px; font-weight:600; padding: 6px 15px;" onclick="resumeViewing()">Continue</button>
+        <button class="btn btn-sm btn-light rounded-circle" style="width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center; border: 1px solid #ddd; background: #fff;" onclick="closeResumeToast()"><i class="fas fa-times"></i></button>
     </div>
 
     <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
         <i class="fas fa-microchip text-warning mb-3" style="font-size: 3rem;"></i>
         <h3 style="color: #111; font-weight:800; margin-bottom:5px;">Optimizing Gallery</h3>
         <p style="color: #666; font-size:0.9rem; max-width: 400px;">Using Multi-Core Processing to prepare high-quality files.</p>
-        <div class="progress-container"><div class="progress-fill" id="cache-fill"></div></div>
+        
+        <div class="progress-container">
+            <div class="progress-fill" id="cache-fill"></div>
+        </div>
+        
         <h5 id="cache-percent" style="font-weight:700; color:var(--primary);">0% Loaded</h5>
         <small id="cache-stats" class="text-muted font-weight-bold mt-1">0 / 0 Images Ready</small>
+        
         <div class="mt-4 d-flex justify-content-center flex-wrap gap-3">
             <button id="btnContinueLive" class="btn btn-primary font-weight-bold mr-3 mb-2" style="border-radius: 50px; padding: 10px 25px; display:none;" onclick="finishCacheOptimizer()">Continue</button>
         </div>
@@ -675,31 +824,80 @@
         </div>
     </div>
 
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content" style="background: #fdfdfd; height: 85vh;">
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h4 class="modal-title font-weight-bold" style="font-family: 'Playfair Display', serif; color: #111;">
+                        <i class="fas fa-heart text-danger mr-2"></i> My Selection Cart
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" style="font-size: 1.8rem;">&times;</button>
+                </div>
+                <div class="modal-body px-4" id="cart-items-container">
+                    </div>
+                <div class="modal-footer border-0 p-3" style="background: #fff; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); border-radius: 0 0 12px 12px;">
+                    <div class="font-weight-bold mr-auto ml-2" style="font-size: 1.1rem; color:#111;">Total: <span id="cart-total-count" style="color: var(--primary);">0</span> Photos</div>
+                    <button class="btn btn-success font-weight-bold px-4 py-2" style="border-radius: 50px; font-size: 1.05rem;" onclick="sendToStudio()">
+                        <i class="fab fa-whatsapp mr-2"></i> Send to Studio
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="gallery-header">
         <div class="d-flex align-items-center">
             <h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1>
         </div>
         <div>
-            <a href="index.html" class="btn-header"><i class="fas fa-home mr-1"></i> Home</a>
-            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-1"></i> Back</button>
-            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-1"></i> Start</button>
-            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-1"></i> Select</button>
-            <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-1"></i> All</button>
+            <a href="index.html" class="btn-header">
+                <i class="fas fa-home mr-1"></i> Home
+            </a>
             
-            <button class="btn-header" id="btnViewCart" style="display: none; border-color: #10b981; color: #10b981;" onclick="sendToStudio()"><i class="fas fa-shopping-cart mr-1"></i> Cart (<span id="cartCountBadge">0</span>)</button>
+            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;">
+                <i class="fas fa-arrow-left mr-1"></i> Back
+            </button>
+            
+            <button class="btn-header" id="btnViewCart" style="display: none;" onclick="openCart()">
+                <i class="fas fa-heart text-danger mr-1"></i> <span id="cartCountBadge">0</span>
+            </button>
+
+            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)">
+                <i class="fas fa-play mr-1"></i> Start
+            </button>
+            
+            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()">
+                <i class="far fa-check-circle mr-1"></i> Select
+            </button>
+            
+            <button class="btn-header download-ui d-none" onclick="promptDownloadAll()">
+                <i class="fas fa-download mr-1"></i> All
+            </button>
         </div>
     </div>
 
     <div id="sticky-pill-menu"></div>
 
     <div id="event-content"></div>
-    <div class="container-fluid"><div id="gallery" class="gallery-grid" style="display:none;"></div></div>
+    
+    <div class="container-fluid">
+        <div id="gallery" class="gallery-grid" style="display:none;"></div>
+    </div>
 
     <div id="selection-bar">
-        <span class="selection-count font-weight-bold">0 Selected</span>
-        <button class="btn-download-batch download-ui d-none" onclick="promptDownloadSelected()"><i class="fas fa-download mr-1"></i> Save</button>
-        <button class="btn-send-studio" onclick="sendToStudio()"><i class="fab fa-whatsapp mr-1"></i> Send to Studio</button>
-        <button class="btn btn-sm btn-outline-light rounded-circle border-0" onclick="clearSelection()"><i class="fas fa-times"></i></button>
+        <span class="selection-count text-white font-weight-bold">
+            <i class="fas fa-heart text-danger mr-1"></i> 
+            <span id="selection-count-text">0</span> Favorites
+        </span>
+        <button class="btn-send-studio" onclick="openCart()">
+            <i class="fas fa-shopping-cart mr-1"></i> View Cart
+        </button>
+        <button class="btn-download-batch download-ui d-none" onclick="promptDownloadSelected()">
+            <i class="fas fa-download mr-1"></i> Save
+        </button>
+        <button class="btn btn-sm btn-outline-light rounded-circle border-0" onclick="clearSelection()">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
     <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
@@ -709,20 +907,39 @@
                     <div class="lb-header">
                         <div class="lb-title" id="lbFileName">image.jpg</div>
                         <div class="lb-actions">
-                            <span class="lb-icon" onclick="toggleSelection(currentIndex)"><i class="far fa-heart" id="lbHeartIcon"></i></span>
+                            <span class="lb-icon" onclick="toggleSelection(currentIndex)">
+                                <i class="far fa-heart" id="lbHeartIcon"></i>
+                            </span>
+                            
                             <div class="dropdown download-ui d-none">
-                                <span class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></span>
+                                <span class="lb-icon" data-toggle="dropdown">
+                                    <i class="fas fa-download"></i>
+                                </span>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
-                                    <a class="dropdown-item fast-dl-btn" href="#" onclick="downloadSingleImage('normal', event)"><i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web)</a>
-                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full', event)"><i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)</a>
+                                    <a class="dropdown-item fast-dl-btn" href="#" onclick="downloadSingleImage('normal', event)">
+                                        <i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web)
+                                    </a>
+                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full', event)">
+                                        <i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)
+                                    </a>
                                 </div>
                             </div>
-                            <span class="lb-icon" data-dismiss="modal" onclick="resetZoom()"><i class="fas fa-times"></i></span>
+                            
+                            <span class="lb-icon" data-dismiss="modal" onclick="resetZoom()">
+                                <i class="fas fa-times"></i>
+                            </span>
                         </div>
                     </div>
-                    <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
+                    
+                    <div class="lb-control lb-prev" onclick="changeImage(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    
                     <img id="lightboxImage" src="" style="opacity: 0;">
-                    <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
+                    
+                    <div class="lb-control lb-next" onclick="changeImage(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -735,7 +952,9 @@
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body p-0">
-                    <div class="video-wrapper"><iframe id="ytIframe" src="" frameborder="0" allowfullscreen></iframe></div>
+                    <div class="video-wrapper">
+                        <iframe id="ytIframe" src="" frameborder="0" allowfullscreen></iframe>
+                    </div>
                 </div>
             </div>
         </div>
@@ -802,6 +1021,7 @@
                 }) 
             }).catch(()=>{});
         }
+        
         pingServer(); 
         setInterval(pingServer, 10000);
 
@@ -822,6 +1042,43 @@
 
         function saveCart() {
             localStorage.setItem('supriya_cart_' + currentEventTracker, JSON.stringify(Array.from(selectedFiles)));
+        }
+
+        // GLOBAL RESUME VIEWING LOGIC
+        function checkResumeToast() {
+            let savedEvent = localStorage.getItem('supriya_resume_event'); 
+            let savedBatch = localStorage.getItem('supriya_resume_batch'); 
+            let savedIndex = parseInt(localStorage.getItem('supriya_resume_index'));
+            
+            // Only show toast if they are returning to the exact same event
+            if (savedEvent === currentEventTracker && savedBatch && !isNaN(savedIndex)) {
+                setTimeout(() => { 
+                    $('#resume-toast').addClass('show'); 
+                }, 1000); 
+            }
+        }
+
+        function resumeViewing() { 
+            let savedBatch = localStorage.getItem('supriya_resume_batch'); 
+            let savedIndex = parseInt(localStorage.getItem('supriya_resume_index')); 
+            $('#resume-toast').removeClass('show'); 
+            
+            if (savedBatch && !isNaN(savedIndex)) {
+                // If the correct folder is already open, just launch lightbox
+                if (galleryData.length > 0 && galleryData[0].batch_id === savedBatch) {
+                    openLightbox(savedIndex);
+                } else {
+                    // Otherwise, instruct the system to open the folder FIRST, then the lightbox
+                    window.pendingResumeIndex = savedIndex;
+                    openFolder(savedBatch);
+                }
+            } 
+        }
+        
+        function closeResumeToast() { 
+            $('#resume-toast').removeClass('show'); 
+            localStorage.removeItem('supriya_resume_batch'); 
+            localStorage.removeItem('supriya_resume_index'); 
         }
 
 
@@ -857,7 +1114,10 @@
                     galleryData = fullEventData.filter(i => i.type === 'work' || i.type === 'link');
                     canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
                     $('#main-loader').fadeOut(300);
-                    if (galleryData.length > 0) openFolder(galleryData[0].batch_id); 
+                    
+                    if (galleryData.length > 0) {
+                        openFolder(galleryData[0].batch_id); 
+                    }
                 }
             } catch (e) { 
                 $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); 
@@ -989,9 +1249,14 @@
                     </div>`;
                 }
             });
+            
             html += '</div>'; 
             $('#event-content').html(html);
+
+            // Execute global resume check now that the dashboard is loaded
+            checkResumeToast();
         }
+
 
         // ==========================================
         // 5. CACHE SYSTEM & FOLDER OPENING
@@ -1063,6 +1328,7 @@
             $('#cache-fill').css('width', pct + '%'); 
             $('#cache-percent').text(pct + '% Loaded'); 
             $('#cache-stats').text(cacheCompleted + ' / ' + cacheTotal + ' Images Ready'); 
+            
             if (cacheCompleted >= 5 || pct >= 10) { 
                 $('#btnContinueLive').fadeIn(); 
             } 
@@ -1098,17 +1364,28 @@
             $('#cache-progress-screen').fadeOut();
             
             // Show appropriate header tools
-            if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
+            if (canDownload > 0) {
+                $('.download-ui').removeClass('d-none').show();
+            }
+            
             $('#btnSelectMode').show(); 
             $('#btnBackToFolders').show(); 
             
-            // Show Normal Start Button
+            // Show Gold Start Button
             $('#btnStartViewing').show();
             
             $('#gallery').show();
             
             // Render the DOM Images
             renderGallery();
+
+            // Check if user is resuming from a Dashboard Click
+            if (window.pendingResumeIndex !== undefined) {
+                let idxToOpen = window.pendingResumeIndex;
+                window.pendingResumeIndex = undefined; // clear flag
+                // Wait a millisecond for DOM to render the images
+                setTimeout(() => { openLightbox(idxToOpen); }, 400); 
+            }
         }
 
         // Return to the top dashboard level
@@ -1117,6 +1394,16 @@
             // This preserves the Amazon-style shopping cart experience across folders.
             renderFolderDashboard(); 
         }
+
+        function openVideo(ytId) { 
+            if (!ytId) return; 
+            $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&showinfo=0`); 
+            $('#videoModal').modal('show'); 
+        }
+        
+        $('#videoModal').on('hidden.bs.modal', function () { 
+            $('#ytIframe').attr('src', ''); 
+        });
 
 
         // ==========================================
@@ -1190,7 +1477,7 @@
 
 
         // ==========================================
-        // 7. ADVANCED SELECTION ENGINE
+        // 7. ADVANCED SELECTION ENGINE & MODAL CART
         // ==========================================
         function toggleSelectMode() { 
             isSelectMode = !isSelectMode; 
@@ -1263,8 +1550,8 @@
         
         function updateFloatingBar() { 
             const count = selectedFiles.size; 
-            $('.selection-count').text(count + " Selected"); 
-            $('#cartCountBadge').text(count); // Update the Top Header Cart Icon
+            $('#selection-count-text').text(count); 
+            $('#cartCountBadge').text(count); // Update the Top Header Badge
 
             if (count > 0) {
                 $('#selection-bar').addClass('visible'); 
@@ -1279,12 +1566,86 @@
         function showFlyingHeart(x, y) {
             let heart = document.createElement('i');
             heart.className = 'fas fa-heart flying-heart';
-            heart.style.left = (x - 30) + 'px'; 
+            heart.style.left = (x - 30) + 'px'; // Center it
             heart.style.top = (y - 30) + 'px';
             document.body.appendChild(heart);
             // Destroy after animation
             setTimeout(() => { heart.remove(); }, 900);
         }
+
+        // --- DEDICATED VIEW CART MODAL UI ---
+        function openCart() {
+            if (selectedFiles.size === 0) {
+                showToast("Your cart is empty. Tap the heart on photos to add them!", "warning");
+                return;
+            }
+            renderCartItems();
+            $('#cartModal').modal('show');
+        }
+
+        function renderCartItems() {
+            let container = $('#cart-items-container');
+            container.empty();
+            let filesByFolder = {};
+            
+            // Organize into folders
+            selectedFiles.forEach(url => {
+                let parts = url.split('/');
+                let filename = parts.pop();
+                let foldername = parts.pop() || "Other";
+                
+                if (!filesByFolder[foldername]) filesByFolder[foldername] = [];
+                filesByFolder[foldername].push({ url: url, filename: filename });
+            });
+
+            let html = '';
+            for (let folder in filesByFolder) {
+                html += `<div class="cart-folder-header"><i class="fas fa-folder-open text-warning mr-2"></i>${escapeHtml(folder)} <span class="badge badge-secondary ml-2">${filesByFolder[folder].length}</span></div>`;
+                html += `<div class="row">`;
+                
+                filesByFolder[folder].forEach((file) => {
+                    // Generate quick thumbnail url locally to avoid heavy loading
+                    let thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(file.url)}&thumb=1`;
+                    html += `
+                    <div class="col-6 col-md-3 mb-3">
+                        <div class="cart-item-card">
+                            <img src="${thumbUrl}" class="cart-item-img">
+                            <div class="p-2 text-center">
+                                <small class="d-block text-truncate mb-2 text-muted font-weight-bold" title="${escapeHtml(file.filename)}">${escapeHtml(file.filename)}</small>
+                                <button class="btn btn-sm btn-outline-danger w-100 font-weight-bold" onclick="removeFromCart('${file.url}')"><i class="fas fa-trash"></i> Remove</button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+            
+            container.html(html);
+            $('#cart-total-count').text(selectedFiles.size);
+            updateFloatingBar(); // Sync UI numbers
+        }
+
+        function removeFromCart(url) {
+            selectedFiles.delete(url);
+            saveCart();
+            updateFloatingBar();
+            updateLightboxHeart();
+            
+            // Remove selection class from the actual grid if it's currently rendered
+            $(`.gallery-item`).each(function() {
+                let imgEl = $(this).find('img').first();
+                if (imgEl && imgEl.attr('data-src') && imgEl.attr('data-src').includes(encodeURIComponent(url))) {
+                    $(this).removeClass('selected');
+                }
+            });
+
+            if (selectedFiles.size === 0) {
+                $('#cartModal').modal('hide');
+            } else {
+                renderCartItems(); // Re-render modal instantly to reflect change
+            }
+        }
+
 
         // ==========================================
         // 8. WHATSAPP SEND TO STUDIO CART
@@ -1325,6 +1686,7 @@
             let finalUrl = `https://wa.me/${STUDIO_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
             window.open(finalUrl, '_blank');
         }
+
 
         // ==========================================
         // 9. DESKTOP LASSO BOX (DRAG TO SELECT)
@@ -1401,6 +1763,7 @@
                 document.querySelectorAll('.lasso-hover').forEach(el => el.classList.remove('lasso-hover'));
             });
         }
+
 
         // ==========================================
         // 10. CONTEXTUAL RIGHT CLICK MENU
@@ -1569,6 +1932,7 @@
             document.body.removeChild(link);
         }
 
+
         // ==========================================
         // 12. ADVANCED ZOOM LIGHTBOX & SWIPE-TO-CLOSE
         // ==========================================
@@ -1621,6 +1985,8 @@
             
             updateLightboxHeart();
             
+            // Save Event and Position for global resume logic
+            localStorage.setItem('supriya_resume_event', currentEventTracker);
             localStorage.setItem('supriya_resume_batch', item.batch_id); 
             localStorage.setItem('supriya_resume_index', currentIndex);
         }
