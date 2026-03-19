@@ -160,19 +160,6 @@
             color: #fff; 
         }
 
-        /* HIGH VISIBILITY START BUTTON */
-        #btnStartViewing { 
-            background: var(--primary) !important; 
-            color: #fff !important; 
-            border: none !important; 
-            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); 
-        }
-        
-        #btnStartViewing:hover { 
-            background: #b5952f !important; 
-            transform: translateY(-2px); 
-        }
-
         /* --- STICKY PILL MENU --- */
         #sticky-pill-menu {
             position: sticky; 
@@ -329,7 +316,6 @@
             .section-header { margin: 20px 15px 15px; } 
             .media-grid { padding: 0 15px; } 
             .gallery-header { justify-content: center; } 
-            #resume-toast { left: 15px; right: 15px; bottom: 20px; flex-wrap: wrap; justify-content: center; text-align: center; }
             #sticky-pill-menu { top: 104px; } 
         }
         
@@ -656,15 +642,6 @@
         <div class="dl-status-text"><span id="dl-text">Starting...</span></div>
     </div>
 
-    <div id="resume-toast">
-        <div style="flex-grow: 1;">
-            <h6 style="margin:0; font-weight:700; color:#111; font-size: 0.95rem;">Welcome Back!</h6>
-            <small style="color:#666; font-size: 0.8rem;">Continue from where you left off?</small>
-        </div>
-        <button class="btn btn-sm btn-primary" style="border-radius:20px; font-weight:600; padding: 6px 15px;" onclick="resumeViewing()">Continue</button>
-        <button class="btn btn-sm btn-light rounded-circle" style="width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center; border: 1px solid #ddd; background: #fff;" onclick="closeResumeToast()"><i class="fas fa-times"></i></button>
-    </div>
-
     <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
         <i class="fas fa-microchip text-warning mb-3" style="font-size: 3rem;"></i>
         <h3 style="color: #111; font-weight:800; margin-bottom:5px;">Optimizing Gallery</h3>
@@ -706,8 +683,10 @@
             <a href="index.html" class="btn-header"><i class="fas fa-home mr-1"></i> Home</a>
             <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-1"></i> Back</button>
             <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-1"></i> Start</button>
-            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-heart mr-1"></i> Select</button>
+            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-1"></i> Select</button>
             <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-1"></i> All</button>
+            
+            <button class="btn-header" id="btnViewCart" style="display: none; border-color: #10b981; color: #10b981;" onclick="sendToStudio()"><i class="fas fa-shopping-cart mr-1"></i> Cart (<span id="cartCountBadge">0</span>)</button>
         </div>
     </div>
 
@@ -845,19 +824,6 @@
             localStorage.setItem('supriya_cart_' + currentEventTracker, JSON.stringify(Array.from(selectedFiles)));
         }
 
-        function resumeViewing() { 
-            let savedIndex = parseInt(localStorage.getItem('supriya_resume_index')); 
-            $('#resume-toast').removeClass('show'); 
-            if (!isNaN(savedIndex)) {
-                openLightbox(savedIndex); 
-            }
-        }
-        
-        function closeResumeToast() { 
-            $('#resume-toast').removeClass('show'); 
-            localStorage.removeItem('supriya_resume_batch'); 
-            localStorage.removeItem('supriya_resume_index'); 
-        }
 
         // ==========================================
         // 3. SYSTEM INITIALIZATION & DATA FETCHING
@@ -1136,21 +1102,13 @@
             $('#btnSelectMode').show(); 
             $('#btnBackToFolders').show(); 
             
-            // Show Gold Start Button
+            // Show Normal Start Button
             $('#btnStartViewing').show();
             
             $('#gallery').show();
             
             // Render the DOM Images
             renderGallery();
-
-            // Check if user is resuming from localstorage
-            let savedBatch = localStorage.getItem('supriya_resume_batch'); 
-            let savedIndex = parseInt(localStorage.getItem('supriya_resume_index'));
-            
-            if (galleryData.length > 0 && savedBatch === galleryData[0].batch_id && !isNaN(savedIndex) && savedIndex < galleryData.length) { 
-                setTimeout(() => { $('#resume-toast').addClass('show'); }, 1000); 
-            }
         }
 
         // Return to the top dashboard level
@@ -1306,10 +1264,14 @@
         function updateFloatingBar() { 
             const count = selectedFiles.size; 
             $('.selection-count').text(count + " Selected"); 
+            $('#cartCountBadge').text(count); // Update the Top Header Cart Icon
+
             if (count > 0) {
                 $('#selection-bar').addClass('visible'); 
+                $('#btnViewCart').show();
             } else {
                 $('#selection-bar').removeClass('visible'); 
+                $('#btnViewCart').hide();
             }
         }
 
