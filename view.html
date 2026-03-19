@@ -204,10 +204,8 @@
         </div>
         <div>
             <a href="index.html" class="btn-header"><i class="fas fa-home mr-1"></i> Home</a>
-            
             <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-1"></i> Back</button>
             <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-1"></i> Start</button>
-            
             <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-1"></i> Select</button>
             <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-1"></i> All</button>
         </div>
@@ -301,9 +299,6 @@
         function pingServer() { trackAction('ping'); }
         pingServer(); setInterval(pingServer, 10000);
 
-        // ==========================================
-        // RESUME VIEWING LOGIC
-        // ==========================================
         function resumeViewing() {
             let savedIndex = parseInt(localStorage.getItem('supriya_resume_index'));
             $('#resume-toast').removeClass('show');
@@ -346,30 +341,18 @@
             } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
         }
 
+        // ==========================================
+        // PERFECT DASHBOARD SORTING ENGINE
+        // ==========================================
         function renderFolderDashboard() {
             $('#gallery').hide().empty(); $('#event-content').show(); 
             $('#btnSelectMode').hide(); $('#btnStartViewing').hide(); $('.download-ui').hide(); $('#btnBackToFolders').hide();
-
-            let groups = {}; let videos = []; let albums = [];
-            
-            fullEventData.forEach(item => {
-                if (item.type === 'teaser' || item.type === 'live') videos.push(item);
-                else if (item.type === 'album') albums.push(item);
-                else if (item.batch_id && (item.type === 'work' || item.type === 'link')) {
-                    let pathParts = item.file_path.split('/');
-                    let actualFolderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : item.title;
-                    if (!groups[item.batch_id]) groups[item.batch_id] = { title: actualFolderName, items: [], cover: item.file_path };
-                    groups[item.batch_id].items.push(item);
-                }
-            });
 
             let html = '';
 
             // --- DISPLAY EVENT TITLE ON FIRST PAGE ONLY ---
             let displayName = params.get('event') ? decodeURIComponent(params.get('event')) : '';
-            if (!displayName && fullEventData.length > 0) {
-                displayName = fullEventData[0].title;
-            }
+            if (!displayName && fullEventData.length > 0) displayName = fullEventData[0].title;
 
             if (displayName) {
                 html += `
@@ -378,27 +361,67 @@
                     <div style="width: 50px; height: 3px; background: var(--primary); margin: 15px auto 0;"></div>
                 </div>`;
             }
-            // ----------------------------------------------
 
             html += '<div class="section-header">Collections</div><div class="media-grid">';
 
-            Object.keys(groups).forEach(bId => {
-                const g = groups[bId]; const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(g.cover)}&thumb=1`;
-                html += `<div class="media-card" onclick="openFolder('${bId}')"><div class="folder-cover" style="background-image: url('${coverUrl}');"></div><div class="card-details"><h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(g.title)}</h5><small><i class="fas fa-image mr-1"></i> ${g.items.length} Photos</small></div></div>`;
+            let dashboardItems = [];
+            let seenBatches = new Set();
+            
+            // 1. Sort absolutely everything by the drag-and-drop 'order_index'
+            let sortedData = [...fullEventData].sort((a, b) => {
+                let orderA = parseInt(a.order_index); if(isNaN(orderA)) orderA = 999999;
+                let orderB = parseInt(b.order_index); if(isNaN(orderB)) orderB = 999999;
+                return orderA - orderB;
             });
 
-            videos.forEach(v => {
-                let ytId = "";
-                if (v.file_path) {
-                    if (v.file_path.includes('embed/')) ytId = v.file_path.split('embed/')[1].split('?')[0]; 
-                    else if (v.file_path.includes('v=')) ytId = v.file_path.split('v=')[1].split('&')[0]; 
-                    else if (v.file_path.includes('youtu.be/')) ytId = v.file_path.split('youtu.be/')[1].split('?')[0];
+            // 2. Unify Folders, Videos, and Albums into a single sequence list
+            sortedData.forEach(item => {
+                let itemOrder = parseInt(item.order_index);
+                if(isNaN(itemOrder)) itemOrder = 999999;
+
+                if (item.type === 'teaser' || item.type === 'live') {
+                    dashboardItems.push({ type: 'video', data: item, order: itemOrder });
                 }
-                html += `<div class="media-card" onclick="openVideo('${ytId}')"><div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');"><div class="folder-overlay"></div><i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i></div><div class="card-details"><h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5><small>Tap to Play Video</small></div></div>`;
+                else if (item.type === 'album') {
+                    dashboardItems.push({ type: 'album', data: item, order: itemOrder });
+                }
+                else if (item.batch_id && (item.type === 'work' || item.type === 'link')) {
+                    if (!seenBatches.has(item.batch_id)) {
+                        seenBatches.add(item.batch_id);
+                        let pathParts = item.file_path.split('/');
+                        let actualFolderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : item.title;
+                        let count = sortedData.filter(i => i.batch_id === item.batch_id).length;
+                        
+                        dashboardItems.push({ 
+                            type: 'folder', id: item.batch_id, title: actualFolderName, 
+                            cover: item.file_path, count: count, order: itemOrder 
+                        });
+                    }
+                }
             });
 
-            albums.forEach(a => {
-                html += `<div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;"><i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i><div class="card-details" style="text-align:center; padding:0;"><h5>${escapeHtml(a.title || 'Digital Album')}</h5><small>View PDF Document</small></div></div>`;
+            // 3. Guarantee precise layout matching admin panel
+            dashboardItems.sort((a, b) => a.order - b.order);
+
+            // 4. Render them sequentially
+            dashboardItems.forEach(card => {
+                if (card.type === 'folder') {
+                    const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(card.cover)}&thumb=1`;
+                    html += `<div class="media-card" onclick="openFolder('${card.id}')"><div class="folder-cover" style="background-image: url('${coverUrl}');"></div><div class="card-details"><h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(card.title)}</h5><small><i class="fas fa-image mr-1"></i> ${card.count} Photos</small></div></div>`;
+                }
+                else if (card.type === 'video') {
+                    let v = card.data; let ytId = "";
+                    if (v.file_path) {
+                        if (v.file_path.includes('embed/')) ytId = v.file_path.split('embed/')[1].split('?')[0]; 
+                        else if (v.file_path.includes('v=')) ytId = v.file_path.split('v=')[1].split('&')[0]; 
+                        else if (v.file_path.includes('youtu.be/')) ytId = v.file_path.split('youtu.be/')[1].split('?')[0];
+                    }
+                    html += `<div class="media-card" onclick="openVideo('${ytId}')"><div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');"><div class="folder-overlay"></div><i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i></div><div class="card-details"><h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5><small>Tap to Play Video</small></div></div>`;
+                }
+                else if (card.type === 'album') {
+                    let a = card.data;
+                    html += `<div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;"><i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i><div class="card-details" style="text-align:center; padding:0;"><h5>${escapeHtml(a.title || 'Digital Album')}</h5><small>View PDF Document</small></div></div>`;
+                }
             });
 
             html += '</div>'; $('#event-content').html(html);
@@ -418,17 +441,19 @@
             galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
             canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
             
-            // --- THE SMART ALPHANUMERIC SORTING FIX ---
+            // --- SMART ALPHANUMERIC SORTING INSIDE THE FOLDER ---
             galleryData.sort((a, b) => {
-                let orderA = parseInt(a.order_index) || 0;
-                let orderB = parseInt(b.order_index) || 0;
+                let orderA = parseInt(a.order_index); if(isNaN(orderA)) orderA = 999999;
+                let orderB = parseInt(b.order_index); if(isNaN(orderB)) orderB = 999999;
+                
+                // If they have the exact same rank (e.g. grouped in same folder), sort by name!
                 if (orderA !== orderB) return orderA - orderB;
                 
                 let nameA = (a.title_from_filename || a.file_path.split('/').pop()).toLowerCase();
                 let nameB = (b.title_from_filename || b.file_path.split('/').pop()).toLowerCase();
                 return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
             });
-            // ------------------------------------------
+            // ----------------------------------------------------
             
             $('#event-content').hide(); 
             $('#main-loader-text').text('Checking Gallery...');
@@ -528,9 +553,8 @@
         function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
 
         // ==========================================
-        // NEW FLOATING DOWNLOAD LOGIC (Non-Blocking)
+        // MODERN FLOATING DOWNLOAD LOGIC 
         // ==========================================
-
         async function executeWebDownload() {
             if (typeof trackAction === "function") trackAction('download', 'Full Folder (Web Quality)');
             $('#quality-overlay').fadeOut(); 
@@ -677,7 +701,6 @@
             let itemDlState = parseInt(item.can_download) || 0;
             if (itemDlState > 0) { $('.download-ui').removeClass('d-none'); if (itemDlState == 2) $('.fast-dl-btn').hide(); else $('.fast-dl-btn').show(); } else { $('.download-ui').addClass('d-none'); }
 
-            // --- TRACK VIEWING PROGRESS ---
             localStorage.setItem('supriya_resume_batch', item.batch_id);
             localStorage.setItem('supriya_resume_index', currentIndex);
         }
