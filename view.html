@@ -3,228 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <title>Supriya Digitals | Client Gallery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="img/icon1.png" rel="icon">
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
-        :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; }
-        img { pointer-events: none; -webkit-user-drag: none; }
-
-        .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* ==========================================================================
+           1. CORE THEME & VARIABLES
+           ========================================================================== */
+        :root { 
+            --primary: #D4AF37; 
+            --text: #1a1a1a; 
+            --text-muted: #71717a;
+            --bg: #fdfdfd; 
+            --white: #ffffff;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
         
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+            user-select: none; 
+            -webkit-user-select: none; 
+            -ms-user-select: none; 
+            -webkit-touch-callout: none; 
+        }
+        
+        img { 
+            pointer-events: none; 
+            -webkit-user-drag: none; 
+        }
+
+        /* ==========================================================================
+           2. SKELETON LOADERS & ANIMATIONS
+           ========================================================================== */
+        .skeleton {
+            background: #f4f4f5;
+            background-image: linear-gradient(90deg, #f4f4f5 0px, #ffffff 50%, #f4f4f5 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+            border-radius: 12px;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .flying-heart { 
+            position: fixed; 
+            font-size: 5rem; 
+            color: #ef4444; 
+            z-index: 9999; 
+            animation: floatUp 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+            pointer-events: none; 
+            text-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+        }
+        @keyframes floatUp { 
+            0% { transform: scale(0.5) translateY(0); opacity: 1; } 
+            100% { transform: scale(1.5) translateY(-200px); opacity: 0; } 
+        }
+
+        /* ==========================================================================
+           3. SYSTEM OVERLAYS & SPINNERS
+           ========================================================================== */
+        .overlay-screen { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255, 255, 255, 0.98); 
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        
+        .spinner-main { 
+            width: 45px; 
+            height: 45px; 
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid var(--primary); 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+        }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .progress-container { width: 100%; max-width: 400px; background: #eee; border-radius: 20px; overflow: hidden; height: 15px; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s linear; }
+
+        /* ==========================================================================
+           4. PREMIUM HEADER UI
+           ========================================================================== */
+        .gallery-header { 
+            padding: 12px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--white); 
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
         
-        .overlay-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; border: 1px solid #eee; }
-        .dl-opt-btn { display: flex; align-items: center; width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; background: #fff; cursor: pointer; transition: 0.2s; text-align: left; }
-        .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
-
-        /* MODERN FLOATING DOWNLOAD MANAGER */
-        #floating-dl-manager {
-            position: fixed; top: 80px; right: 20px; width: 320px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15); z-index: 1050; padding: 20px;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
-            transform: translateY(-50px); opacity: 0; pointer-events: none;
+        .brand-title { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.4rem; 
+            color: #000; 
+            margin: 0; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
         }
-        #floating-dl-manager.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
-        .dl-title { font-weight: 700; color: #111; margin-bottom: 15px; font-size: 0.95rem; }
-        .dl-progress-bar { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; }
-        .dl-progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s linear; }
-        .dl-status-text { font-size: 0.8rem; color: #666; margin-top: 10px; display: flex; justify-content: space-between; font-weight: 600; }
-        .progress-fill-pulse { animation: progress-pulse 1.5s infinite ease-in-out; }
-        @keyframes progress-pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
-
-        /* RESUME VIEWING TOAST */
-        #resume-toast {
-            position: fixed; bottom: 30px; left: 30px; z-index: 1060;
-            background: #fff; padding: 15px 20px; border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2); border-left: 4px solid var(--primary);
-            display: flex; align-items: center; gap: 15px;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
-            transform: translateY(150px); opacity: 0; pointer-events: none;
-        }
-        #resume-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
-
-        .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px; }
-        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
         .brand-title span { color: var(--primary); }
-        .btn-header { border: 1px solid #eee; color: #555; border-radius: 50px; padding: 8px 20px; font-size: 0.85rem; transition: 0.3s; background: #fff; cursor: pointer; display: inline-flex; align-items: center; margin-left: 8px; font-weight: 600; text-decoration: none !important;}
-        .btn-header:hover, .btn-header.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+        
+        .btn-header { 
+            border: 1px solid #e4e4e7; 
+            color: #3f3f46; 
+            border-radius: 50px; 
+            padding: 8px 22px; 
+            font-size: 0.85rem; 
+            transition: all 0.2s ease;
+            background: var(--white); 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            margin-left: 8px; 
+            font-weight: 600; 
+            text-decoration: none !important;
+        }
+        
+        .btn-header:hover, .btn-header.active { 
+            background: #f4f4f5; border-color: #d4d4d8; color: #000;
+        }
 
-        .section-header { margin: 40px 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 0 30px; margin-bottom: 40px; margin-top:30px; }
-        .media-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
-        .media-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: var(--primary); }
-        .folder-cover { height: 200px; background-size: cover; background-position: center; position: relative; }
+        /* Cart Icon in Header */
+        #btnViewCart { position: relative; color: var(--danger); border-color: #fee2e2; }
+        #btnViewCart:hover { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+        #cartCountBadge {
+            position: absolute; top: -6px; right: -6px; background: var(--danger); color: white;
+            font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 50px; border: 2px solid white;
+        }
+
+        /* ==========================================================================
+           5. STICKY PILL MENU (YOUTUBE STYLE)
+           ========================================================================== */
+        #sticky-pill-menu {
+            position: sticky; top: 64px; background: rgba(255,255,255,0.95); z-index: 900;
+            padding: 10px 30px; display: none; overflow-x: auto; white-space: nowrap; 
+            border-bottom: 1px solid #f4f4f5; scroll-behavior: smooth; backdrop-filter: blur(8px);
+        }
+        #sticky-pill-menu::-webkit-scrollbar { display: none; }
+        
+        .pill-btn {
+            display: inline-block; padding: 6px 18px; background: #f4f4f5; color: #71717a; 
+            border-radius: 50px; margin-right: 8px; font-weight: 600; font-size: 0.85rem; 
+            cursor: pointer; transition: 0.2s; border: 1px solid transparent;
+        }
+        .pill-btn.active { background: #18181b; color: #fff; }
+
+        /* ==========================================================================
+           6. DASHBOARD & GALLERY GRID
+           ========================================================================== */
+        .section-header { margin: 30px 30px 15px; font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #111; border-bottom: 1px solid #f4f4f5; padding-bottom: 10px; }
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 0 30px; margin-bottom: 40px; }
+        .media-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f4f4f5; cursor: pointer; transition: all 0.3s ease;}
+        .media-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-color: var(--primary); }
+        
+        .folder-cover { height: 180px; background-size: cover; background-position: center; position: relative; }
         .folder-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); }
-        .card-details { padding: 20px; text-align: left; }
-        .card-details h5 { margin: 0 0 5px 0; font-weight: 700; font-size: 1.1rem; color: #111; }
+        .card-details { padding: 15px 20px; text-align: left; }
+        .card-details h5 { margin: 0 0 5px 0; font-weight: 700; font-size: 1.05rem; color: #111; }
         .card-details small { color: #666; font-weight: 500; }
 
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
-
-        .container-fluid { padding: 30px; padding-bottom: 120px; }
-        .gallery-grid { column-count: 4; column-gap: 20px; }
-        @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { 
-            .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } 
-            .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; } 
-            .media-grid { padding: 0 15px; } .gallery-header { justify-content: center; } 
-            #resume-toast { left: 15px; right: 15px; bottom: 20px; flex-wrap: wrap; justify-content: center; text-align: center; }
+        .gallery-grid { column-count: 4; column-gap: 15px; padding: 20px 30px 120px 30px;}
+        
+        .gallery-item { 
+            break-inside: avoid; margin-bottom: 15px; position: relative; border-radius: 12px; 
+            overflow: hidden; cursor: pointer; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); background: #f0f0f0; min-height: 200px;
         }
-        @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
+        .gallery-item:hover { transform: scale(1.015); }
+        .lazy-image { width: 100%; display: block; }
         
-        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; min-height: 250px; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-out; }
-        .lazy-image.loaded { opacity: 1; }
-        .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
-        .gallery-item.selected::after { content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; top: 10px; right: 10px; background: var(--primary); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        
-        #selection-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #222; color: #fff; padding: 12px 30px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; gap: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto;}
-        #selection-bar.visible { transform: translateX(-50%) translateY(0); }
-        .btn-download-batch { background: var(--primary); color: #fff; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
+        /* Selection Frame */
+        .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 4px var(--primary); border-radius: 14px; }
+        .gallery-item.selected::after { 
+            content: "\f004"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; 
+            top: 12px; right: 12px; background: var(--danger); color: #fff; width: 34px; height: 34px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.25); z-index: 10;
+        }
 
-        /* ADVANCED ZOOM LIGHTBOX CSS */
-        .modal-content { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; overflow: hidden; pointer-events: auto;}
-        .modal-body { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;}
+        /* ==========================================================================
+           7. FLOATING DOCK BAR (BOTTOM ACTION BAR)
+           ========================================================================== */
+        #selection-bar { 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(150px); 
+            background: rgba(24, 24, 27, 0.95); backdrop-filter: blur(15px); color: #fff; 
+            padding: 10px 20px; border-radius: 100px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            z-index: 1050; display: flex; align-items: center; gap: 12px; 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto;
+        }
+        #selection-bar.visible { transform: translateX(-50%) translateY(0); }
+        
+        .btn-dock {
+            border: none; border-radius: 50px; padding: 8px 22px; font-size: 0.85rem; 
+            font-weight: 700; cursor: pointer; transition: transform 0.2s;
+        }
+        .btn-dock:active { transform: scale(0.95); }
+        .btn-dock-cart { background: var(--white); color: #000; }
+        .btn-dock-cart:hover { background: #f3f4f6; }
+        .btn-dock-dl { background: #3b82f6; color: white; }
+
+        /* ==========================================================================
+           8. THE CART MODAL (PRO UI)
+           ========================================================================== */
+        .cart-modal-body { background: #f8fafc; padding: 25px !important; }
+        .cart-group-wrapper { margin-bottom: 25px; }
+        .cart-folder-label { display: flex; align-items: center; font-weight: 800; font-size: 0.95rem; color: #334155; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .cart-folder-label i { color: var(--primary); margin-right: 10px; font-size: 1.2rem; }
+        .cart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+        
+        .cart-tile {
+            position: relative; border-radius: 12px; overflow: hidden; background: white; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eef2f6; aspect-ratio: 1/1;
+        }
+        .cart-tile img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .cart-tile-remove {
+            position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; 
+            background: rgba(239, 68, 68, 0.95); color: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 11px; 
+            cursor: pointer; border: 2px solid white; z-index: 2; transition: 0.2s;
+        }
+        .cart-tile-remove:hover { transform: scale(1.1); background: #dc2626; }
+
+        /* ==========================================================================
+           9. ADVANCED ZOOM LIGHTBOX
+           ========================================================================== */
+        .modal-content-lb { background-color: rgba(5,5,5,0.98); border: none; height: 100vh; overflow: hidden; }
         .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
         .lb-header > * { pointer-events: auto; } 
-        .lb-title { color: #fff; font-size: 1.1rem; opacity: 0.8; }
-        .lb-actions { display: flex; align-items: center; }
-        .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
-        .lb-icon:hover { opacity: 1; color: var(--primary); }
+        .lb-title { color: #fff; font-size: 1rem; opacity: 0.9; font-weight: 500; letter-spacing: 0.5px;}
+        .lb-actions { display: flex; align-items: center; gap: 20px; }
+        .lb-icon { font-size: 1.5rem; color: #fff; cursor: pointer; opacity: 0.8; transition: 0.3s; }
+        .lb-icon:hover { opacity: 1; transform: scale(1.1); }
         
-        #lightboxImage { max-height: 80vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: transform 0.15s ease-out; cursor: zoom-in; will-change: transform;}
+        #lightboxImage { max-height: 85vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: transform 0.2s ease-out; cursor: zoom-in; will-change: transform, opacity; }
         
-        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.3s; z-index:1050; pointer-events: auto;}
-        .lb-control:hover { background: var(--primary); }
-        .lb-prev { left: 20px; } .lb-next { right: 20px; }
-        .dropdown-menu-dark { background: #222; border: 1px solid #444; }
-        .dropdown-item { color: #eee; padding: 10px 20px; border-bottom: 1px solid #333; }
-        .dropdown-item:hover { background: var(--primary); color: #fff; }
+        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 56px; height: 56px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.3s; z-index:1050; pointer-events: auto; backdrop-filter: blur(5px); font-size: 1.2rem;}
+        .lb-control:hover { background: rgba(255,255,255,0.25); }
+        .lb-prev { left: 30px; } .lb-next { right: 30px; }
 
-        .zoom-overlay { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1060; display: flex; gap: 20px; background: rgba(0,0,0,0.7); padding: 10px 25px; border-radius: 50px; pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .zoom-overlay i { color: #fff; font-size: 1.5rem; cursor: pointer; transition: 0.2s; padding: 5px; }
-        .zoom-overlay i:hover { color: var(--primary); transform: scale(1.1); }
+        /* ==========================================================================
+           10. UTILITIES (TOASTS, LASSO, DOWNLOAD MGR)
+           ========================================================================== */
+        #lasso-box { position: absolute; background: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; display: none; z-index: 1000; pointer-events: none; border-radius: 4px; }
+        
+        #custom-context-menu { position: absolute; background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); padding: 8px 0; z-index: 10000; display: none; min-width: 220px; border: 1px solid #eee; }
+        .ctx-item { padding: 12px 20px; color: #333; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; font-weight: 500; transition: 0.2s; }
+        .ctx-item:hover { background: #f9fafb; color: var(--primary); }
+
+        #resume-toast { position: fixed; bottom: 30px; left: 30px; z-index: 1060; background: #fff; padding: 18px 25px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border-left: 5px solid var(--primary); display: flex; align-items: center; gap: 20px; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s; transform: translateY(150px); opacity: 0; pointer-events: none; }
+        #resume-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+        .overlay-box { background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); text-align: center; max-width: 450px; width: 100%; border: 1px solid #eee; }
+        .dl-opt-btn { display: flex; align-items: center; width: 100%; padding: 15px; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px; background: #fff; cursor: pointer; transition: 0.2s; text-align: left; }
+        .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
+
+        #floating-dl-manager { position: fixed; top: 85px; right: 25px; width: 340px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); border: 1px solid #eee; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.12); z-index: 1050; padding: 25px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s; transform: translateY(-50px); opacity: 0; pointer-events: none; }
+        #floating-dl-manager.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        .dl-progress-bar { height: 10px; background: #f3f4f6; border-radius: 10px; overflow: hidden; margin-top:15px; }
+        .dl-progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s linear; }
+        
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px;}
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; }
+
+        /* ==========================================================================
+           11. MOBILE RESPONSIVENESS OVERRIDES
+           ========================================================================== */
+        @media (max-width: 768px) { 
+            .gallery-grid { column-count: 2; column-gap: 10px; padding: 15px 15px 100px 15px;} 
+            .gallery-header { padding: 12px 15px; justify-content: center; } 
+            #sticky-pill-menu { top: 98px; padding: 10px 15px;} 
+            #resume-toast { left: 15px; right: 15px; bottom: 20px; flex-wrap: wrap; justify-content: center; text-align: center; }
+            .lb-control { width: 40px; height: 40px; }
+            .lb-prev { left: 10px; } .lb-next { right: 10px; }
+            .cart-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        }
+        
+        /* EXTREME MOBILE: ICON-ONLY HEADER BUTTONS */
+        @media (max-width: 480px) {
+            .btn-text { display: none !important; }
+            .btn-header i.mr-1 { margin-right: 0 !important; } 
+            .btn-header { padding: 8px 14px; margin-left: 4px; font-size: 1rem;}
+            .brand-title { font-size: 1.15rem; width: 100%; text-align: center; margin-bottom: 10px;}
+            
+            #selection-bar { width: 90%; padding: 10px 15px; gap: 8px; justify-content: space-between; }
+            .btn-dock { padding: 6px 12px; font-size: 0.75rem; }
+            #selection-count-text { font-size: 0.8rem; }
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <iframe name="hidden_dl_iframe" style="display:none;"></iframe>
+    <div id="lasso-box"></div>
 
     <div id="main-loader" class="overlay-screen">
-        <div class="spinner"></div>
-        <h4 id="main-loader-text" style="color: #111; font-weight:700;">Connecting to Studio</h4>
-    </div>
-
-    <div id="floating-dl-manager">
-        <div class="dl-title" id="dl-title">
-            <span><i class="fas fa-file-archive text-warning mr-2"></i> Preparing Download...</span>
-        </div>
-        <div class="dl-progress-bar">
-            <div class="dl-progress-fill" id="dl-fill"></div>
-        </div>
-        <div class="dl-status-text">
-            <span id="dl-text">Starting...</span>
-        </div>
+        <div class="spinner-main"></div>
+        <h5 class="mt-4 font-weight-bold" style="letter-spacing:1px; color:#111;">CONNECTING TO STUDIO</h5>
+        <small class="text-muted mt-2">Fetching high-resolution assets...</small>
     </div>
 
     <div id="resume-toast">
         <div style="flex-grow: 1;">
-            <h6 style="margin:0; font-weight:700; color:#111; font-size: 0.95rem;">Welcome Back!</h6>
-            <small style="color:#666; font-size: 0.8rem;">Continue from where you left off?</small>
+            <h6 style="margin:0; font-weight:800; color:#000;">RESUME PREVIOUS VIEW?</h6>
+            <small style="color:var(--text-muted);">Continue exactly where you left off.</small>
         </div>
-        <button class="btn btn-sm btn-primary" style="border-radius:20px; font-weight:600; padding: 6px 15px;" onclick="resumeViewing()">Continue</button>
-        <button class="btn btn-sm btn-light rounded-circle" style="width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center; border: 1px solid #ddd; background: #fff;" onclick="closeResumeToast()"><i class="fas fa-times"></i></button>
-    </div>
-
-    <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
-        <i class="fas fa-microchip text-warning mb-3" style="font-size: 3rem;"></i>
-        <h3 style="color: #111; font-weight:800; margin-bottom:5px;">Optimizing Gallery</h3>
-        <p style="color: #666; font-size:0.9rem; max-width: 400px;">Using Multi-Core Processing to prepare high-quality files.</p>
-        
-        <div class="progress-container"><div class="progress-fill" id="cache-fill"></div></div>
-        
-        <h5 id="cache-percent" style="font-weight:700; color:var(--primary);">0% Loaded</h5>
-        <small id="cache-stats" class="text-muted font-weight-bold mt-1">0 / 0 Images Ready</small>
-        
-        <div class="mt-3 p-3 bg-light rounded text-left" style="max-width: 400px; border:1px solid #e5e7eb;">
-            <p style="margin:0; font-size: 0.85rem; color:#444;"><i class="fas fa-info-circle text-primary mr-2"></i> <b>Safe to leave!</b> You do not need to stay on this page. The system will save your progress.</p>
-        </div>
-
-        <div class="mt-4 d-flex justify-content-center flex-wrap gap-3">
-            <button id="btnContinueLive" class="btn btn-primary font-weight-bold mr-3 mb-2" style="border-radius: 50px; padding: 10px 25px; display:none;" onclick="finishCacheOptimizer()">
-                <i class="fas fa-play mr-2"></i> Continue with Ready Files
-            </button>
-            <button class="btn btn-outline-dark font-weight-bold mr-3 mb-2" style="border-radius: 50px; padding: 10px 25px;" onclick="cancelCacheAndGoBack()">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Folders
-            </button>
-            <a href="index.html" class="btn btn-dark font-weight-bold mb-2" style="border-radius: 50px; padding: 10px 25px;">
-                <i class="fas fa-home mr-2"></i> Home Page
-            </a>
-        </div>
-    </div>
-
-    <div id="quality-overlay" class="overlay-screen" style="display:none; background:rgba(0,0,0,0.5);">
-        <div class="overlay-box">
-            <h4 style="margin-top: 0; color: #111; margin-bottom: 20px;">Choose Download Quality</h4>
-            <button class="dl-opt-btn" onclick="executeWebDownload()">
-                <i class="fas fa-bolt"></i>
-                <div>
-                    <div style="font-weight: 700; color: #111;">Web Quality (Fast)</div>
-                    <div style="font-size: 0.8rem; color: #666;">Downloads instantly. Perfect for WhatsApp/Instagram.</div>
-                </div>
-            </button>
-            <button class="dl-opt-btn" onclick="executeOriginalDownload()">
-                <i class="fas fa-star"></i>
-                <div>
-                    <div style="font-weight: 700; color: #111;">Original Quality (Slow)</div>
-                    <div style="font-size: 0.8rem; color: #666;">Massive files. Recommended only for high-end printing.</div>
-                </div>
-            </button>
-            <button class="btn btn-light w-100 mt-2 font-weight-bold" onclick="$('#quality-overlay').fadeOut();">Cancel</button>
-        </div>
+        <button class="btn btn-sm btn-primary px-4 py-2" style="border-radius:50px; font-weight:800;" onclick="resumeViewing()">CONTINUE</button>
+        <button class="btn btn-sm btn-light rounded-circle" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center;" onclick="closeResumeToast()"><i class="fas fa-times text-muted"></i></button>
     </div>
 
     <div class="gallery-header">
         <div class="d-flex align-items-center">
-            <h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1>
+            <h1 class="brand-title"><span>SUPRIYA</span> STUDIO</h1>
         </div>
-        <div>
-            <a href="index.html" class="btn-header"><i class="fas fa-home mr-1"></i> Home</a>
-            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;"><i class="fas fa-arrow-left mr-1"></i> Back</button>
-            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)"><i class="fas fa-play mr-1"></i> Start</button>
-            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()"><i class="far fa-check-circle mr-1"></i> Select</button>
-            <button class="btn-header download-ui d-none" onclick="promptDownloadAll()"><i class="fas fa-download mr-1"></i> All</button>
+        <div class="d-flex align-items-center">
+            <a href="index.html" class="btn-header">
+                <i class="fas fa-home mr-1"></i> <span class="btn-text">Home</span>
+            </a>
+            
+            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;">
+                <i class="fas fa-arrow-left mr-1"></i> <span class="btn-text">Back</span>
+            </button>
+            
+            <button class="btn-header" id="btnViewCart" style="display: none;" onclick="openCart()">
+                <i class="fas fa-heart mr-1"></i> <span id="cartCountBadge">0</span>
+            </button>
+
+            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)">
+                <i class="fas fa-play mr-1"></i> <span class="btn-text">Start</span>
+            </button>
+            
+            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()">
+                <i class="far fa-check-circle mr-1"></i> <span class="btn-text">Select</span>
+            </button>
+            
+            <button class="btn-header download-ui d-none" onclick="promptDownloadAll()">
+                <i class="fas fa-download mr-1"></i> <span class="btn-text">All</span>
+            </button>
         </div>
     </div>
+
+    <div id="sticky-pill-menu"></div>
 
     <div id="event-content"></div>
     <div class="container-fluid"><div id="gallery" class="gallery-grid" style="display:none;"></div></div>
 
     <div id="selection-bar">
-        <span class="selection-count text-white font-weight-bold">0 Selected</span>
-        <button class="btn-download-batch download-ui d-none" onclick="promptDownloadSelected()"><i class="fas fa-cloud-download-alt mr-2"></i> Download</button>
-        <button class="btn btn-sm btn-outline-light rounded-circle border-0" onclick="clearSelection()"><i class="fas fa-times"></i></button>
+        <div class="mr-2" style="font-size: 0.9rem; font-weight: 600;"><span id="selection-count-text">0</span> Liked</div>
+        <button class="btn-dock btn-dock-cart" onclick="openCart()"><i class="fas fa-shopping-cart mr-1"></i> Review & Send</button>
+        <button class="btn-dock btn-dock-dl download-ui d-none" onclick="promptDownloadSelected()"><i class="fas fa-download"></i></button>
+        <i class="fas fa-times-circle ml-2" style="cursor:pointer; opacity:0.6;" onclick="clearSelection()"></i>
+    </div>
+
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; height: 85vh;">
+                <div class="modal-header border-0 px-4 pt-4">
+                    <h4 class="modal-title font-weight-bold"><i class="fas fa-heart text-danger mr-2"></i> My Selections</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body cart-modal-body" id="cart-items-container">
+                    </div>
+                <div class="modal-footer border-0 p-4" style="background: white; box-shadow: 0 -10px 30px rgba(0,0,0,0.03);">
+                    <div class="mr-auto font-weight-bold" style="font-size: 1.2rem;">Total: <span id="cart-total-count" style="color: var(--primary);">0</span></div>
+                    <button class="btn btn-success btn-lg font-weight-bold px-5" style="border-radius: 50px;" onclick="sendToStudio()">
+                        <i class="fab fa-whatsapp mr-2"></i> SEND SELECTION
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="quality-overlay" class="overlay-screen" style="display:none; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px);">
+        <div class="overlay-box">
+            <h4 style="margin-top: 0; color: #111; margin-bottom: 25px; font-weight:800;">Select Quality</h4>
+            
+            <button class="dl-opt-btn" onclick="executeWebDownload()">
+                <i class="fas fa-bolt" style="font-size:2rem; width:40px; text-align:center;"></i>
+                <div>
+                    <div style="font-weight: 800; color: #111; font-size:1.05rem;">Web Quality (Fast)</div>
+                    <div style="font-size: 0.85rem; color: #666; margin-top:3px;">Downloads instantly. Perfect for social media.</div>
+                </div>
+            </button>
+            
+            <button class="dl-opt-btn" onclick="executeOriginalDownload()">
+                <i class="fas fa-star" style="font-size:2rem; width:40px; text-align:center;"></i>
+                <div>
+                    <div style="font-weight: 800; color: #111; font-size:1.05rem;">Original Quality (Slow)</div>
+                    <div style="font-size: 0.85rem; color: #666; margin-top:3px;">Massive files. Recommended only for printing.</div>
+                </div>
+            </button>
+            
+            <button class="btn btn-light w-100 mt-3 font-weight-bold py-2" style="border-radius:10px; border:1px solid #e5e7eb;" onclick="$('#quality-overlay').fadeOut();">Cancel</button>
+        </div>
+    </div>
+
+    <div id="floating-dl-manager">
+        <div class="font-weight-bold" style="color:#111; font-size:1.05rem;" id="dl-title">
+            <i class="fas fa-file-archive text-warning mr-2"></i> Preparing Download
+        </div>
+        <div class="dl-progress-bar"><div class="dl-progress-fill" id="dl-fill"></div></div>
+        <div class="mt-2 d-flex justify-content-between font-weight-bold text-muted" style="font-size:0.8rem;">
+            <span id="dl-text">Starting...</span>
+        </div>
+    </div>
+
+    <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
+        <i class="fas fa-microchip text-warning mb-4" style="font-size: 3.5rem;"></i>
+        <h3 style="color: #111; font-weight:800; margin-bottom:10px;">Optimizing Gallery</h3>
+        <p style="color: #666; font-size:0.95rem; max-width: 400px; line-height:1.5;">We are using multi-core processing to prepare your high-quality files for smooth viewing.</p>
+        <div class="progress-container"><div class="progress-fill" id="cache-fill"></div></div>
+        <h5 id="cache-percent" style="font-weight:800; color:var(--primary);">0% Loaded</h5>
+        <small id="cache-stats" class="text-muted font-weight-bold mt-1">0 / 0 Images Ready</small>
+        <div class="mt-5 d-flex justify-content-center flex-wrap gap-3">
+            <button id="btnContinueLive" class="btn btn-primary font-weight-bold px-4 py-2 shadow-sm" style="border-radius: 50px; display:none;" onclick="finishCacheOptimizer()">
+                Continue Browsing
+            </button>
+        </div>
+    </div>
+
+    <div id="custom-context-menu">
+        <div class="ctx-item" id="ctx-view"><i class="fas fa-expand text-primary" style="width:20px;"></i> View High-Res</div>
+        <div class="ctx-item" id="ctx-select"><i class="fas fa-heart text-danger" style="width:20px;"></i> Select for Album</div>
+        <div style="height:1px; background:#eee; margin: 5px 0;"></div>
+        <div class="ctx-item" id="ctx-dl"><i class="fas fa-bolt text-warning" style="width:20px;"></i> Fast Download</div>
+        <div class="ctx-item" id="ctx-dl-full"><i class="fas fa-cloud-download-alt text-success" style="width:20px;"></i> Original Quality</div>
+    </div>
+
+    <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
+        <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
+            <div class="modal-content modal-content-lb">
+                <div class="modal-body" id="lb-body-container" style="padding:0; position:relative; display:flex; align-items:center; justify-content:center;">
+                    <div class="lb-header" style="position:absolute; top:0; width:100%; display:flex; justify-content:space-between; padding:20px 30px; z-index:100;">
+                        <div class="lb-title" id="lbFileName">...</div>
+                        <div class="lb-actions">
+                            <span class="lb-icon" onclick="toggleSelection(currentIndex)"><i class="far fa-heart" id="lbHeartIcon"></i></span>
+                            <span class="lb-icon" data-dismiss="modal" onclick="resetZoom()"><i class="fas fa-times"></i></span>
+                        </div>
+                    </div>
+                    <div class="lb-control lb-prev shadow" onclick="changeImage(-1)" style="left:20px; position:absolute;"><i class="fas fa-chevron-left"></i></div>
+                    <img id="lightboxImage" src="">
+                    <div class="lb-control lb-next" onclick="changeImage(1)" style="right:20px; position:absolute;"><i class="fas fa-chevron-right"></i></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="videoModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="background: #000;">
-                <div class="modal-header border-0 p-2" style="position: absolute; right: 0; z-index: 10;">
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <div class="modal-content" style="background: #000; border-radius:16px; overflow:hidden;">
+                <div class="modal-header border-0 p-3" style="position: absolute; right: 0; z-index: 10;">
+                    <button type="button" class="close text-white" data-dismiss="modal" style="opacity:0.8; text-shadow:none;">&times;</button>
                 </div>
                 <div class="modal-body p-0">
                     <div class="video-wrapper">
@@ -235,557 +497,539 @@
         </div>
     </div>
 
-    <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
-        <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
-            <div class="modal-content">
-                <div class="modal-body" id="lb-body-container">
-                    <div class="lb-header">
-                        <div class="lb-title" id="lbFileName">image.jpg</div>
-                        <div class="lb-actions">
-                            <div class="dropdown download-ui d-none">
-                                <span class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></span>
-                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
-                                    <a class="dropdown-item fast-dl-btn" href="#" onclick="downloadSingleImage('normal', event)"><i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web)</a>
-                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full', event)"><i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)</a>
-                                </div>
-                            </div>
-                            <span class="lb-icon" data-dismiss="modal" onclick="resetZoom()"><i class="fas fa-times"></i></span>
-                        </div>
-                    </div>
-                    
-                    <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
-                    <img id="lightboxImage" src="">
-                    <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
-                    
-                    <div class="zoom-overlay d-none" id="zoom-overlay-ui">
-                        <i class="fas fa-search-minus" onclick="adjustZoom(-0.5)" title="Zoom Out"></i>
-                        <i class="fas fa-search-plus" onclick="adjustZoom(0.5)" title="Zoom In"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const API_BASE = "https://supriyadigitals.store/api/";
+        // ==========================================
+        // SYSTEM CORE
+        // ==========================================
+        const API = "https://supriyadigitals.store/api/";
+        const WHATSAPP = "919246789966";
         const params = new URLSearchParams(window.location.search);
+        let currentEvent = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root Dashboard';
         
-        let fullEventData = []; let galleryData = []; let selectedFiles = new Set();
-        let isSelectMode = false; let currentIndex = 0; let canDownload = 0; 
+        let fullData = []; 
+        let currentFolderData = []; 
+        let cart = new Set();
+        let isSelectMode = false;
+        let currentIndex = 0;
+        let lastTapTime = 0;
+        let lastSelectedIndex = -1;
+        let isLasso = false;
+        let lStartX, lStartY;
+        let canDownload = 0;
         let pendingDownloadArray = [];
 
-        let cacheMissingUrls = []; let cacheTotal = 0; let cacheCompleted = 0;
-        let cacheWorkersActive = 0; 
-        const MAX_WORKERS = 4; 
-
-        function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
-
-        let deviceId = localStorage.getItem('supriya_device_id');
-        if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('supriya_device_id', deviceId); }
-        
-        let currentEventTracker = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root Dashboard';
-        
-        function trackAction(actionType, itemInfo = '') {
-            fetch(API_BASE + 'track.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ device: deviceId, site: 'View Page', event: currentEventTracker, action: actionType, item_info: itemInfo })
-            }).catch(()=>{});
-        }
-        
-        function pingServer() { trackAction('ping'); }
-        pingServer(); setInterval(pingServer, 10000);
-
-        function resumeViewing() {
-            let savedIndex = parseInt(localStorage.getItem('supriya_resume_index'));
-            $('#resume-toast').removeClass('show');
-            if (!isNaN(savedIndex)) {
-                openLightbox(savedIndex);
+        // --- CART PERSISTENCE ---
+        function loadCart() {
+            const saved = localStorage.getItem('supriya_favs_' + currentEvent);
+            if (saved) {
+                cart = new Set(JSON.parse(saved));
+                updateUI();
             }
         }
-
-        function closeResumeToast() {
-            $('#resume-toast').removeClass('show');
-            localStorage.removeItem('supriya_resume_batch');
-            localStorage.removeItem('supriya_resume_index');
+        function saveCart() {
+            localStorage.setItem('supriya_favs_' + currentEvent, JSON.stringify(Array.from(cart)));
+            updateUI();
         }
 
-        async function initializeGallery() {
-            try {
-                let url = `${API_BASE}fetch.php?mode=client`;
-                const eventName = params.get('event');
-                if (eventName) url += `&event=${encodeURIComponent(eventName)}&type=all`;
-                
-                const response = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } });
-                const result = await response.json();
-
-                if (!result.success || result.data.length === 0) { 
-                    $('#main-loader').html('<div class="text-center p-4"><h3 class="text-danger font-weight-bold mb-2">Link Expired or Private</h3><p class="text-muted">The gallery you are looking for is currently unavailable.</p></div>'); 
-                    return; 
-                }
-
-                fullEventData = result.data;
-                
-                if (eventName) {
-                    $('#main-loader').fadeOut(300);
-                    renderFolderDashboard();
-                } else {
-                    galleryData = fullEventData.filter(i => i.type === 'work' || i.type === 'link');
-                    canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
-                    $('#main-loader').fadeOut(300);
-                    if (galleryData.length > 0) openFolder(galleryData[0].batch_id); 
-                }
-            } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
-        }
-
-        // ==========================================
-        // PERFECT DASHBOARD SORTING ENGINE
-        // ==========================================
-        function renderFolderDashboard() {
-            $('#gallery').hide().empty(); $('#event-content').show(); 
-            $('#btnSelectMode').hide(); $('#btnStartViewing').hide(); $('.download-ui').hide(); $('#btnBackToFolders').hide();
-
-            let html = '';
-
-            // --- DISPLAY EVENT TITLE ON FIRST PAGE ONLY ---
-            let displayName = params.get('event') ? decodeURIComponent(params.get('event')) : '';
-            if (!displayName && fullEventData.length > 0) displayName = fullEventData[0].title;
-
-            if (displayName) {
-                html += `
-                <div style="text-align: center; padding: 40px 20px 0;">
-                    <h2 style="font-family: 'Playfair Display', serif; font-weight: 700; color: #111; font-size: 2.2rem; margin: 0; letter-spacing: 1px;">${escapeHtml(displayName)}</h2>
-                    <div style="width: 50px; height: 3px; background: var(--primary); margin: 15px auto 0;"></div>
-                </div>`;
+        // --- UI SYNC ---
+        function updateUI() {
+            const count = cart.size;
+            $('#cartCountBadge, #selection-count-text, #cart-total-count').text(count);
+            if (count > 0) {
+                $('#selection-bar').addClass('visible');
+                $('#btnViewCart').show();
+            } else {
+                $('#selection-bar').removeClass('visible');
+                $('#btnViewCart').hide();
             }
-
-            html += '<div class="section-header">Collections</div><div class="media-grid">';
-
-            let dashboardItems = [];
-            let seenBatches = new Set();
             
-            // 1. Sort absolutely everything by the drag-and-drop 'order_index'
-            let sortedData = [...fullEventData].sort((a, b) => {
-                let orderA = parseInt(a.order_index); if(isNaN(orderA)) orderA = 999999;
-                let orderB = parseInt(b.order_index); if(isNaN(orderB)) orderB = 999999;
-                return orderA - orderB;
-            });
+            // Sync heart icon in lightbox if open
+            if ($('#lightboxModal').is(':visible') && currentFolderData.length > 0) {
+                const path = currentFolderData[currentIndex].file_path;
+                if (cart.has(path)) $('#lbHeartIcon').removeClass('far').addClass('fas text-danger');
+                else $('#lbHeartIcon').removeClass('fas text-danger').addClass('far');
+            }
+        }
 
-            // 2. Unify Folders, Videos, and Albums into a single sequence list
-            sortedData.forEach(item => {
-                let itemOrder = parseInt(item.order_index);
-                if(isNaN(itemOrder)) itemOrder = 999999;
+        // --- INITIALIZATION ---
+        async function startApp() {
+            loadCart();
+            try {
+                let url = `${API}fetch.php?mode=client&event=${encodeURIComponent(currentEvent)}&type=all`;
+                const res = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } }).then(r => r.json());
+                if (!res.success) throw "Error";
+                fullData = res.data;
+                $('#main-loader').fadeOut(300);
+                renderDashboard();
+            } catch(e) { $('#main-loader').html('<h5 class="text-danger mt-4 font-weight-bold">SERVER OFFLINE</h5>'); }
+        }
 
+        function renderDashboard() {
+            $('#gallery, #sticky-pill-menu, #btnSelectMode, #btnStartViewing, #btnBackToFolders, .download-ui').hide();
+            $('#event-content').show();
+            
+            let html = '<div class="section-header">Event Collections</div><div class="media-grid">';
+            let pills = '<div class="pill-btn active" onclick="goBackToFolders()">All Collections</div>';
+            let seen = new Set();
+            
+            // Sort master list
+            fullData.sort((a,b) => (parseInt(a.order_index)||999) - (parseInt(b.order_index)||999));
+
+            fullData.forEach(item => {
                 if (item.type === 'teaser' || item.type === 'live') {
-                    dashboardItems.push({ type: 'video', data: item, order: itemOrder });
+                    let ytId = "";
+                    if (item.file_path) { 
+                        if (item.file_path.includes('embed/')) ytId = item.file_path.split('embed/')[1].split('?')[0]; 
+                        else if (item.file_path.includes('v=')) ytId = item.file_path.split('v=')[1].split('&')[0]; 
+                        else if (item.file_path.includes('youtu.be/')) ytId = item.file_path.split('youtu.be/')[1].split('?')[0]; 
+                    }
+                    html += `
+                    <div class="media-card" onclick="openVideo('${ytId}')">
+                        <div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');">
+                            <div class="folder-overlay"></div>
+                            <i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i>
+                        </div>
+                        <div class="card-details">
+                            <h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(item.video_category || 'Cinematic Film')}</h5>
+                            <small>Tap to Play Video</small>
+                        </div>
+                    </div>`;
                 }
                 else if (item.type === 'album') {
-                    dashboardItems.push({ type: 'album', data: item, order: itemOrder });
+                    html += `
+                    <div class="media-card" onclick="window.open('${escapeHtml(item.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;">
+                        <i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i>
+                        <div class="card-details" style="text-align:center; padding:0;">
+                            <h5>${escapeHtml(item.title || 'Digital Album')}</h5>
+                            <small>View PDF Document</small>
+                        </div>
+                    </div>`;
                 }
-                else if (item.batch_id && (item.type === 'work' || item.type === 'link')) {
-                    if (!seenBatches.has(item.batch_id)) {
-                        seenBatches.add(item.batch_id);
-                        let pathParts = item.file_path.split('/');
-                        let actualFolderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : item.title;
-                        let count = sortedData.filter(i => i.batch_id === item.batch_id).length;
-                        
-                        dashboardItems.push({ 
-                            type: 'folder', id: item.batch_id, title: actualFolderName, 
-                            cover: item.file_path, count: count, order: itemOrder 
-                        });
-                    }
-                }
-            });
-
-            // 3. Guarantee precise layout matching admin panel
-            dashboardItems.sort((a, b) => a.order - b.order);
-
-            // 4. Render them sequentially
-            dashboardItems.forEach(card => {
-                if (card.type === 'folder') {
-                    const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(card.cover)}&thumb=1`;
-                    html += `<div class="media-card" onclick="openFolder('${card.id}')"><div class="folder-cover" style="background-image: url('${coverUrl}');"></div><div class="card-details"><h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(card.title)}</h5><small><i class="fas fa-image mr-1"></i> ${card.count} Photos</small></div></div>`;
-                }
-                else if (card.type === 'video') {
-                    let v = card.data; let ytId = "";
-                    if (v.file_path) {
-                        if (v.file_path.includes('embed/')) ytId = v.file_path.split('embed/')[1].split('?')[0]; 
-                        else if (v.file_path.includes('v=')) ytId = v.file_path.split('v=')[1].split('&')[0]; 
-                        else if (v.file_path.includes('youtu.be/')) ytId = v.file_path.split('youtu.be/')[1].split('?')[0];
-                    }
-                    html += `<div class="media-card" onclick="openVideo('${ytId}')"><div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');"><div class="folder-overlay"></div><i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i></div><div class="card-details"><h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5><small>Tap to Play Video</small></div></div>`;
-                }
-                else if (card.type === 'album') {
-                    let a = card.data;
-                    html += `<div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;"><i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i><div class="card-details" style="text-align:center; padding:0;"><h5>${escapeHtml(a.title || 'Digital Album')}</h5><small>View PDF Document</small></div></div>`;
+                else if (item.batch_id && !seen.has(item.batch_id)) {
+                    seen.add(item.batch_id);
+                    let folderName = item.file_path.split('/').slice(-2, -1)[0] || item.title;
+                    const cover = `${API}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
+                    
+                    html += `
+                    <div class="media-card" onclick="openFolder('${item.batch_id}')">
+                        <div class="folder-cover" style="background-image: url('${cover}')"></div>
+                        <div class="card-details">
+                            <h5 class="text-truncate"><i class="fas fa-folder-open mr-2 text-warning"></i>${escapeHtml(folderName)}</h5>
+                            <small>${fullData.filter(i => i.batch_id === item.batch_id).length} Photos</small>
+                        </div>
+                    </div>`;
+                    pills += `<div class="pill-btn" onclick="openFolder('${item.batch_id}')">${escapeHtml(folderName)}</div>`;
                 }
             });
-
-            html += '</div>'; $('#event-content').html(html);
-        }
-
-        function openVideo(ytId) {
-            if (!ytId) return;
-            $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&showinfo=0`);
-            $('#videoModal').modal('show');
-        }
-        
-        $('#videoModal').on('hidden.bs.modal', function () {
-            $('#ytIframe').attr('src', ''); 
-        });
-
-        function openFolder(batchId) {
-            galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
-            canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
             
-            // --- SMART ALPHANUMERIC SORTING INSIDE THE FOLDER ---
-            galleryData.sort((a, b) => {
+            $('#event-content').html(html + '</div>');
+            $('#sticky-pill-menu').html(pills);
+            
+            // Check for resume
+            const savedEvent = localStorage.getItem('supriya_resume_event');
+            if (savedEvent === currentEvent) {
+                setTimeout(() => { $('#resume-toast').addClass('show'); }, 1000);
+            }
+        }
+
+        // --- NAVIGATION & CACHING ---
+        let cacheTotal = 0, cacheCompleted = 0, cacheMissingUrls = [];
+        let cacheWorkersActive = 0;
+
+        function openFolder(bid) {
+            currentFolderData = fullData.filter(i => i.batch_id === bid);
+            canDownload = Math.max(...currentFolderData.map(i => parseInt(i.can_download) || 0));
+            
+            // Smart Sort
+            currentFolderData.sort((a, b) => {
                 let orderA = parseInt(a.order_index); if(isNaN(orderA)) orderA = 999999;
                 let orderB = parseInt(b.order_index); if(isNaN(orderB)) orderB = 999999;
-                
-                // If they have the exact same rank (e.g. grouped in same folder), sort by name!
                 if (orderA !== orderB) return orderA - orderB;
-                
                 let nameA = (a.title_from_filename || a.file_path.split('/').pop()).toLowerCase();
                 let nameB = (b.title_from_filename || b.file_path.split('/').pop()).toLowerCase();
                 return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
             });
-            // ----------------------------------------------------
-            
-            $('#event-content').hide(); 
-            $('#main-loader-text').text('Checking Gallery...');
+
+            $('#event-content').hide();
+            $('#main-loader-text').text('Verifying High-Res Assets...');
             $('#main-loader').show();
             
-            $.get(API_BASE + 'cache_manager.php?action=status&batch_id=' + batchId, function(res) {
+            $.get(API + 'cache_manager.php?action=status&batch_id=' + bid, function(res) {
                 let data = JSON.parse(res);
-                cacheTotal = data.total;
-                cacheCompleted = data.cached;
+                cacheTotal = data.total; 
+                cacheCompleted = data.cached; 
                 cacheMissingUrls = data.missing;
-
-                updateCacheUI();
-
+                
+                let pct = cacheTotal > 0 ? Math.round((cacheCompleted / cacheTotal) * 100) : 100;
+                $('#cache-fill').css('width', pct + '%'); 
+                $('#cache-percent').text(pct + '% Loaded');
+                $('#cache-stats').text(cacheCompleted + ' / ' + cacheTotal + ' Images Ready');
+                
                 if (cacheMissingUrls.length === 0) {
                     $('#main-loader').fadeOut(200);
                     finishCacheOptimizer();
                 } else {
                     $('#main-loader').fadeOut(200);
                     $('#cache-progress-screen').fadeIn();
-                    for(let i=0; i<MAX_WORKERS; i++) { runCacheWorker(); }
+                    if (cacheCompleted >= 5 || pct >= 10) $('#btnContinueLive').fadeIn();
+                    for(let i=0; i<MAX_WORKERS; i++) runCacheWorker();
                 }
             }).fail(function() { 
                 $('#main-loader').fadeOut(200); 
                 finishCacheOptimizer(); 
             });
-        }
 
-        function updateCacheUI() {
-            let pct = cacheTotal > 0 ? Math.round((cacheCompleted / cacheTotal) * 100) : 100;
-            $('#cache-fill').css('width', pct + '%');
-            $('#cache-percent').text(pct + '% Loaded');
-            $('#cache-stats').text(cacheCompleted + ' / ' + cacheTotal + ' Images Ready');
-            
-            if (cacheCompleted >= 5 || pct >= 10) { $('#btnContinueLive').fadeIn(); }
+            // Update UI Menu
+            $('#sticky-pill-menu').show();
+            $('.pill-btn').removeClass('active');
+            $(`.pill-btn[onclick="openFolder('${bid}')"]`).addClass('active');
+            let activePill = $(`.pill-btn[onclick="openFolder('${bid}')"]`)[0];
+            if(activePill) activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
 
         function runCacheWorker() {
             if(cacheMissingUrls.length === 0) return;
             cacheWorkersActive++;
             const url = cacheMissingUrls.shift();
-            
-            const buildUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1';
-            fetch(buildUrl)
-                .then(() => {
-                    cacheCompleted++; updateCacheUI(); cacheWorkersActive--;
-                    if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) finishCacheOptimizer();
-                    else runCacheWorker();
-                })
-                .catch(() => { cacheCompleted++; updateCacheUI(); cacheWorkersActive--; runCacheWorker(); });
+            fetch(API + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1')
+            .then(() => {
+                cacheCompleted++;
+                let pct = cacheTotal > 0 ? Math.round((cacheCompleted / cacheTotal) * 100) : 100;
+                $('#cache-fill').css('width', pct + '%'); 
+                $('#cache-percent').text(pct + '% Loaded');
+                $('#cache-stats').text(cacheCompleted + ' / ' + cacheTotal + ' Images Ready');
+                if (cacheCompleted >= 5 || pct >= 10) $('#btnContinueLive').fadeIn();
+                
+                cacheWorkersActive--;
+                if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) finishCacheOptimizer();
+                else runCacheWorker();
+            }).catch(() => { cacheCompleted++; cacheWorkersActive--; runCacheWorker(); });
         }
 
         function finishCacheOptimizer() {
             $('#cache-progress-screen').fadeOut();
             if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
-            $('#btnStartViewing').show(); 
-            $('#btnSelectMode').show(); 
-            $('#btnBackToFolders').show(); 
-            $('#gallery').show();
-            renderGallery();
-
-            // --- CHECK IF THEY LEFT OFF HERE PREVIOUSLY ---
-            let savedBatch = localStorage.getItem('supriya_resume_batch');
-            let savedIndex = parseInt(localStorage.getItem('supriya_resume_index'));
+            $('#btnSelectMode, #btnStartViewing, #btnBackToFolders, #gallery').show();
             
-            if (galleryData.length > 0 && savedBatch === galleryData[0].batch_id && !isNaN(savedIndex) && savedIndex < galleryData.length) {
-                setTimeout(() => { $('#resume-toast').addClass('show'); }, 1000);
+            renderGallery();
+            
+            if (window.pendingResumeIndex !== undefined) {
+                setTimeout(() => openLightbox(window.pendingResumeIndex), 400);
+                window.pendingResumeIndex = undefined;
             }
         }
 
-        function cancelCacheAndGoBack() { cacheMissingUrls = []; $('#cache-progress-screen').fadeOut(); goBackToFolders(); }
-        function goBackToFolders() { clearSelection(); renderFolderDashboard(); }
+        function goBackToFolders() { 
+            // IMPORTANT: If select mode is on, turn it off cleanly so normal UI resumes
+            if (isSelectMode) toggleSelectMode();
+            renderDashboard(); 
+        }
 
         function renderGallery() {
             let html = '';
-            galleryData.forEach((item, index) => {
-                const imgUrl = item.file_path; galleryData[index].fullUrl = imgUrl; 
-                galleryData[index].filename = item.title_from_filename || item.file_path.split('/').pop();
-                const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`; 
-                const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
-                galleryData[index].thumbUrl = thumbUrl; galleryData[index].highResUrl = highResUrl;
-                html += `<div class="gallery-item" id="item-${index}" onclick="handleItemClick(${index})"><img data-src="${thumbUrl}" class="lazy-image"></div>`;
+            currentFolderData.forEach((item, index) => {
+                const thumb = `${API}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
+                const isSel = cart.has(item.file_path) ? 'selected' : '';
+                html += `<div class="gallery-item skeleton ${isSel}" id="item-${index}" onclick="handleItemClick(${index}, event)" oncontextmenu="showContextMenu(event, ${index})"><img data-src="${thumb}" class="lazy-image" style="opacity:0; transition: opacity 0.5s;"></div>`;
             });
-            document.getElementById('gallery').innerHTML = html; initLazyLoader();
+            $('#gallery').html(html);
+            
+            // Lazy Load Logic
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(en => {
+                    if (en.isIntersecting) {
+                        let div = en.target;
+                        let img = div.querySelector('img');
+                        img.src = img.dataset.src;
+                        img.onload = () => { div.classList.remove('skeleton'); img.style.opacity = 1; };
+                        observer.unobserve(div);
+                    }
+                });
+            }, { rootMargin: '500px' });
+            document.querySelectorAll('.gallery-item').forEach(el => observer.observe(el));
         }
 
-        let imageLoadQueue = []; let activeDownloads = 0; const MAX_LAZY_DOWNLOADS = 6;
-        function processImageLoadQueue() { if (imageLoadQueue.length === 0 || activeDownloads >= MAX_LAZY_DOWNLOADS) return; const img = imageLoadQueue.shift(); activeDownloads++; img.onload = () => { img.classList.add('loaded'); activeDownloads--; processImageLoadQueue(); }; img.onerror = () => { activeDownloads--; processImageLoadQueue(); }; img.src = img.getAttribute('data-src'); }
-        function initLazyLoader() { const imageObserver = new IntersectionObserver((entries, observer) => { entries.forEach(entry => { if (entry.isIntersecting) { imageLoadQueue.push(entry.target); processImageLoadQueue(); observer.unobserve(entry.target); } }); }, { rootMargin: "0px 0px 1200px 0px" }); document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img)); }
+        // --- INTERACTION ---
+        function handleItemClick(idx, e) {
+            let now = Date.now();
+            
+            // DOUBLE TAP ACTION
+            if (now - lastTapTime < 300 && now - lastTapTime > 0) { 
+                toggleSelection(idx, true);
+                showFlyingHeart(e.clientX, e.clientY);
+                e.preventDefault();
+                return;
+            }
+            lastTapTime = now;
 
-        function toggleSelectMode() { isSelectMode = !isSelectMode; $('#btnSelectMode').toggleClass('active'); if(!isSelectMode) clearSelection(); }
-        function handleItemClick(index) { if (isSelectMode) toggleSelection(index); else openLightbox(index); }
-        function toggleSelection(index) { const item = galleryData[index]; const $el = $(`#item-${index}`); if (selectedFiles.has(item.fullUrl)) { selectedFiles.delete(item.fullUrl); $el.removeClass('selected'); } else { selectedFiles.add(item.fullUrl); $el.addClass('selected'); } updateFloatingBar(); }
-        function clearSelection() { selectedFiles.clear(); $('.gallery-item').removeClass('selected'); updateFloatingBar(); }
-        function updateFloatingBar() { const count = selectedFiles.size; $('.selection-count').text(count + " Selected"); if (count > 0) $('#selection-bar').addClass('visible'); else $('#selection-bar').removeClass('visible'); }
+            // Normal Click Logic - STRICTLY obey isSelectMode
+            if (isSelectMode) {
+                if (e.shiftKey && lastSelectedIndex !== -1) {
+                    let start = Math.min(lastSelectedIndex, idx);
+                    let end = Math.max(lastSelectedIndex, idx);
+                    for(let i=start; i<=end; i++) toggleSelection(i, true);
+                } else {
+                    toggleSelection(idx);
+                }
+                lastSelectedIndex = idx;
+            } else { 
+                openLightbox(idx); 
+            }
+        }
 
-        function promptDownloadAll() { pendingDownloadArray = galleryData.map(i => i.fullUrl); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
-        function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
+        function toggleSelection(idx, force) {
+            const path = currentFolderData[idx].file_path;
+            const el = $(`#item-${idx}`);
+            
+            if (force === true || !cart.has(path)) {
+                cart.add(path); 
+                el.addClass('selected');
+            } else if (force === false || cart.has(path)) {
+                cart.delete(path); 
+                el.removeClass('selected');
+            }
+            saveCart();
+        }
 
-        // ==========================================
-        // MODERN FLOATING DOWNLOAD LOGIC 
-        // ==========================================
+        function clearSelection() {
+            if (confirm("Clear all selections?")) {
+                cart.clear();
+                $('.gallery-item').removeClass('selected');
+                saveCart();
+                lastSelectedIndex = -1;
+            }
+        }
+
+        // --- THE PRO CART MODAL RENDER ---
+        function openCart() {
+            if (cart.size === 0) {
+                alert("Your cart is empty. Tap the 'Select' button or double-tap photos to add them!");
+                return;
+            }
+            
+            let container = $('#cart-items-container');
+            container.empty();
+            let groups = {};
+
+            cart.forEach(path => {
+                let folder = path.split('/').slice(-2, -1)[0] || "Uncategorized";
+                if (!groups[folder]) groups[folder] = [];
+                groups[folder].push(path);
+            });
+
+            let html = '';
+            for (let folder in groups) {
+                html += `
+                <div class="cart-group-wrapper">
+                    <div class="cart-folder-label"><i class="fas fa-folder-open"></i>${escapeHtml(folder)}</div>
+                    <div class="cart-grid">`;
+                
+                groups[folder].forEach(path => {
+                    const thumb = `${API}serve_image.php?file=${encodeURIComponent(path)}&thumb=1`;
+                    html += `
+                    <div class="cart-tile">
+                        <button class="cart-tile-remove" onclick="removeFromCart('${path}')"><i class="fas fa-times"></i></button>
+                        <img src="${thumb}" loading="lazy">
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+            container.html(html);
+            $('#cartModal').modal('show');
+        }
+
+        function removeFromCart(path) {
+            cart.delete(path);
+            saveCart();
+            
+            // Sync main grid UI if visible
+            $(`.gallery-item`).each(function() {
+                let imgEl = $(this).find('img');
+                if (imgEl.length && imgEl.attr('src') && imgEl.attr('src').includes(encodeURIComponent(path))) {
+                    $(this).removeClass('selected');
+                }
+            });
+            
+            if (cart.size === 0) {
+                $('#cartModal').modal('hide');
+            } else {
+                openCart(); // Re-render modal
+            }
+        }
+
+        function sendToStudio() {
+            let text = `*SUPRIYA DIGITALS ALBUM SELECTION*\nEvent: ${currentEvent}\n\n`;
+            let groups = {};
+            cart.forEach(path => {
+                let folder = path.split('/').slice(-2, -1)[0] || "Other";
+                if (!groups[folder]) groups[folder] = [];
+                groups[folder].push(path.split('/').pop());
+            });
+
+            for (let f in groups) {
+                text += `📁 *${f}*\n`;
+                groups[f].forEach((file, i) => text += `   ${i+1}. ${file}\n`);
+                text += "\n";
+            }
+            text += `*Total Photos: ${cart.size}*`;
+            window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // --- 6. LIGHTBOX SWIPE TO CLOSE ---
+        let lImg = document.getElementById('lightboxImage');
+        let panY = 0;
+        
+        function openLightbox(idx) {
+            currentIndex = idx;
+            const item = currentFolderData[idx];
+            const highRes = `${API}serve_image.php?file=${encodeURIComponent(item.file_path)}`;
+            
+            $('#lbFileName').text(item.file_path.split('/').pop());
+            
+            // Apply Permissions
+            let dlState = parseInt(item.can_download) || 0; 
+            if (dlState > 0) { $('.download-ui').removeClass('d-none'); if (dlState == 2) $('.fast-dl-btn').hide(); else $('.fast-dl-btn').show(); } else { $('.download-ui').addClass('d-none'); }
+            
+            updateUI(); // Set heart state
+            
+            lImg.src = highRes;
+            lImg.onload = () => { lImg.style.opacity = 1; };
+            $('#lightboxModal').modal('show');
+            
+            localStorage.setItem('supriya_resume_event', currentEvent);
+            localStorage.setItem('supriya_resume_batch', item.batch_id);
+            localStorage.setItem('supriya_resume_index', idx);
+        }
+
+        // Simple Vertical Swipe Logic
+        lImg.addEventListener('touchstart', e => { if(e.touches.length === 1) lStartY = e.touches[0].clientY; lImg.style.transition = 'none'; }, {passive: false});
+        lImg.addEventListener('touchmove', e => { 
+            if(e.touches.length === 1) {
+                panY = e.touches[0].clientY - lStartY; 
+                if (Math.abs(panY) > 20) { // Add tiny threshold to prevent accidental swipe
+                    lImg.style.transform = `translateY(${panY}px)`;
+                    lImg.style.opacity = 1 - (Math.abs(panY) / 500);
+                    e.preventDefault(); // Stop page scrolling
+                }
+            }
+        }, {passive: false});
+        lImg.addEventListener('touchend', () => {
+            lImg.style.transition = 'transform 0.3s, opacity 0.3s';
+            if (Math.abs(panY) > 150) {
+                $('#lightboxModal').modal('hide');
+            }
+            lImg.style.transform = 'translateY(0)';
+            lImg.style.opacity = 1;
+            panY = 0;
+        });
+
+        function changeImage(dir) {
+            currentIndex = (currentIndex + dir + currentFolderData.length) % currentFolderData.length;
+            lImg.style.opacity = 0; // Fade out slightly between changes
+            openLightbox(currentIndex);
+        }
+
+        $('#lightboxModal').on('hidden.bs.modal', function () { lImg.style.opacity = 1; lImg.style.transform = 'translateY(0)'; });
+
+        // --- CONTEXT MENU (DESKTOP RIGHT CLICK) ---
+        const ctxMenu = document.getElementById('custom-context-menu');
+        function showContextMenu(e, index) {
+            e.preventDefault(); ctxTargetIndex = index;
+            let item = currentFolderData[index]; let dlState = parseInt(item.can_download) || 0;
+            if (dlState === 0) { $('#ctx-dl, #ctx-dl-full').hide(); } else if (dlState === 2) { $('#ctx-dl').hide(); $('#ctx-dl-full').show(); } else { $('#ctx-dl, #ctx-dl-full').show(); }
+            if (cart.has(item.file_path)) $('#ctx-select').html('<i class="fas fa-times text-secondary" style="width:20px;"></i> Deselect'); else $('#ctx-select').html('<i class="fas fa-heart text-danger" style="width:20px;"></i> Select for Album');
+
+            ctxMenu.style.display = 'block';
+            let menuX = e.clientX; let menuY = e.clientY + window.scrollY;
+            if (menuX + ctxMenu.offsetWidth > window.innerWidth) menuX = window.innerWidth - ctxMenu.offsetWidth - 10;
+            ctxMenu.style.left = menuX + 'px'; ctxMenu.style.top = menuY + 'px';
+        }
+        document.addEventListener('click', () => { ctxMenu.style.display = 'none'; });
+
+        $('#ctx-view').click((e) => { e.preventDefault(); openLightbox(ctxTargetIndex); });
+        $('#ctx-select').click((e) => { e.preventDefault(); toggleSelection(ctxTargetIndex); });
+        $('#ctx-dl').click((e) => { e.preventDefault(); currentIndex = ctxTargetIndex; downloadSingleImage('normal'); });
+        $('#ctx-dl-full').click((e) => { e.preventDefault(); currentIndex = ctxTargetIndex; downloadSingleImage('full'); });
+
+
+        // --- DESKTOP LASSO BOX ---
+        if (window.matchMedia("(hover: hover)").matches) {
+            document.addEventListener('mousedown', e => {
+                if (!isSelectMode || e.target.closest('nav, .modal, button, .gallery-header, #selection-bar')) return;
+                isLasso = true; lStartX = e.pageX; lStartY = e.pageY;
+                $('#lasso-box').css({left: lStartX, top: lStartY, width: 0, height: 0, display: 'block'});
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', e => {
+                if (!isLasso) return;
+                let w = e.pageX - lStartX; let h = e.pageY - lStartY;
+                $('#lasso-box').css({width: Math.abs(w), height: Math.abs(h), left: w<0?e.pageX:lStartX, top: h<0?e.pageY:lStartY});
+                
+                let rect = document.getElementById('lasso-box').getBoundingClientRect();
+                document.querySelectorAll('.gallery-item').forEach((el, i) => {
+                    let r = el.getBoundingClientRect();
+                    // Intersection math
+                    if (!(r.right < rect.left || r.left > rect.right || r.bottom < rect.top || r.top > rect.bottom)) {
+                        if (!el.classList.contains('lasso-hover')) {
+                            el.classList.add('lasso-hover');
+                            toggleSelection(i, true);
+                        }
+                    }
+                });
+            });
+            document.addEventListener('mouseup', () => { 
+                isLasso = false; 
+                $('#lasso-box').hide(); 
+                document.querySelectorAll('.lasso-hover').forEach(el => el.classList.remove('lasso-hover'));
+            });
+        }
+
+        // --- DOWNLOAD SYSTEM ---
+        function promptDownloadAll() { pendingDownloadArray = currentFolderData.map(i => i.file_path); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
+        function promptDownloadSelected() { if (cart.size === 0) return; pendingDownloadArray = Array.from(cart); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
+
         async function executeWebDownload() {
-            if (typeof trackAction === "function") trackAction('download', 'Full Folder (Web Quality)');
             $('#quality-overlay').fadeOut(); 
-            
-            const dlManager = document.getElementById('floating-dl-manager');
-            const dlFill = document.getElementById('dl-fill');
-            const dlText = document.getElementById('dl-text');
-            const dlTitle = document.getElementById('dl-title');
-            
-            dlTitle.innerHTML = '<span><i class="fas fa-file-archive text-warning mr-2"></i> Zipping Photos...</span>';
-            dlFill.style.width = '0%';
-            dlText.innerText = `0 / ${pendingDownloadArray.length} Prepared`;
-            dlManager.classList.add('active');
-            
+            const dlManager = document.getElementById('floating-dl-manager'); const dlFill = document.getElementById('dl-fill'); const dlText = document.getElementById('dl-text'); const dlTitle = document.getElementById('dl-title');
+            dlTitle.innerHTML = '<span><i class="fas fa-file-archive text-warning mr-2"></i> Zipping Photos...</span>'; dlFill.style.width = '0%'; dlText.innerText = `0 / ${pendingDownloadArray.length} Prepared`; dlManager.classList.add('active');
             const zip = new JSZip();
             for(let i=0; i<pendingDownloadArray.length; i++) {
                 try {
-                    let cacheUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(pendingDownloadArray[i]) + '&thumb=1';
-                    let res = await fetch(cacheUrl); 
-                    let blob = await res.blob();
-                    let filename = pendingDownloadArray[i].split('/').pop();
-                    zip.file("Web_" + filename, blob);
-                    
-                    let pct = Math.round(((i + 1) / pendingDownloadArray.length) * 100);
-                    dlFill.style.width = pct + '%';
-                    dlText.innerText = `${i + 1} / ${pendingDownloadArray.length} Prepared (${pct}%)`;
-                    
+                    let cacheUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(pendingDownloadArray[i]) + '&thumb=1'; let res = await fetch(cacheUrl); let blob = await res.blob(); let filename = pendingDownloadArray[i].split('/').pop();
+                    zip.file("Web_" + filename, blob); let pct = Math.round(((i + 1) / pendingDownloadArray.length) * 100); dlFill.style.width = pct + '%'; dlText.innerText = `${i + 1} / ${pendingDownloadArray.length} Prepared (${pct}%)`;
                     await new Promise(r => setTimeout(r, 10));
-                } catch(e) { console.error("Skip", e); }
+                } catch(e) {}
             }
-            
-            dlTitle.innerHTML = '<span><i class="fas fa-spinner fa-spin text-primary mr-2"></i> Finalizing ZIP...</span>';
-            dlText.innerText = "Please wait...";
-            
+            dlTitle.innerHTML = '<span><i class="fas fa-spinner fa-spin text-primary mr-2"></i> Finalizing ZIP...</span>'; dlText.innerText = "Please wait...";
             zip.generateAsync({type:"blob"}).then(function(content) {
-                const link = document.createElement('a'); 
-                link.href = URL.createObjectURL(content); 
-                link.download = "Supriya_Web_Photos.zip"; 
-                link.click();
-                
-                dlTitle.innerHTML = '<span><i class="fas fa-check-circle text-success mr-2"></i> Complete!</span>';
-                dlText.innerText = "Saved to your device.";
-                setTimeout(() => { dlManager.classList.remove('active'); clearSelection(); }, 4000);
+                const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = "Supriya_Web_Photos.zip"; link.click();
+                dlTitle.innerHTML = '<span><i class="fas fa-check-circle text-success mr-2"></i> Complete!</span>'; dlText.innerText = "Saved to your device."; setTimeout(() => { dlManager.classList.remove('active'); }, 4000);
             });
         }
 
         function executeOriginalDownload() {
-            if (typeof trackAction === "function") trackAction('download', 'Full Folder (Original Quality)');
             $('#quality-overlay').fadeOut(); 
-            
-            const dlManager = document.getElementById('floating-dl-manager');
-            document.getElementById('dl-title').innerHTML = '<span><i class="fas fa-cloud-download-alt text-success mr-2"></i> Handing off to Device...</span>';
-            document.getElementById('dl-fill').style.width = '100%';
-            document.getElementById('dl-fill').classList.add('progress-fill-pulse');
-            document.getElementById('dl-text').innerText = "Downloading in background. You can lock your screen.";
-            dlManager.classList.add('active');
-            
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = API_BASE + 'stream_zip.php';
-            form.target = 'hidden_dl_iframe'; 
-            
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'files_json';
-            input.value = JSON.stringify(pendingDownloadArray);
-            form.appendChild(input);
-            
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
-            
-            setTimeout(() => {
-                document.getElementById('dl-title').innerHTML = '<span><i class="fas fa-check-circle text-success mr-2"></i> Download Started</span>';
-                document.getElementById('dl-text').innerText = "Check your device's notification panel.";
-                document.getElementById('dl-fill').classList.remove('progress-fill-pulse');
-                setTimeout(() => { dlManager.classList.remove('active'); clearSelection(); }, 5000);
-            }, 2000);
+            const dlManager = document.getElementById('floating-dl-manager'); document.getElementById('dl-title').innerHTML = '<span><i class="fas fa-cloud-download-alt text-success mr-2"></i> Handing off to Device...</span>'; document.getElementById('dl-fill').style.width = '100%'; document.getElementById('dl-fill').classList.add('progress-fill-pulse'); document.getElementById('dl-text').innerText = "Downloading in background."; dlManager.classList.add('active');
+            const form = document.createElement('form'); form.method = 'POST'; form.action = API_BASE + 'stream_zip.php'; form.target = 'hidden_dl_iframe'; 
+            const input = document.createElement('input'); input.type = 'hidden'; input.name = 'files_json'; input.value = JSON.stringify(pendingDownloadArray); form.appendChild(input); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
+            setTimeout(() => { document.getElementById('dl-title').innerHTML = '<span><i class="fas fa-check-circle text-success mr-2"></i> Download Started</span>'; document.getElementById('dl-text').innerText = "Check your device's notification panel."; document.getElementById('dl-fill').classList.remove('progress-fill-pulse'); setTimeout(() => { dlManager.classList.remove('active'); }, 5000); }, 2000);
         }
 
         function downloadSingleImage(type, event) {
-            if (event) event.preventDefault(); 
-            const item = galleryData[currentIndex];
-            if(item.can_download == 0) return;
-            
-            if (typeof trackAction === "function") {
-                trackAction('download', (type === 'normal' ? 'Single Web: ' : 'Single Original: ') + (item.filename || 'unknown.jpg'));
-            }
-            
-            let dlUrl = '';
-            if (type === 'normal') {
-                dlUrl = `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`;
-            } else if (type === 'full') {
-                dlUrl = `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
-            }
-            
-            const link = document.createElement('a'); 
-            link.href = dlUrl; 
-            link.setAttribute('download', item.filename || 'download.jpg'); 
-            document.body.appendChild(link); 
-            link.click(); 
-            document.body.removeChild(link);
+            if (event) event.preventDefault(); const item = currentFolderData[currentIndex]; if(item.can_download == 0) return;
+            let dlUrl = type === 'normal' ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.file_path)}` : `${API_BASE}download_full.php?file=${encodeURIComponent(item.file_path)}`;
+            const link = document.createElement('a'); link.href = dlUrl; link.setAttribute('download', item.file_path.split('/').pop()); document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
-        // ==========================================
-        // ADVANCED ZOOM ENGINE & LIGHTBOX
-        // ==========================================
-        let currentZoom = 1; 
-        let imgPanX = 0, imgPanY = 0;
-        let isDragging = false;
-        let startDragX, startDragY;
-        let currentHighResLoader = null;
-        const imgEl = document.getElementById('lightboxImage');
+        // --- UTILS ---
+        function toggleSelectMode() { isSelectMode = !isSelectMode; $('#btnSelectMode').toggleClass('active'); }
+        function openVideo(ytId) { if (!ytId) return; $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&showinfo=0`); $('#videoModal').modal('show'); }
+        $('#videoModal').on('hidden.bs.modal', function () { $('#ytIframe').attr('src', ''); });
 
-        function openLightbox(index) { 
-            currentIndex = index; 
-            resetZoom(); 
-            updateLightbox(); 
-            $('#lightboxModal').modal('show'); 
-        }
-
-        function updateLightbox() {
-            const item = galleryData[currentIndex];
-            $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2"></i> Enhancing...`);
-            imgEl.src = item.thumbUrl;
-            imgEl.style.opacity = '1';
-            
-            if (currentHighResLoader) currentHighResLoader.onload = null;
-            currentHighResLoader = new Image();
-            currentHighResLoader.onload = function() { 
-                if (galleryData[currentIndex].highResUrl === this.src) { 
-                    imgEl.src = this.src; 
-                    $('#lbFileName').text(item.filename); 
-                    $('#zoom-overlay-ui').removeClass('d-none'); 
-                } 
-            };
-            currentHighResLoader.src = item.highResUrl;
-
-            let nextIndex = (currentIndex + 1) % galleryData.length; 
-            let preloadNext = new Image(); preloadNext.src = galleryData[nextIndex].highResUrl;
-            let prevIndex = currentIndex - 1; if (prevIndex < 0) prevIndex = galleryData.length - 1; 
-            let preloadPrev = new Image(); preloadPrev.src = galleryData[prevIndex].highResUrl;
-
-            let itemDlState = parseInt(item.can_download) || 0;
-            if (itemDlState > 0) { $('.download-ui').removeClass('d-none'); if (itemDlState == 2) $('.fast-dl-btn').hide(); else $('.fast-dl-btn').show(); } else { $('.download-ui').addClass('d-none'); }
-
-            localStorage.setItem('supriya_resume_batch', item.batch_id);
-            localStorage.setItem('supriya_resume_index', currentIndex);
-        }
-
-        function changeImage(dir) { 
-            currentIndex += dir; 
-            if (currentIndex >= galleryData.length) currentIndex = 0; 
-            if (currentIndex < 0) currentIndex = galleryData.length - 1; 
-            $('#zoom-overlay-ui').addClass('d-none');
-            resetZoom();
-            updateLightbox(); 
-        }
-
-        function resetZoom() {
-            currentZoom = 1; imgPanX = 0; imgPanY = 0;
-            applyTransform();
-        }
-
-        function adjustZoom(delta) {
-            currentZoom += delta;
-            if(currentZoom <= 1) resetZoom();
-            else {
-                if(currentZoom > 5) currentZoom = 5;
-                applyTransform();
-            }
-        }
-
-        function applyTransform() {
-            imgEl.style.transform = `translate(${imgPanX}px, ${imgPanY}px) scale(${currentZoom})`;
-            imgEl.style.cursor = currentZoom > 1 ? 'grab' : 'zoom-in';
-        }
-
-        imgEl.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            adjustZoom(e.deltaY * -0.005);
-        }, {passive: false});
-
-        let initialDistance = null;
-        let initialZoom = 1;
-
-        imgEl.addEventListener('touchstart', function(e) { 
-            if(e.touches.length === 2) { 
-                initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); 
-                initialZoom = currentZoom;
-            } else if (e.touches.length === 1 && currentZoom > 1) {
-                isDragging = true;
-                startDragX = e.touches[0].pageX - imgPanX;
-                startDragY = e.touches[0].pageY - imgPanY;
-            }
-        }, {passive: false});
-
-        imgEl.addEventListener('touchmove', function(e) { 
-            if(e.touches.length === 2 && initialDistance) {
-                e.preventDefault();
-                let currentDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-                currentZoom = Math.min(Math.max(1, initialZoom * (currentDist / initialDistance)), 5);
-                applyTransform();
-            } else if (isDragging && e.touches.length === 1 && currentZoom > 1) {
-                e.preventDefault();
-                imgPanX = e.touches[0].pageX - startDragX;
-                imgPanY = e.touches[0].pageY - startDragY;
-                applyTransform();
-            }
-        }, {passive: false});
-
-        imgEl.addEventListener('touchend', function(e) { 
-            initialDistance = null; 
-            isDragging = false;
-        });
-
-        let lastTapTime = 0;
-        imgEl.addEventListener('touchend', function(e) {
-            if (e.changedTouches.length === 1) { 
-                let currentTime = new Date().getTime();
-                let tapLength = currentTime - lastTapTime;
-                if (tapLength < 300 && tapLength > 0) {
-                    if (currentZoom > 1) { resetZoom(); }
-                    else { adjustZoom(1.5); } 
-                    e.preventDefault();
-                }
-                lastTapTime = currentTime;
-            }
-        });
-
-        initializeGallery();
+        startApp();
     </script>
 </body>
 </html>
