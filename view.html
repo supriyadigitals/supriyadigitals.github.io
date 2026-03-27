@@ -352,17 +352,6 @@
     <div id="main-loader-text">Connecting to Studio</div>
 </div>
 
-<!-- Cache Progress Screen -->
-<div id="cache-screen">
-    <i class="fas fa-microchip" style="font-size:2.5rem;color:var(--gold);margin-bottom:14px;"></i>
-    <div class="cache-title">Preparing Your Gallery</div>
-    <p class="cache-sub">Optimising images for the best viewing experience. Please wait a moment.</p>
-    <div class="cache-bar-wrap"><div class="cache-bar-fill" id="cache-fill"></div></div>
-    <div class="cache-pct" id="cache-pct">0% Ready</div>
-    <div class="cache-stats" id="cache-stats">0 / 0 images</div>
-    <button class="btn-continue" id="btn-continue" onclick="finishCacheLoad()">Continue →</button>
-</div>
-
 <!-- Download Manager -->
 <div id="dl-manager">
     <div class="dl-title" id="dl-title"><i class="fas fa-file-archive" style="color:var(--gold);margin-right:6px;"></i> Preparing...</div>
@@ -744,28 +733,11 @@ function openFolder(batchId) {
     // Update pill menu active state
     document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
 
-    // Check cache
-    fetch(API_BASE + 'cache_manager.php?action=status&batch_id=' + batchId)
-        .then(r => r.json())
-        .then(data => {
-            cacheTotal   = data.total  || 0;
-            cacheDone    = data.cached || 0;
-            cacheMissing = data.missing || [];
-            document.getElementById('main-loader').style.display = 'none';
-
-            if (cacheMissing.length === 0) {
-                finishCacheLoad();
-            } else {
-                const cs = document.getElementById('cache-screen');
-                cs.style.display = 'flex';
-                updateCacheUI();
-                for (let i = 0; i < Math.min(MAX_WORKERS, cacheMissing.length); i++) runWorker();
-            }
-        })
-        .catch(() => {
-            document.getElementById('main-loader').style.display = 'none';
-            finishCacheLoad();
-        });
+    // --- DIRECTLY LOAD GALLERY (NO CACHE SCREEN) ---
+    // Hide the loader immediately and trigger the lazy-load gallery render
+    document.getElementById('main-loader').style.display = 'none';
+    finishCacheLoad();
+    // -----------------------------------------------
 
     // Activate correct pill
     document.querySelectorAll('.pill').forEach(p => {
@@ -1015,8 +987,22 @@ function checkResume(batchId) {
 }
 
 function executeResume() {
+    // 1. Save the index to a temporary variable first
+    const idxToOpen = resumeIdx; 
+    
+    // 2. Hide the toast and clear memory
     dismissResume();
-    if (resumeIdx !== null && !isCartView) openLightbox(resumeIdx);
+    
+    // 3. Open the lightbox using the saved variable
+    if (idxToOpen !== null && !isCartView) {
+        openLightbox(idxToOpen);
+        
+        // Extra feature: scroll the background gallery down to this photo
+        const photoEl = document.getElementById('pi-' + idxToOpen);
+        if (photoEl) {
+            photoEl.scrollIntoView({ behavior: 'auto', block: 'center' });
+        }
+    }
 }
 function dismissResume() {
     document.getElementById('resume-toast').classList.remove('show');
