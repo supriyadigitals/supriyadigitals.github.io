@@ -49,28 +49,17 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #main-loader-text { font-weight: 700; font-size: 1rem; color: var(--text); }
 
-        /* ── CACHE PROGRESS SCREEN ── */
-        #cache-screen {
-            position: fixed; inset: 0; background: #fff;
-            z-index: 9998; display: none; flex-direction: column;
-            align-items: center; justify-content: center; padding: 30px; text-align: center;
-        }
-        .cache-title { font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-        .cache-sub { font-size: 0.85rem; color: var(--muted); max-width: 360px; line-height: 1.6; }
-        .cache-bar-wrap { width: 100%; max-width: 380px; height: 6px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin: 20px 0 8px; }
-        .cache-bar-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.2s linear; }
-        .cache-pct { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
-        .cache-stats { font-size: 0.8rem; color: var(--muted); font-weight: 600; margin-top: 4px; }
-        .btn-continue { display: none; margin-top: 20px; padding: 12px 32px; background: var(--dark); color: #fff; border: none; border-radius: 4px; font-family: var(--sans); font-weight: 700; font-size: 0.9rem; cursor: pointer; }
-
         /* ── SKELETON ── */
         .skeleton {
-            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
-            background-size: 200% 100%;
-            animation: skeleton-shine 1.2s ease-in-out infinite;
+            background: #e2e5e7;
+            background-image: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.6), rgba(255,255,255,0));
+            background-size: 40px 100%; 
+            background-repeat: no-repeat; 
+            background-position: left -40px top 0;
+            animation: shine 1.2s ease-in-out infinite; 
             border-radius: 4px;
         }
-        @keyframes skeleton-shine { to { background-position-x: -200%; } }
+        @keyframes shine { to { background-position: right -40px top 0; } }
 
         /* ── GALLERY HEADER ── */
         .g-header {
@@ -331,10 +320,8 @@
 </head>
 
 <body oncontextmenu="return false;">
-<!-- Hidden iframe for background form downloads -->
 <iframe name="dl-frame" style="display:none;"></iframe>
 
-<!-- Context Menu -->
 <div id="ctx-menu">
     <div class="ctx-item" id="ctx-view"><i class="fas fa-expand" style="color:var(--gold);width:16px;"></i> View High-Res</div>
     <div class="ctx-item" id="ctx-toggle"><i class="fas fa-check-circle" style="color:var(--green);width:16px;"></i> Select Photo</div>
@@ -343,23 +330,19 @@
     <div class="ctx-item ctx-dl-item" id="ctx-dl-orig"><i class="fas fa-star" style="color:var(--green);width:16px;"></i> Original Quality</div>
 </div>
 
-<!-- Lasso Box -->
 <div id="lasso-box"></div>
 
-<!-- Main Loader -->
 <div id="main-loader">
     <div class="loader-spinner"></div>
     <div id="main-loader-text">Connecting to Studio</div>
 </div>
 
-<!-- Download Manager -->
 <div id="dl-manager">
     <div class="dl-title" id="dl-title"><i class="fas fa-file-archive" style="color:var(--gold);margin-right:6px;"></i> Preparing...</div>
     <div class="dl-bar-wrap"><div class="dl-bar-fill" id="dl-fill"></div></div>
     <div class="dl-status"><span id="dl-text">Starting...</span></div>
 </div>
 
-<!-- Quality Selection Overlay -->
 <div id="quality-overlay">
     <div class="quality-box">
         <h5>Choose Download Quality</h5>
@@ -375,7 +358,6 @@
     </div>
 </div>
 
-<!-- Resume Toast -->
 <div id="resume-toast">
     <div class="toast-content">
         <h6 id="resume-title">Welcome back!</h6>
@@ -387,7 +369,6 @@
     </div>
 </div>
 
-<!-- Gallery Header -->
 <div class="g-header">
     <div class="g-brand"><span>Supriya</span> Studio</div>
     <div class="g-actions">
@@ -400,10 +381,8 @@
     </div>
 </div>
 
-<!-- Pill Menu (shown when in a folder) -->
 <div id="pill-menu"></div>
 
-<!-- Search Bar (shown when in a folder) — NEW FEATURE -->
 <div id="search-bar">
     <i class="fas fa-search" style="color:var(--muted);flex-shrink:0;"></i>
     <div class="search-input-wrap">
@@ -413,21 +392,17 @@
     <span id="search-result-count"></span>
 </div>
 
-<!-- Event Dashboard Content -->
 <div id="event-content"></div>
 
-<!-- Gallery (photo grid) -->
 <div class="gallery-container" id="gallery-wrap" style="display:none;">
     <div class="gallery-grid" id="gallery"></div>
 </div>
 
-<!-- Floating Cart Button -->
 <button id="cart-fab" class="hidden" onclick="openCart()">
     <i class="fas fa-shopping-cart"></i>
     <div id="cart-badge">0</div>
 </button>
 
-<!-- Cart Modal -->
 <div class="modal fade" id="cartModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content modal-content-custom">
@@ -447,7 +422,6 @@
     </div>
 </div>
 
-<!-- Video Modal -->
 <div class="modal fade" id="videoModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" style="background:#000;border:none;">
@@ -461,15 +435,11 @@
     </div>
 </div>
 
-<!-- Lightbox -->
 <div class="lb-backdrop" id="lightbox">
     <div class="lb-header">
         <div class="lb-filename" id="lb-filename">photo.jpg</div>
         <div class="lb-actions-right">
             <button class="lb-icon" id="lb-select-btn" onclick="toggleSelection(currentIdx)"><i class="far fa-check-circle" id="lb-select-icon"></i></button>
-            <!-- Bug 2 Fix: Lightbox download button controlled separately from header.
-                 It uses its own id #lb-dl-btn and is shown/hidden based on item.can_download,
-                 NOT tied to the cart count like the old .download-ui class was. -->
             <div class="dropdown" id="lb-dl-btn" style="display:none;">
                 <button class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></button>
                 <div class="dropdown-menu dropdown-menu-right" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;min-width:180px;">
@@ -517,13 +487,6 @@ let pendingDlFiles = [];
 let resumeBatchId  = null;
 let resumeIdx      = null;
 
-// Cache worker state
-let cacheMissing   = [];
-let cacheTotal     = 0;
-let cacheDone      = 0;
-const MAX_WORKERS  = 4;
-let activeWorkers  = 0;
-
 // Tracking
 let deviceId = localStorage.getItem('sds_device');
 if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2,9); localStorage.setItem('sds_device', deviceId); }
@@ -542,7 +505,7 @@ function ping() {
     fetch(API_BASE + 'ping.php?device=' + deviceId).catch(() => {});
     track('ping');
 }
-ping(); setInterval(ping, 5000);
+ping(); setInterval(ping, 10000);
 
 // ════════════════════════════════════════════════════════
 //  INIT
@@ -574,7 +537,6 @@ async function init() {
         if (evt) {
             renderDashboard();
         } else {
-            // No event specified — find first work batch and open it
             const first = allEventData.find(i => i.type === 'work' || i.type === 'link');
             if (first) openFolder(first.batch_id);
             else renderDashboard();
@@ -592,7 +554,6 @@ function renderDashboard() {
     isCartView = false;
     if (isSelectMode) toggleSelectMode();
 
-    // Hide gallery, show dashboard
     document.getElementById('gallery-wrap').style.display  = 'none';
     document.getElementById('event-content').style.display = 'block';
     document.getElementById('search-bar').style.display    = 'none';
@@ -613,10 +574,8 @@ function renderDashboard() {
         </div>`;
     }
 
-    // Build pill menu
     let pillHtml = `<span class="pill active" onclick="renderDashboard()"><i class="fas fa-th-large mr-1"></i> All</span>`;
 
-    // Collect folders, videos, albums in order
     const seenBatches = new Set();
     const sorted = [...allEventData].sort((a,b) => (parseInt(a.order_index)||999999) - (parseInt(b.order_index)||999999));
 
@@ -641,7 +600,6 @@ function renderDashboard() {
     document.getElementById('pill-menu').innerHTML = pillHtml;
     document.getElementById('pill-menu').style.display = 'flex';
 
-    // Render cards
     html += `<div class="media-grid">`;
     items.sort((a,b) => a.order - b.order).forEach(item => {
         if (item.kind === 'folder') {
@@ -699,12 +657,10 @@ function openFolder(batchId) {
 
     galleryData = allEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
 
-    // Bug 5 Fix: guard against empty array before Math.max
     canDownload = galleryData.length > 0
         ? Math.max(...galleryData.map(i => parseInt(i.can_download) || 0))
         : 0;
 
-    // Natural sort by filename
     galleryData.sort((a,b) => {
         let oa = parseInt(a.order_index); if (isNaN(oa)) oa = 999999;
         let ob = parseInt(b.order_index); if (isNaN(ob)) ob = 999999;
@@ -724,62 +680,16 @@ function openFolder(batchId) {
 
     filteredData = [...galleryData];
 
-    // Show loader while cache check runs
     document.getElementById('event-content').style.display  = 'none';
     document.getElementById('gallery-wrap').style.display   = 'none';
     document.getElementById('main-loader-text').textContent = 'Loading gallery...';
     document.getElementById('main-loader').style.display    = 'flex';
 
-    // Update pill menu active state
     document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
 
     // --- DIRECTLY LOAD GALLERY (NO CACHE SCREEN) ---
-    // Hide the loader immediately and trigger the lazy-load gallery render
     document.getElementById('main-loader').style.display = 'none';
-    finishCacheLoad();
-    // -----------------------------------------------
-
-    // Activate correct pill
-    document.querySelectorAll('.pill').forEach(p => {
-        if (p.getAttribute('onclick') && p.getAttribute('onclick').includes(batchId)) p.classList.add('active');
-    });
-
-    document.getElementById('pill-menu').style.display = 'flex';
-    document.getElementById('btn-back-folders').style.display = 'block';
-    document.getElementById('btn-back-cart').style.display    = 'none';
-
-    // Bug 4 Fix: Use consistent key format for resume save/read
-    checkResume(batchId);
-}
-
-// ════════════════════════════════════════════════════════
-//  CACHE WORKER
-// ════════════════════════════════════════════════════════
-function updateCacheUI() {
-    const pct = cacheTotal > 0 ? Math.round((cacheDone / cacheTotal) * 100) : 100;
-    document.getElementById('cache-fill').style.width = pct + '%';
-    document.getElementById('cache-pct').textContent  = pct + '% Ready';
-    document.getElementById('cache-stats').textContent = `${cacheDone} / ${cacheTotal} images`;
-    if (cacheDone >= 5 || pct >= 15) document.getElementById('btn-continue').style.display = 'block';
-}
-
-function runWorker() {
-    if (cacheMissing.length === 0) return;
-    activeWorkers++;
-    const url = cacheMissing.shift();
-    fetch(API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1')
-        .then(() => { cacheDone++; updateCacheUI(); activeWorkers--; checkCacheDone(); runWorker(); })
-        .catch(() => { cacheDone++; updateCacheUI(); activeWorkers--; checkCacheDone(); runWorker(); });
-}
-
-function checkCacheDone() {
-    if (cacheMissing.length === 0 && activeWorkers === 0 && cacheDone >= cacheTotal) {
-        finishCacheLoad();
-    }
-}
-
-function finishCacheLoad() {
-    document.getElementById('cache-screen').style.display = 'none';
+    
     document.getElementById('gallery-wrap').style.display = 'block';
     document.getElementById('search-bar').style.display   = 'flex';
 
@@ -788,10 +698,21 @@ function finishCacheLoad() {
     if (canDownload > 0) document.getElementById('btn-dl-all').style.display = 'block';
 
     renderGallery(filteredData);
+    // -----------------------------------------------
+
+    document.querySelectorAll('.pill').forEach(p => {
+        if (p.getAttribute('onclick') && p.getAttribute('onclick').includes(batchId)) p.classList.add('active');
+    });
+
+    document.getElementById('pill-menu').style.display = 'flex';
+    document.getElementById('btn-back-folders').style.display = 'block';
+    document.getElementById('btn-back-cart').style.display    = 'none';
+
+    checkResume(batchId);
 }
 
 // ════════════════════════════════════════════════════════
-//  SEARCH FEATURE (NEW)
+//  SEARCH FEATURE
 // ════════════════════════════════════════════════════════
 function handleSearch(query) {
     const q = query.toLowerCase().trim();
@@ -883,7 +804,6 @@ function handleClick(i, e) {
     lastTap = now;
 
     if (isDoubleTap) {
-        // Double tap = toggle select with animation
         const item = filteredData[i];
         if (item) toggleSelection(i, true);
         spawnCheck(e.clientX, e.clientY);
@@ -916,15 +836,11 @@ function toggleSelection(i, forceAdd = null) {
     } else {
         selectedFiles.delete(item.fullUrl);
         el?.classList.remove('selected');
-        // Bug 6 Fix: if in cart view and all deselected, go back to dashboard silently
         if (isCartView) {
             el?.addEventListener('transitionend', () => el.remove(), { once: true });
             const remaining = filteredData.filter(f => selectedFiles.has(f.fullUrl));
             if (remaining.length === 0) {
-                setTimeout(() => {
-                    // Bug 6 Fix: don't show alert — just silently go to dashboard
-                    goToDashboard();
-                }, 350);
+                setTimeout(() => { goToDashboard(); }, 350);
             }
         }
     }
@@ -950,7 +866,6 @@ function updateCartUI() {
     const fab = document.getElementById('cart-fab');
     if (count > 0) { fab.classList.remove('hidden'); }
     else           { fab.classList.add('hidden'); }
-    // Header all-download button: show if can download AND photos in view
     if (canDownload > 0) document.getElementById('btn-dl-all').style.display = 'block';
 }
 
@@ -968,12 +883,11 @@ function loadCart() {
 function saveCart() { localStorage.setItem(cartKey(), JSON.stringify([...selectedFiles])); }
 
 // ════════════════════════════════════════════════════════
-//  RESUME FEATURE — Bug 4 Fix: consistent key format
+//  RESUME FEATURE 
 // ════════════════════════════════════════════════════════
 function resumeKey(batchId) { return `sds_resume_${currentEvent}_${batchId}`; }
 
 function checkResume(batchId) {
-    // Bug 4 Fix: read with the SAME key format used when saving
     const saved = parseInt(localStorage.getItem(resumeKey(batchId)));
     if (!isNaN(saved) && saved > 0) {
         resumeBatchId = batchId;
@@ -987,23 +901,15 @@ function checkResume(batchId) {
 }
 
 function executeResume() {
-    // 1. Save the index to a temporary variable first
     const idxToOpen = resumeIdx; 
-    
-    // 2. Hide the toast and clear memory
     dismissResume();
-    
-    // 3. Open the lightbox using the saved variable
     if (idxToOpen !== null && !isCartView) {
         openLightbox(idxToOpen);
-        
-        // Extra feature: scroll the background gallery down to this photo
         const photoEl = document.getElementById('pi-' + idxToOpen);
-        if (photoEl) {
-            photoEl.scrollIntoView({ behavior: 'auto', block: 'center' });
-        }
+        if (photoEl) photoEl.scrollIntoView({ behavior: 'auto', block: 'center' });
     }
 }
+
 function dismissResume() {
     document.getElementById('resume-toast').classList.remove('show');
     if (resumeBatchId) localStorage.removeItem(resumeKey(resumeBatchId));
@@ -1028,7 +934,6 @@ function goToDashboard() {
 
 function goBackToCart() {
     goToDashboard();
-    // Bug 6 Fix: only open cart if there are still selected photos
     if (selectedFiles.size > 0) openCart();
 }
 
@@ -1040,10 +945,10 @@ function openVideoModal(ytId) {
 $('#videoModal').on('hidden.bs.modal', () => { document.getElementById('yt-iframe').src = ''; });
 
 // ════════════════════════════════════════════════════════
-//  CART MODAL — grouped by folder
+//  CART MODAL 
 // ════════════════════════════════════════════════════════
 function openCart() {
-    if (selectedFiles.size === 0) return; // Bug 6 Fix: don't alert, just silently do nothing
+    if (selectedFiles.size === 0) return;
     renderCartModal();
     $('#cartModal').modal('show');
 }
@@ -1088,7 +993,6 @@ function openCartFolder(batchId, folderName) {
 
     galleryData = allEventData.filter(i => i.batch_id === batchId && selectedFiles.has(i.file_path) && (i.type === 'work' || i.type === 'link'));
 
-    // Bug 5 Fix: guard against empty array
     canDownload = galleryData.length > 0
         ? Math.max(...galleryData.map(i => parseInt(i.can_download) || 0))
         : 0;
@@ -1118,7 +1022,7 @@ function openCartFolder(batchId, folderName) {
 }
 
 // ════════════════════════════════════════════════════════
-//  SEND TO STUDIO — Bug 1 Fix: chunks for large selections
+//  SEND TO STUDIO
 // ════════════════════════════════════════════════════════
 async function sendToStudio() {
     if (selectedFiles.size === 0) return;
@@ -1128,29 +1032,26 @@ async function sendToStudio() {
     const origHtml = sendBtn ? sendBtn.innerHTML : '';
     if (sendBtn) { sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Preparing...'; sendBtn.disabled = true; }
 
-    // Group files by folder for detailed listing
     const byFolder = {};
     selectedFiles.forEach(url => {
         const parts = url.split('/'); 
         const fname = parts.pop();
         const folder = parts.pop() || 'Main';
         if (!byFolder[folder]) byFolder[folder] = [];
-        byFolder[folder].push(fname); // Store the actual file names
+        byFolder[folder].push(fname); 
     });
 
     const reset = () => { if (sendBtn) { sendBtn.innerHTML = origHtml; sendBtn.disabled = false; } };
 
-    // Small selection — send directly with detailed numbered list
     if (selectedFiles.size <= 80) {
         let text = `Hello Supriya Digitals! 📸\n\nEvent: *${evtName}*\nTotal: *${selectedFiles.size} photos*\n\n`;
         
-        // Loop through each folder and list its photos with numbers
         for (const [folder, files] of Object.entries(byFolder)) {
             text += `📁 *${folder}* (${files.length} photos):\n`;
             files.forEach((file, index) => {
                 text += `${index + 1}. ${file}\n`;
             });
-            text += `\n`; // Add a blank line between folders
+            text += `\n`; 
         }
 
         text += `Please prepare these for me.`;
@@ -1159,7 +1060,6 @@ async function sendToStudio() {
         return;
     }
 
-    // Large selection — save to server and send reference code
     try {
         const res = await fetch(API_BASE + 'save_selection.php', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1174,7 +1074,6 @@ async function sendToStudio() {
         reset();
         window.open(`https://wa.me/${WA_NUMBER}?text=` + encodeURIComponent(text), '_blank');
     } catch(e) {
-        // Fallback: chunked messages with numbers
         reset();
         const all    = [...selectedFiles];
         const chunks = [];
@@ -1312,12 +1211,9 @@ function updateLb() {
     imgEl.style.opacity     = '1';
     document.getElementById('lb-filename').innerHTML = `<i class="fas fa-spinner fa-spin mr-2" style="font-size:0.8rem;"></i>${escHtml(item.filename)}`;
 
-    // Bug 2 Fix: Lightbox download controlled purely by item.can_download
-    // NOT by cart count. It uses its own element #lb-dl-btn.
     const dlBtn = document.getElementById('lb-dl-btn');
     dlBtn.style.display = (parseInt(item.can_download) || 0) > 0 ? 'block' : 'none';
 
-    // Load high-res
     if (lbHighResLoader) lbHighResLoader.onload = null;
     lbHighResLoader = new Image();
     lbHighResLoader.onload = function() {
@@ -1328,7 +1224,6 @@ function updateLb() {
     };
     lbHighResLoader.src = item.highResUrl;
 
-    // Preload neighbours
     const next = filteredData[(currentIdx + 1) % filteredData.length];
     const prev = filteredData[(currentIdx - 1 + filteredData.length) % filteredData.length];
     if (next) new Image().src = next.highResUrl;
@@ -1336,7 +1231,6 @@ function updateLb() {
 
     updateLbSelectIcon();
 
-    // Bug 4 Fix: Save resume using consistent key
     if (!isCartView && item.batch_id) {
         localStorage.setItem(resumeKey(item.batch_id), currentIdx);
     }
@@ -1363,7 +1257,6 @@ function updateLbSelectIcon() {
     else        { icon.className = 'far fa-check-circle'; icon.style.color = ''; }
 }
 
-// Keyboard navigation
 window.addEventListener('keydown', e => {
     if (!document.getElementById('lightbox').classList.contains('open')) return;
     if (e.key === 'ArrowRight') changePhoto(1);
@@ -1371,7 +1264,6 @@ window.addEventListener('keydown', e => {
     if (e.key === 'Escape')     closeLightbox();
 });
 
-// Touch gestures (pinch zoom + swipe to close)
 const imgEl = document.getElementById('lb-img');
 
 imgEl.addEventListener('touchstart', e => {
@@ -1406,7 +1298,6 @@ imgEl.addEventListener('touchend', e => {
     }
 });
 
-// Double tap to zoom
 let lbLastTap = 0;
 imgEl.addEventListener('touchend', e => {
     const now = Date.now();
@@ -1418,7 +1309,6 @@ imgEl.addEventListener('touchend', e => {
     lbLastTap = now;
 });
 
-// Mouse wheel zoom
 imgEl.addEventListener('wheel', e => { e.preventDefault(); lbZoom = Math.min(5, Math.max(1, lbZoom - e.deltaY * 0.004)); applyLbTransform(); }, { passive: false });
 
 function applyLbTransform() {
