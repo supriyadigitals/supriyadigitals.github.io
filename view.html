@@ -553,7 +553,7 @@ function ping() {
     fetch(API_BASE + 'ping.php?device=' + deviceId).catch(() => {});
     track('ping');
 }
-ping(); setInterval(ping, 10000);
+ping(); setInterval(ping, 5000);
 
 // ════════════════════════════════════════════════════════
 //  INIT
@@ -1153,9 +1153,19 @@ async function sendToStudio() {
     const reset = () => { if (sendBtn) { sendBtn.innerHTML = origHtml; sendBtn.disabled = false; } };
 
     // Small selection — send directly
+  // Small selection — send directly
     if (selectedFiles.size <= 80) {
         let text = `Hello Supriya Digitals! 📸\n\nEvent: *${evtName}*\nTotal: *${selectedFiles.size} photos*\n\n`;
         for (const [folder, count] of Object.entries(byFolder)) text += `📁 *${folder}*: ${count} photos\n`;
+        
+        // ADDED: List individual file names with numbers
+        text += `\n*Selected Photos:*\n`;
+        let i = 1;
+        selectedFiles.forEach(url => {
+            text += `${i}. ${url.split('/').pop()}\n`;
+            i++;
+        });
+
         text += `\nPlease prepare these for me.`;
         reset();
         window.open(`https://wa.me/${WA_NUMBER}?text=` + encodeURIComponent(text), '_blank');
