@@ -1142,31 +1142,32 @@ async function sendToStudio() {
     const origHtml = sendBtn ? sendBtn.innerHTML : '';
     if (sendBtn) { sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Preparing...'; sendBtn.disabled = true; }
 
-    // Folder summary (always used)
+    // Group files by folder for detailed listing
     const byFolder = {};
     selectedFiles.forEach(url => {
-        const parts = url.split('/'); parts.pop();
+        const parts = url.split('/'); 
+        const fname = parts.pop();
         const folder = parts.pop() || 'Main';
-        byFolder[folder] = (byFolder[folder] || 0) + 1;
+        if (!byFolder[folder]) byFolder[folder] = [];
+        byFolder[folder].push(fname); // Store the actual file names
     });
 
     const reset = () => { if (sendBtn) { sendBtn.innerHTML = origHtml; sendBtn.disabled = false; } };
 
-    // Small selection — send directly
-  // Small selection — send directly
+    // Small selection — send directly with detailed numbered list
     if (selectedFiles.size <= 80) {
         let text = `Hello Supriya Digitals! 📸\n\nEvent: *${evtName}*\nTotal: *${selectedFiles.size} photos*\n\n`;
-        for (const [folder, count] of Object.entries(byFolder)) text += `📁 *${folder}*: ${count} photos\n`;
         
-        // ADDED: List individual file names with numbers
-        text += `\n*Selected Photos:*\n`;
-        let i = 1;
-        selectedFiles.forEach(url => {
-            text += `${i}. ${url.split('/').pop()}\n`;
-            i++;
-        });
+        // Loop through each folder and list its photos with numbers
+        for (const [folder, files] of Object.entries(byFolder)) {
+            text += `📁 *${folder}* (${files.length} photos):\n`;
+            files.forEach((file, index) => {
+                text += `${index + 1}. ${file}\n`;
+            });
+            text += `\n`; // Add a blank line between folders
+        }
 
-        text += `\nPlease prepare these for me.`;
+        text += `Please prepare these for me.`;
         reset();
         window.open(`https://wa.me/${WA_NUMBER}?text=` + encodeURIComponent(text), '_blank');
         return;
@@ -1181,13 +1182,13 @@ async function sendToStudio() {
         const data = await res.json();
 
         let text = `Hello Supriya Digitals! 📸\n\nEvent: *${evtName}*\nSelection Code: *#${data.code}*\n\n*${selectedFiles.size} photos total:*\n`;
-        for (const [folder, count] of Object.entries(byFolder)) text += `📁 ${folder}: ${count} photos\n`;
+        for (const [folder, files] of Object.entries(byFolder)) text += `📁 ${folder}: ${files.length} photos\n`;
         text += `\nPlease look up *#${data.code}* to find my exact selection.`;
 
         reset();
         window.open(`https://wa.me/${WA_NUMBER}?text=` + encodeURIComponent(text), '_blank');
     } catch(e) {
-        // Fallback: chunked messages
+        // Fallback: chunked messages with numbers
         reset();
         const all    = [...selectedFiles];
         const chunks = [];
