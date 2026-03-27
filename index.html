@@ -1,784 +1,969 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <title>SUPRIYA DIGITALS STUDIO | Professional Photography</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="Photography, Videography, Studio, Mangalagiri, Wedding" name="keywords">
-    <meta content="Supriya Digitals Studio - Capturing life's best moments since 2001." name="description">
-
+    <title>SUPRIYA DIGITALS STUDIO | Professional Photography — Mangalagiri</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Supriya Digitals Studio — Capturing life's best moments since 2001. Professional wedding, event photography and cinematography in Mangalagiri, AP.">
+    <meta name="keywords" content="Photography, Videography, Studio, Mangalagiri, Wedding, Supriya Digitals">
     <link href="img/icon1.png" rel="icon">
 
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 
     <style>
-        /* --- 1. GLOBAL VARIABLES & RESET --- */
+        /* ─── VARIABLES ─── */
         :root {
-            --primary: #D4AF37; 
-            --primary-hover: #b5952f;
-            --dark: #1a1a1a;
-            --light: #f8f9fa;
-            --text-gray: #666;
-            --glass: rgba(26, 26, 26, 0.95);
+            --gold:      #D4AF37;
+            --gold-dim:  #b89a2f;
+            --dark:      #0d0d0d;
+            --charcoal:  #1c1c1c;
+            --text:      #2d2d2d;
+            --muted:     #777;
+            --light-bg:  #f8f7f4;
+            --white:     #ffffff;
+            --serif:     'Cormorant Garamond', Georgia, serif;
+            --sans:      'Jost', sans-serif;
         }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--text-gray);
-            background-color: #ffffff;
-            overflow-x: hidden;
-            position: relative; 
-        }
+        /* ─── RESET ─── */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--sans); color: var(--text); background: var(--white); overflow-x: hidden; }
+        h1,h2,h3,h4,h5,h6 { font-family: var(--serif); font-weight: 700; color: var(--dark); }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
-            color: var(--dark);
-            font-weight: 700;
-        }
-
-        /* --- 2. NAVBAR (Glassmorphism) --- */
+        /* ─── NAVBAR ─── */
         .navbar {
-            padding: 15px 0;
-            transition: all 0.4s ease;
-            z-index: 1000;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            position: fixed; top: 0; width: 100%; z-index: 1000; padding: 18px 0;
+            transition: background 0.4s, padding 0.4s, box-shadow 0.4s;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
         }
-
         .navbar.scrolled {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            background: rgba(13,13,13,0.97);
+            backdrop-filter: blur(12px);
             padding: 10px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
-
-        .navbar-brand h1 {
-            color: #fff;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-            margin: 0;
-            text-transform: uppercase;
-        }
-        
-        .navbar-brand .highlight { color: var(--primary); }
-
+        .navbar-brand { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: #fff !important; letter-spacing: 0.5px; }
+        .navbar-brand span { color: var(--gold); }
         .navbar-nav .nav-link {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255,255,255,0.8) !important;
-            padding: 0 15px !important;
-            transition: color 0.3s, transform 0.3s;
+            font-family: var(--sans); font-size: 0.8rem; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.82) !important; padding: 0 14px !important; transition: 0.25s;
         }
+        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active { color: var(--gold) !important; }
+        .navbar-toggler { border-color: rgba(255,255,255,0.3); }
+        .navbar-toggler-icon { filter: invert(1); }
 
-        .navbar-nav .nav-link:hover, 
-        .navbar-nav .nav-link.active {
-            color: var(--primary) !important;
-            font-weight: 600;
-            transform: scale(1.1); 
+        /* ─── HERO ─── */
+        .hero {
+            height: 100vh; min-height: 600px;
+            background: var(--dark); position: relative; overflow: hidden;
         }
+        .hero-slide {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 1.4s ease;
+        }
+        .hero-slide.active { opacity: 1; }
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.7) 100%);
+        }
+        .hero-content {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px; z-index: 2;
+        }
+        .hero-tag {
+            font-family: var(--sans); font-size: 0.72rem; font-weight: 600;
+            letter-spacing: 4px; text-transform: uppercase; color: var(--gold);
+            margin-bottom: 18px;
+        }
+        .hero-title {
+            font-family: var(--serif); font-size: clamp(2.8rem, 7vw, 5.5rem);
+            font-weight: 700; color: #fff; line-height: 1.1; margin-bottom: 20px;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.4);
+        }
+        .hero-sub {
+            font-size: 1rem; color: rgba(255,255,255,0.75); max-width: 500px;
+            margin-bottom: 36px; font-weight: 300; line-height: 1.7;
+        }
+        .btn-hero {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--gold); color: var(--dark);
+            padding: 14px 36px; border-radius: 2px;
+            font-family: var(--sans); font-size: 0.78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+            border: 2px solid var(--gold);
+        }
+        .btn-hero:hover { background: transparent; color: var(--gold); }
+        .btn-hero-ghost {
+            background: transparent; color: #fff; border-color: rgba(255,255,255,0.5);
+            margin-left: 12px;
+        }
+        .btn-hero-ghost:hover { border-color: var(--gold); color: var(--gold); }
 
-        /* --- 3. HERO CAROUSEL --- */
-        .carousel-item {
-            height: 100vh;
-            min-height: 600px;
-            background-size: cover;
-            background-position: center;
+        /* Hero slide controls */
+        .hero-dots { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 8px; }
+        .hero-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: 0.3s; }
+        .hero-dot.active { background: var(--gold); width: 24px; border-radius: 3px; }
+        .hero-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+            width: 46px; height: 46px; border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #fff; cursor: pointer; transition: 0.3s; font-size: 0.9rem;
         }
-        .carousel-overlay {
-            background: rgba(0,0,0,0.4);
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-        }
-        .carousel-caption {
-            top: 50%;
-            transform: translateY(-50%);
-            bottom: auto;
-        }
-        .carousel-caption h1 {
-            font-size: 3.5rem;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            border: none;
-            border-radius: 50px;
-            padding: 12px 35px;
-            font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-        }
+        .hero-arrow:hover { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+        .hero-arrow.prev { left: 30px; }
+        .hero-arrow.next { right: 30px; }
 
-        /* --- CLIENT PORTAL SEARCH BAR --- */
+        /* ─── PORTAL SEARCH ─── */
         .portal-section {
-            background: var(--primary);
-            padding: 40px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 10;
+            background: var(--gold); padding: 44px 0;
+            position: relative; z-index: 10;
         }
+        .portal-title { font-family: var(--serif); font-size: 1.6rem; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+        .portal-sub { font-size: 0.85rem; color: rgba(0,0,0,0.55); margin-bottom: 20px; font-weight: 500; }
+        .portal-form { display: flex; max-width: 560px; width: 100%; }
         .portal-input {
-            border-radius: 50px 0 0 50px !important;
-            border: none;
-            padding: 25px 20px;
-            font-weight: 600;
+            flex: 1; padding: 14px 20px; border: none; border-radius: 3px 0 0 3px;
+            font-size: 0.95rem; font-family: var(--sans); font-weight: 500;
+            background: rgba(255,255,255,0.92); color: var(--dark); outline: none;
         }
+        .portal-input::placeholder { color: #999; }
         .portal-btn {
-            border-radius: 0 50px 50px 0 !important;
-            background: var(--dark);
-            color: white;
-            border: none;
-            padding: 0 30px;
-            font-weight: 700;
-            text-transform: uppercase;
-            transition: 0.3s;
+            padding: 0 28px; background: var(--dark); color: #fff; border: none;
+            border-radius: 0 3px 3px 0; font-family: var(--sans); font-size: 0.78rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+            cursor: pointer; transition: 0.25s; white-space: nowrap;
         }
-        .portal-btn:hover { background: #000; color: var(--primary); }
+        .portal-btn:hover { background: #333; }
 
-        /* --- 4. SECTIONS & HEADERS --- */
-        .section-padding { padding: 80px 0; }
-        
-        .page-header {
-            text-align: center;
-            margin-bottom: 50px;
-            position: relative;
+        /* ─── SECTION COMMONS ─── */
+        .sec { padding: 100px 0; }
+        .sec-alt { background: var(--light-bg); }
+        .sec-head { text-align: center; margin-bottom: 60px; }
+        .sec-tag {
+            display: inline-block; font-size: 0.72rem; font-weight: 600;
+            letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px;
         }
-        .page-header h1 {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: inline-block;
-            position: relative;
+        .sec-title {
+            font-family: var(--serif); font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 700; color: var(--dark); margin-bottom: 0; line-height: 1.2;
         }
-        .page-header h1::after {
-            content: ''; display: block; width: 60px; height: 3px; background: var(--primary); margin: 15px auto 0;
+        .sec-title::after {
+            content: ''; display: block; width: 44px; height: 2px;
+            background: var(--gold); margin: 18px auto 0;
         }
+        .sec-sub { color: var(--muted); font-size: 1rem; margin-top: 14px; max-width: 540px; margin-left: auto; margin-right: auto; line-height: 1.7; }
 
-        /* --- 5. MASONRY GRID & MEDIA CARDS --- */
-        .gallery-grid { column-count: 3; column-gap: 20px; }
+        /* ─── ABOUT ─── */
+        .about-img-wrap { position: relative; }
+        .about-img { border-radius: 2px; display: block; width: 100%; box-shadow: 18px 18px 0 var(--gold); }
+        .stat-block { text-align: center; padding: 28px; background: #fff; border-radius: 2px; border-bottom: 3px solid var(--gold); box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: 0.3s; }
+        .stat-block:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .stat-num { font-family: var(--serif); font-size: 2.8rem; font-weight: 700; color: var(--gold); line-height: 1; }
+        .stat-label { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+        .about-tag { font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+        .about-title { font-family: var(--serif); font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 700; color: var(--dark); line-height: 1.2; margin-bottom: 18px; }
+
+        /* ─── SERVICES ─── */
+        .svc-card {
+            background: #fff; padding: 38px 28px; text-align: center;
+            border-radius: 2px; border-bottom: 3px solid transparent;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04); transition: 0.35s; height: 100%;
+        }
+        .svc-card:hover { border-bottom-color: var(--gold); transform: translateY(-5px); box-shadow: 0 14px 35px rgba(0,0,0,0.08); }
+        .svc-icon { font-size: 2.2rem; color: var(--gold); margin-bottom: 18px; }
+        .svc-title { font-family: var(--serif); font-size: 1.3rem; margin-bottom: 10px; color: var(--dark); }
+        .svc-text { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
+        /* ─── GALLERY GRID (masonry-style) ─── */
+        .gallery-grid { column-count: 3; column-gap: 16px; }
         @media (max-width: 992px) { .gallery-grid { column-count: 2; } }
-        @media (max-width: 576px) { .gallery-grid { column-count: 1; } }
+        @media (max-width: 576px)  { .gallery-grid { column-count: 1; } }
 
         .gallery-item {
-            break-inside: avoid;
-            margin-bottom: 20px;
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
-            background: #eee;
+            break-inside: avoid; margin-bottom: 16px; border-radius: 2px;
+            overflow: hidden; cursor: pointer; position: relative;
+            background: #e8e6e0; /* warm skeleton */
+            transition: transform 0.3s;
         }
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
+        .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.15); }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
 
-        /* Shimmering Skeleton Animation */
-        .image-skeleton {
-            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
-            background-size: 200% 100%;
-            animation: 1.5s shine linear infinite;
-            min-height: 250px; 
-        }
-        @keyframes shine { to { background-position-x: -200%; } }
-
-        .gallery-img { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-in; }
+        .gallery-img { width: 100%; display: block; opacity: 0; transition: opacity 0.5s; }
         .gallery-img.loaded { opacity: 1; }
 
-        /* Video / Album Fast Cover Logic */
-        .folder-cover { height: 250px; background-size: cover; background-position: center; position: relative; }
-        .folder-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; pointer-events: auto; }
-
-        /* --- 6. ABOUT & STATS --- */
-        .about-img { box-shadow: 20px 20px 0px var(--primary); border-radius: 4px; }
-        .stats-box { text-align: center; padding: 30px; background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.05); border-radius: 8px; transition: transform 0.3s; }
-        .stats-box:hover { transform: translateY(-5px); border-bottom: 3px solid var(--primary); }
-        .stats-box h2 { font-size: 2.5rem; color: var(--primary); margin: 0; }
-        
-        /* --- 7. PAGINATION --- */
-        .pagination { margin-top: 30px; }
-        .page-link { color: var(--dark); border: none; margin: 0 5px; border-radius: 4px; font-weight: 600; }
-        .page-item.active .page-link { background-color: var(--primary); color: #fff; }
-
-        /* --- 8. FOOTER --- */
-        .footer { background: var(--dark); color: #aaa; padding: 60px 0 30px; }
-        .footer h2 { color: #fff; }
-        .footer a { color: #aaa; transition: 0.3s; }
-        .footer a:hover { color: var(--primary); text-decoration: none; }
-        .footer-social a { display: inline-flex; width: 40px; height: 40px; background: rgba(255,255,255,0.1); color: #fff; align-items: center; justify-content: center; border-radius: 50%; margin-right: 10px; transition: 0.3s; }
-        .footer-social a:hover { background: var(--primary); }
-
-        /* --- 9. MOBILE RESPONSIVE FIXES --- */
-        @media (max-width: 768px) {
-            .container { padding-left: 20px; padding-right: 20px; }
-            .section-padding { padding: 50px 0; }
-            h1 { font-size: 2rem !important; }
-            .display-3 { font-size: 2.2rem; }
-            .carousel-caption h1 { font-size: 2rem; }
-            .about-img { margin-bottom: 40px; box-shadow: 10px 10px 0px var(--primary); }
-            .portal-input { border-radius: 10px !important; margin-bottom: 10px; }
-            .portal-btn { border-radius: 10px !important; width: 100%; }
-            .portal-form { flex-direction: column; }
+        /* Shimmer skeleton */
+        .gallery-item.loading {
+            background: linear-gradient(110deg, #e8e6e0 8%, #f0ede6 18%, #e8e6e0 33%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s linear infinite;
+            min-height: 220px;
         }
-        
-        /* MODAL FIX */
-        #modalImage { max-height: 85vh; width: auto; max-width: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        .modal-dialog-custom { max-width: 95vw; margin: 1.75rem auto; display: flex; justify-content: center; }
+        @keyframes shimmer { to { background-position-x: -200%; } }
+
+        .gallery-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.35);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: 0.3s;
+        }
+        .gallery-overlay i { color: #fff; font-size: 1.8rem; }
+
+        /* ─── VIDEO CARDS ─── */
+        .video-card { background: #fff; border-radius: 2px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); height: 100%; transition: 0.3s; cursor: pointer; }
+        .video-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        .video-thumb { width: 100%; height: 200px; background-size: cover; background-position: center; position: relative; }
+        .video-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); transition: 0.3s; }
+        .video-play i { font-size: 3rem; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .video-card:hover .video-play { background: rgba(212,175,55,0.25); }
+        .video-card-body { padding: 16px 18px; }
+        .video-card-title { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+        .video-card-sub { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+
+        /* ─── ALBUM CARDS ─── */
+        .album-card { background: #fff; border-radius: 2px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); cursor: pointer; transition: 0.3s; height: 100%; }
+        .album-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); border-bottom: 3px solid var(--gold); }
+        .album-thumb { width: 100%; height: 200px; object-fit: cover; display: block; background: #eee; }
+        .album-thumb-placeholder { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f0f0f0, #e0e0e0); }
+        .album-body { padding: 16px 18px; }
+        .album-title { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--dark); }
+
+        /* ─── PAGINATION ─── */
+        .pager { display: flex; justify-content: center; gap: 8px; margin-top: 40px; flex-wrap: wrap; }
+        .pager-btn {
+            width: 36px; height: 36px; border-radius: 2px; border: 1px solid var(--border, #e0e0e0);
+            background: #fff; color: var(--text); font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .pager-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .pager-btn.active { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+        .pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ─── CONTACT ─── */
+        .contact-info-item { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 28px; }
+        .contact-icon { width: 44px; height: 44px; background: var(--gold); color: var(--dark); border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .contact-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 2px; }
+        .contact-value { font-size: 0.92rem; color: var(--text); font-weight: 500; }
+        .social-links { display: flex; gap: 10px; margin-top: 28px; }
+        .social-link { width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 0.9rem; transition: 0.3s; }
+        .social-link:hover { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+
+        .contact-form-input {
+            width: 100%; padding: 12px 16px; border: 1px solid #e0ddd7; border-radius: 2px;
+            background: #fff; font-family: var(--sans); font-size: 0.9rem; color: var(--text);
+            transition: border-color 0.2s; margin-bottom: 14px;
+        }
+        .contact-form-input:focus { outline: none; border-color: var(--gold); }
+        textarea.contact-form-input { resize: vertical; min-height: 130px; }
+        .btn-submit {
+            width: 100%; padding: 14px; background: var(--gold); color: var(--dark);
+            border: none; border-radius: 2px; font-family: var(--sans); font-size: 0.82rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.25s;
+        }
+        .btn-submit:hover { background: var(--gold-dim); }
+
+        /* ─── FOOTER ─── */
+        .footer { background: var(--dark); color: #888; padding: 70px 0 30px; }
+        .footer-brand { font-family: var(--serif); font-size: 1.6rem; color: #fff; margin-bottom: 14px; }
+        .footer-brand span { color: var(--gold); }
+        .footer-text { font-size: 0.88rem; line-height: 1.8; max-width: 300px; }
+        .footer-head { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+        .footer-link { display: block; font-size: 0.88rem; color: #888; margin-bottom: 10px; transition: 0.2s; }
+        .footer-link:hover { color: var(--gold); }
+        .footer-divider { border-color: rgba(255,255,255,0.07); margin: 40px 0 24px; }
+        .footer-copy { font-size: 0.8rem; color: #555; text-align: center; }
+
+        /* ─── LIGHTBOX ─── */
+        .lb-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .lb-overlay.open { opacity: 1; pointer-events: auto; }
+        .lb-img { max-height: 88vh; max-width: 90vw; object-fit: contain; border-radius: 1px; }
+        .lb-close { position: absolute; top: 20px; right: 24px; color: #fff; font-size: 1.8rem; cursor: pointer; opacity: 0.7; transition: 0.2s; background: none; border: none; }
+        .lb-close:hover { opacity: 1; color: var(--gold); }
+
+        /* ─── VIDEO MODAL ─── */
+        .modal-content-dark { background: #000; border: none; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+        /* ─── EMPTY STATE ─── */
+        .empty-sec { padding: 60px 20px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .sec { padding: 70px 0; }
+            .about-img { box-shadow: 10px 10px 0 var(--gold); margin-bottom: 50px; }
+            .hero-arrow { display: none; }
+            .portal-form { flex-direction: column; gap: 10px; }
+            .portal-input { border-radius: 3px; }
+            .portal-btn { border-radius: 3px; padding: 14px; }
+            .btn-hero-ghost { margin-left: 0; margin-top: 10px; }
+        }
     </style>
 </head>
-
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark" id="main-navbar">
-        <div class="container">
-            <a href="#home" class="navbar-brand">
-                <h1><span class="highlight">Supriya</span> Digitals</h1>
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ml-auto">
-                    <a href="#home" class="nav-item nav-link active">Home</a>
-                    <a href="#about" class="nav-item nav-link">About</a>
-                    <a href="#services" class="nav-item nav-link">Services</a>
-                    <a href="#works" class="nav-item nav-link">Works</a>
-                    <a href="#albums" class="nav-item nav-link">Albums</a>
-                    <a href="#teasers" class="nav-item nav-link">Teasers</a>
-                    <a href="#live" class="nav-item nav-link">Live</a>
-                    <a href="#contact" class="nav-item nav-link">Contact</a>
-                </div>
-            </div>
-        </div>
-    </nav>
 
-    <section id="home">
-        <div id="header-carousel" class="carousel slide carousel-fade" data-ride="carousel">
-            <div class="carousel-inner">
-                <div class="carousel-item active" style="background-image: url('img/carousel-1.jpg');">
-                    <div class="carousel-overlay"></div>
-                    <div class="carousel-caption">
-                        <div class="container">
-                            <h5 class="text-uppercase text-white font-weight-bold mb-3" style="letter-spacing: 2px;">Welcome To</h5>
-                            <h1 class="display-3 text-white mb-4">Supriya Digitals Studio</h1>
-                            <p class="lead text-white mb-4 d-none d-md-block">Capturing life's best moments since 2001 with passion and perfection.</p>
-                            <a href="#works" class="btn btn-primary">View Portfolio</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item" style="background-image: url('img/carousel-2.jpg');">
-                    <div class="carousel-overlay"></div>
-                    <div class="carousel-caption">
-                        <div class="container">
-                            <h5 class="text-uppercase text-white font-weight-bold mb-3" style="letter-spacing: 2px;">Professional Team</h5>
-                            <h1 class="display-3 text-white mb-4">We Create Memories</h1>
-                            <a href="#contact" class="btn btn-primary">Book Now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <a class="carousel-control-prev" href="#header-carousel" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-            </a>
-            <a class="carousel-control-next" href="#header-carousel" role="button" data-slide="next">
-                <span class="carousel-control-next-icon"></span>
-            </a>
-        </div>
-    </section>
-
-    <section class="portal-section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8 text-center">
-                    <h3 class="text-dark font-weight-bold mb-3">Find Your Event Gallery</h3>
-                    <form class="d-flex portal-form" onsubmit="event.preventDefault(); openClientGallery();">
-                        <input type="text" id="clientEventName" class="form-control portal-input" placeholder="Enter your Event Name..." required>
-                        <button type="submit" class="btn portal-btn"><i class="fas fa-search mr-2"></i> Open</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="about" class="section-padding">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-5">
-                    <img class="img-fluid w-100 about-img" src="img/dad.jpg" alt="About Us">
-                </div>
-                <div class="col-lg-7 pl-lg-5">
-                    <h6 class="text-primary text-uppercase font-weight-bold" style="letter-spacing: 2px;">About Us</h6>
-                    <h1 class="mb-4">20 Years of Cinematic Excellence</h1>
-                    <p class="mb-4 text-muted">Supriya Digitals, established in 2001, is a premier studio in Mangalagiri. We specialize in capturing the essence of your weddings, birthdays, and corporate events with state-of-the-art equipment and a creative eye.</p>
-                    
-                    <div class="row mt-5">
-                        <div class="col-sm-6 mb-4">
-                            <div class="stats-box">
-                                <h2 data-toggle="counter-up">20</h2>
-                                <p>Years Experience</p>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 mb-4">
-                            <div class="stats-box">
-                                <h2 data-toggle="counter-up">1500</h2>
-                                <p>Happy Clients</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="services" class="section-padding bg-light">
-        <div class="container">
-            <div class="page-header">
-                <h1>Our Services</h1>
-                <p class="text-muted">What we offer to make your moments special</p>
-            </div>
-            <div class="row">
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="stats-box h-100">
-                        <i class="fa fa-camera fa-3x text-primary mb-3"></i>
-                        <h4>Photography</h4>
-                        <p class="text-muted small">Wedding & Event photography captured with artistic flair.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="stats-box h-100">
-                        <i class="fa fa-film fa-3x text-primary mb-3"></i>
-                        <h4>Cinematography</h4>
-                        <p class="text-muted small">High quality 4K cinematic teasers and wedding films.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="stats-box h-100">
-                        <i class="fa fa-child fa-3x text-primary mb-3"></i>
-                        <h4>Candid Shots</h4>
-                        <p class="text-muted small">Natural moments frozen in time forever.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="stats-box h-100">
-                        <i class="fa fa-book-open fa-3x text-primary mb-3"></i>
-                        <h4>Album Design</h4>
-                        <p class="text-muted small">Custom designed Karizma albums printed in our lab.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="works" class="section-padding">
-        <div class="container">
-            <div class="page-header">
-                <h1>Candid Shots</h1>
-                <p class="text-muted">A glimpse into our public photography portfolio</p>
-            </div>
-            <div id="works-grid-container"></div>
-            <nav id="works-pagination-nav" class="d-flex justify-content-center"></nav>
-        </div>
-    </section>
-
-    <section id="albums" class="section-padding bg-light">
-        <div class="container">
-            <div class="page-header">
-                <h1>Album Designs</h1>
-                <p class="text-muted">Click the cover to view the full HD PDF</p>
-            </div>
-            <div id="albums-grid-container"></div>
-            <nav id="albums-pagination-nav" class="d-flex justify-content-center"></nav>
-        </div>
-    </section>
-
-    <section id="teasers" class="section-padding">
-        <div class="container">
-            <div class="page-header">
-                <h1>Cinematic Teasers</h1>
-                <p class="text-muted">Highlights of our best films</p>
-            </div>
-            <div id="teasers-grid-container"></div>
-            <nav id="teasers-pagination-nav" class="d-flex justify-content-center"></nav>
-        </div>
-    </section>
-
-    <section id="live" class="section-padding bg-light">
-        <div class="container">
-            <div class="page-header">
-                <h1>Live Events</h1>
-                <p class="text-muted">Streamed directly from the venue</p>
-            </div>
-            <div id="live-grid-container"></div>
-            <nav id="live-pagination-nav" class="d-flex justify-content-center"></nav>
-        </div>
-    </section>
-
-    <section id="contact" class="section-padding">
-        <div class="container">
-            <div class="page-header">
-                <h1>Get In Touch</h1>
-            </div>
-            <div class="row">
-                <div class="col-lg-6 mb-5">
-                    <h3 class="mb-4">Visit Our Studio</h3>
-                    <div class="d-flex mb-4">
-                        <i class="fa fa-map-marker-alt text-primary fa-2x mr-3"></i>
-                        <div>
-                            <h5 class="mb-1">Address</h5>
-                            <p class="text-muted">8-271 Bhargavpet, Mangalagiri, AP</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-4">
-                        <i class="fa fa-phone-alt text-primary fa-2x mr-3"></i>
-                        <div>
-                            <h5 class="mb-1">Phone</h5>
-                            <p class="text-muted">+91 9246789966</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-4">
-                        <i class="fa fa-envelope text-primary fa-2x mr-3"></i>
-                        <div>
-                            <h5 class="mb-1">Email</h5>
-                            <p class="text-muted">supriyadigitals73@gmail.com</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <form id="my-form" action="https://formspree.io/f/mqknwbbq" method="POST" class="p-4 bg-white rounded shadow-sm border">
-                        <div class="form-group mb-3">
-                            <input type="text" class="form-control p-3 bg-light border-0" placeholder="Your Name" name="name" required />
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="email" class="form-control p-3 bg-light border-0" placeholder="Your Email" name="email" required />
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="text" class="form-control p-3 bg-light border-0" placeholder="Subject" name="subject" required />
-                        </div>
-                        <div class="form-group mb-3">
-                            <textarea class="form-control p-3 bg-light border-0" rows="5" placeholder="Message" name="message" required></textarea>
-                        </div>
-                        <button class="btn btn-primary btn-block py-3" style="border-radius: 8px;" type="submit">Send Message</button>
-                        <p id="my-form-status" class="mt-3 text-center"></p>
-                    </form>
-                </div>
-            </div>
-            
-            <div class="row mt-5">
-                <div class="col-12">
-                    <div class="map-container rounded overflow-hidden shadow" style="height: 400px;">
-                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3826.6642674384963!2d80.56068231486333!3d16.44192598865175!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f0a2a0d1d9d9%3A0x6b0f3b0f3b0f3b0f!2sMangalagiri%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1625634567890!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="footer">
-        <div class="container text-center text-md-left">
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <h2 class="mb-4"><span class="text-primary">SUPRIYA</span> DIGITALS</h2>
-                    <p>Professional photography services for all your special occasions. We bring your memories to life.</p>
-                    <div class="footer-social mt-4">
-                        <a href="https://www.facebook.com/venkat.ganji.7/"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://youtube.com/channel/UCXHQ5eKU_UMFv7tYCS1B0RQ"><i class="fab fa-youtube"></i></a>
-                        <a href="https://www.instagram.com/venkat.ganji.7/"><i class="fab fa-instagram"></i></a>
-                        <a href="https://chat.whatsapp.com/GQGN0RG0coa8GvSW6jHey8"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <h4 class="text-white mb-4">Quick Links</h4>
-                    <div class="d-flex flex-column justify-content-start">
-                        <a class="mb-2" href="#home"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                        <a class="mb-2" href="#about"><i class="fa fa-angle-right mr-2"></i>About Us</a>
-                        <a class="mb-2" href="#services"><i class="fa fa-angle-right mr-2"></i>Services</a>
-                        <a class="mb-2" href="#works"><i class="fa fa-angle-right mr-2"></i>Portfolio</a>
-                        <a class="mb-2" href="#contact"><i class="fa fa-angle-right mr-2"></i>Contact</a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <h4 class="text-white mb-4">Find Us</h4>
-                    <p><i class="fa fa-map-marker-alt mr-2"></i>8-271 Bhargavpet, Mangalagiri, AP</p>
-                    <p><i class="fa fa-phone-alt mr-2"></i>+91 9246789966</p>
-                    <p><i class="fa fa-envelope mr-2"></i>supriyadigitals73@gmail.com</p>
-                </div>
-            </div>
-            <hr style="border-color: rgba(255,255,255,0.1);">
-            <p class="m-0 text-center text-muted">© 2001 - 2025 Supriya Digitals Studio. All Rights Reserved.</p>
+<nav class="navbar navbar-expand-lg" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="#home"><span>Supriya</span> Digitals</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="#works">Works</a></li>
+                <li class="nav-item"><a class="nav-link" href="#albums">Albums</a></li>
+                <li class="nav-item"><a class="nav-link" href="#teasers">Teasers</a></li>
+                <li class="nav-item"><a class="nav-link" href="#live">Live</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+            </ul>
         </div>
     </div>
+</nav>
 
-    <div class="modal fade" id="imageModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-custom">
-            <div class="modal-content bg-transparent border-0">
-                <div class="modal-body p-0 text-center position-relative">
-                    <button type="button" class="close text-white" data-dismiss="modal" style="position: absolute; right: -20px; top: -30px; opacity: 1; font-size: 2.5rem; text-shadow: 0 2px 10px #000;">×</button>
-                    <img id="modalImage" src="" class="img-fluid">
-                </div>
-            </div>
+<section id="home" class="hero">
+    <div class="hero-slide active" style="background-image:url('img/carousel-1.jpg');"></div>
+    <div class="hero-slide" style="background-image:url('img/carousel-2.jpg');"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="hero-tag">Welcome to Supriya Digitals Studio</div>
+        <h1 class="hero-title" id="hero-title">Capturing Life's<br>Best Moments</h1>
+        <p class="hero-sub" id="hero-sub">Professional photography & cinematography since 2001, based in Mangalagiri, AP.</p>
+        <div>
+            <a href="#works" class="btn-hero">View Portfolio</a>
+            <a href="#contact" class="btn-hero btn-hero-ghost">Book Now</a>
         </div>
     </div>
+    <div class="hero-arrow prev" onclick="heroChange(-1)"><i class="fas fa-chevron-left"></i></div>
+    <div class="hero-arrow next" onclick="heroChange(1)"><i class="fas fa-chevron-right"></i></div>
+    <div class="hero-dots" id="hero-dots"></div>
+</section>
 
-    <div class="modal fade" id="videoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="background: #000;">
-                <div class="modal-header border-0 p-2" style="position: absolute; right: 0; z-index: 10;">
-                    <button type="button" class="close text-white" data-dismiss="modal">×</button>
+<section class="portal-section">
+    <div class="container text-center">
+        <div class="portal-title">Find Your Event Gallery</div>
+        <p class="portal-sub">Enter your event name to access your private photo collection</p>
+        <div class="d-flex justify-content-center">
+            <form class="portal-form" onsubmit="openPortal(event)">
+                <input class="portal-input" type="text" id="portalInput" placeholder="e.g. Ravi & Priya Wedding..." required>
+                <button class="portal-btn" type="submit"><i class="fas fa-search mr-2"></i>Open</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="sec">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-5 mb-lg-0">
+                <div class="about-img-wrap">
+                    <img class="about-img" src="img/dad.jpg" alt="Supriya Digitals Studio">
                 </div>
-                <div class="modal-body p-0">
-                    <div class="video-wrapper">
-                        <iframe id="ytIframe" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="col-lg-7 pl-lg-5">
+                <div class="about-tag">About Us</div>
+                <h2 class="about-title">20 Years of Cinematic Excellence</h2>
+                <p style="color:var(--muted); line-height:1.8; font-size:0.95rem; margin-bottom:30px;">
+                    Supriya Digitals, established in 2001, is a premier photography studio in Mangalagiri.
+                    We specialise in capturing the essence of your weddings, birthdays, and corporate events
+                    with state-of-the-art equipment and a creative eye for detail.
+                </p>
+                <div class="row">
+                    <div class="col-6 col-sm-3 mb-4">
+                        <div class="stat-block">
+                            <div class="stat-num" id="cnt-years">20</div>
+                            <div class="stat-label">Years</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-3 mb-4">
+                        <div class="stat-block">
+                            <div class="stat-num" id="cnt-clients">1500</div>
+                            <div class="stat-label">Clients</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-3 mb-4">
+                        <div class="stat-block">
+                            <div class="stat-num">4K</div>
+                            <div class="stat-label">Video</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-3 mb-4">
+                        <div class="stat-block">
+                            <div class="stat-num">24/7</div>
+                            <div class="stat-label">Support</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
+<section id="services" class="sec sec-alt">
+    <div class="container">
+        <div class="sec-head">
+            <span class="sec-tag">What We Offer</span>
+            <h2 class="sec-title">Our Services</h2>
+            <p class="sec-sub">Everything you need to make your special moments last forever</p>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="svc-card">
+                    <div class="svc-icon"><i class="fas fa-camera"></i></div>
+                    <div class="svc-title">Photography</div>
+                    <p class="svc-text">Wedding & event photography captured with artistic flair and technical precision.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="svc-card">
+                    <div class="svc-icon"><i class="fas fa-film"></i></div>
+                    <div class="svc-title">Cinematography</div>
+                    <p class="svc-text">High quality 4K cinematic teasers and wedding films that tell your story.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="svc-card">
+                    <div class="svc-icon"><i class="fas fa-child"></i></div>
+                    <div class="svc-title">Candid Shots</div>
+                    <p class="svc-text">Natural, unposed moments frozen in time forever with our candid photography.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="svc-card">
+                    <div class="svc-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="svc-title">Album Design</div>
+                    <p class="svc-text">Custom designed Karizma albums printed in our fully equipped in-house lab.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <script>
-        /* --- CORE CONFIGURATION --- */
-        const API_BASE = "https://supriyadigitals.store/api/";
-        const VIEW_BASE = "view.html";
-        const ITEMS_PER_PAGE = 9; 
-        
-        // --- VIEWER HISTORY TRACKER INJECTION ---
-        let deviceId = localStorage.getItem('supriya_device_id');
-        if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('supriya_device_id', deviceId); }
-        
-        function trackAction(actionType, itemInfo = '') {
-            fetch(API_BASE + 'track.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    device: deviceId, 
-                    site: 'Main Website', 
-                    event: 'Home Page', 
-                    action: actionType, 
-                    item_info: itemInfo 
-                })
-            }).catch(()=>{});
-        }
-        
-        function pingServer() { 
-            trackAction('ping'); 
-            fetch(API_BASE + 'ping.php?device=' + deviceId).catch(()=>{}); 
-        }
-        pingServer(); setInterval(pingServer, 10000);
-        // ------------------------------------------
+<section id="works" class="sec">
+    <div class="container">
+        <div class="sec-head">
+            <span class="sec-tag">Portfolio</span>
+            <h2 class="sec-title">Candid Shots</h2>
+            <p class="sec-sub">A glimpse into our public photography portfolio</p>
+        </div>
+        <div class="gallery-grid" id="works-grid"></div>
+        <div class="pager" id="works-pager"></div>
+    </div>
+</section>
 
-        // Separate arrays for Teasers and Live
-        let mediaData = { works: [], albums: [], teasers: [], live: [] };
+<section id="albums" class="sec sec-alt">
+    <div class="container">
+        <div class="sec-head">
+            <span class="sec-tag">Albums</span>
+            <h2 class="sec-title">Album Designs</h2>
+            <p class="sec-sub">Click any cover to view the full HD digital album</p>
+        </div>
+        <div class="row" id="albums-grid"></div>
+        <div class="pager" id="albums-pager"></div>
+    </div>
+</section>
 
-        // Fixed HTML Escaper function syntax error
-        function escapeHtml(unsafe) { 
-            return (unsafe || "").toString()
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;"); 
-        }
+<section id="teasers" class="sec">
+    <div class="container">
+        <div class="sec-head">
+            <span class="sec-tag">Films</span>
+            <h2 class="sec-title">Cinematic Teasers</h2>
+            <p class="sec-sub">Highlights from our best wedding and event films</p>
+        </div>
+        <div class="row" id="teasers-grid"></div>
+        <div class="pager" id="teasers-pager"></div>
+    </div>
+</section>
 
-        // Client Portal Redirect with Tracking
-        function openClientGallery() {
-            const val = $('#clientEventName').val().trim();
-            if(val) { 
-                trackAction('Searched Portal', val);
-                window.location.href = `${VIEW_BASE}?event=${encodeURIComponent(val)}`; 
-            }
-        }
+<section id="live" class="sec sec-alt">
+    <div class="container">
+        <div class="sec-head">
+            <span class="sec-tag">Streaming</span>
+            <h2 class="sec-title">Live Events</h2>
+            <p class="sec-sub">Watch our events streamed directly from the venue</p>
+        </div>
+        <div class="row" id="live-grid"></div>
+        <div class="pager" id="live-pager"></div>
+    </div>
+</section>
 
-        // 1. FETCH ALL PUBLIC DATA
-        async function fetchAllMediaData() {
-            try {
-                const response = await fetch(`${API_BASE}fetch.php?mode=public&type=all`, {
-                    headers: { "ngrok-skip-browser-warning": "69420" }
-                });
-                const result = await response.json();
-                if (result.success) distributeData(result.data);
-            } catch (error) { console.error("Fetch Error:", error); }
-        }
+<section id="contact" class="sec" style="background:var(--charcoal);">
+    <div class="container">
+        <div class="sec-head">
+            <span class="sec-tag" style="color:var(--gold);">Get In Touch</span>
+            <h2 class="sec-title" style="color:#fff;">Book Your Session</h2>
+            <p class="sec-sub" style="color:#888;">Ready to create beautiful memories? Reach out today.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-5 mb-5 mb-lg-0">
+                <div class="contact-info-item">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div>
+                        <div class="contact-label">Address</div>
+                        <div class="contact-value" style="color:#ccc;">8-271 Bhargavpet, Mangalagiri, AP 522503</div>
+                    </div>
+                </div>
+                <div class="contact-info-item">
+                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div>
+                        <div class="contact-label">Phone</div>
+                        <div class="contact-value" style="color:#ccc;"><a href="tel:+919246789966" style="color:#ccc;">+91 92467 89966</a></div>
+                    </div>
+                </div>
+                <div class="contact-info-item">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <div>
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value" style="color:#ccc;"><a href="mailto:info@supriyadigitals.com" style="color:#ccc;">info@supriyadigitals.com</a></div>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a class="social-link" href="https://www.facebook.com/venkat.ganji.7/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a class="social-link" href="https://youtube.com/channel/UCXHQ5eKU_UMFv7tYCS1B0RQ" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a class="social-link" href="https://www.instagram.com/venkat.ganji.7/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a class="social-link" href="https://wa.me/919246789966" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <form id="contact-form" action="https://formspree.io/f/mqknwbbq" method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input class="contact-form-input" type="text" name="name" placeholder="Your Name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input class="contact-form-input" type="email" name="email" placeholder="Your Email" required>
+                        </div>
+                    </div>
+                    <input class="contact-form-input" type="text" name="subject" placeholder="Event Type (e.g. Wedding)" required>
+                    <textarea class="contact-form-input" name="message" placeholder="Tell us about your event..." required></textarea>
+                    <button class="btn-submit" type="submit">Send Message</button>
+                    <div id="form-status" style="margin-top:12px; text-align:center; font-size:0.85rem; font-weight:600;"></div>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                <div style="border-radius:2px; overflow:hidden; height:380px;">
+                    <iframe src="https://maps.google.com/maps?q=Mangalagiri,%20AP&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-        // 2. DISTRIBUTE DATA (Teasers & Live Unmerged)
-        function distributeData(allData) {
-            allData.forEach(item => {
-                if (item.type === 'work' || item.type === 'link') mediaData.works.push(item);
-                else if (item.type === 'album') mediaData.albums.push(item);
-                else if (item.type === 'teaser') mediaData.teasers.push(item); 
-                else if (item.type === 'live') mediaData.live.push(item);     
-            });
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-5">
+                <div class="footer-brand"><span>SUPRIYA</span> DIGITALS</div>
+                <p class="footer-text">Professional photography services for all your special occasions. We bring your memories to life with passion and perfection.</p>
+            </div>
+            <div class="col-lg-2 col-6 mb-5">
+                <div class="footer-head">Navigation</div>
+                <a class="footer-link" href="#home">Home</a>
+                <a class="footer-link" href="#about">About</a>
+                <a class="footer-link" href="#services">Services</a>
+                <a class="footer-link" href="#works">Portfolio</a>
+                <a class="footer-link" href="#contact">Contact</a>
+            </div>
+            <div class="col-lg-3 col-6 mb-5">
+                <div class="footer-head">Services</div>
+                <a class="footer-link" href="#services">Wedding Photography</a>
+                <a class="footer-link" href="#services">Event Coverage</a>
+                <a class="footer-link" href="#teasers">Cinematography</a>
+                <a class="footer-link" href="#albums">Album Design</a>
+                <a class="footer-link" href="#live">Live Streaming</a>
+            </div>
+            <div class="col-lg-3 mb-5">
+                <div class="footer-head">Contact</div>
+                <p style="font-size:0.85rem; color:#888; line-height:1.8;">
+                    8-271 Bhargavpet<br>Mangalagiri, AP 522503<br>
+                    <a href="tel:+919246789966" style="color:#888;">+91 92467 89966</a><br>
+                    <a href="mailto:info@supriyadigitals.com" style="color:#888;">info@supriyadigitals.com</a>
+                </p>
+            </div>
+        </div>
+        <hr class="footer-divider">
+        <p class="footer-copy">© 2001 – 2026 Supriya Digitals Studio. All Rights Reserved.</p>
+    </div>
+</footer>
 
-            renderContent('works', 1);
-            renderContent('albums', 1);
-            renderContent('teasers', 1);
-            renderContent('live', 1); 
-        }
+<div class="lb-overlay" id="lb" onclick="closeLb()">
+    <button class="lb-close" onclick="closeLb()"><i class="fas fa-times"></i></button>
+    <img class="lb-img" id="lb-img" src="" alt="">
+</div>
 
-        // 3. THE HIGH-SPEED RENDERER
-        function renderContent(sectionId, page) {
-            const containerId = `#${sectionId}-grid-container`;
-            const paginationId = `#${sectionId}-pagination-nav`;
-            const data = mediaData[sectionId] || [];
-            
-            const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-            const pageItems = data.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+<div class="modal fade" id="videoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content modal-content-dark">
+            <div class="modal-header border-0 p-2" style="position:absolute;right:0;z-index:10;">
+                <button class="close text-white" data-dismiss="modal" style="font-size:2rem;opacity:0.8;">×</button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="video-wrapper">
+                    <iframe id="yt-iframe" src="" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            let contentHtml = '<div class="gallery-grid">'; 
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script>
+// ──────────────────────────────────────────────
+//  CONFIG
+// ──────────────────────────────────────────────
+const API_BASE  = "https://supriyadigitals.store/api/";
+const VIEW_BASE = "view.html";
+const PER_PAGE  = 9;
 
-            if (pageItems.length === 0) {
-                contentHtml = `<p class="text-center text-muted p-5 w-100">Updating portfolio soon...</p>`;
-            } else {
-                pageItems.forEach(item => {
-                    const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
-                    const highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}`;
+// ──────────────────────────────────────────────
+//  TRACKING
+// ──────────────────────────────────────────────
+let deviceId = localStorage.getItem('supriya_dev');
+if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2,9); localStorage.setItem('supriya_dev', deviceId); }
 
-                    if (sectionId === 'works') {
-                        contentHtml += `
-                            <div class="gallery-item image-skeleton" onclick="openHighRes('${highResUrl}')">
-                                <img class="gallery-img" src="${thumbUrl}" alt="Photo" loading="lazy" 
-                                     onload="this.classList.add('loaded'); this.parentElement.classList.remove('image-skeleton');">
-                            </div>`;
-                    } 
-                    else if (sectionId === 'albums') {
-                        const targetUrl = item.pdf_link ? item.pdf_link : item.file_path;
-                        contentHtml += `
-                            <div class="gallery-item image-skeleton" onclick="trackAction('Viewed Album', '${escapeHtml(item.title)}'); window.open('${escapeHtml(targetUrl)}', '_blank')">
-                                <img class="gallery-img" src="${thumbUrl}" alt="Album Cover" loading="lazy" 
-                                     onload="this.classList.add('loaded'); this.parentElement.classList.remove('image-skeleton');">
-                                <div class="p-3 text-center bg-white border-top">
-                                    <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-book-open text-primary mr-2"></i>${escapeHtml(item.title || 'Digital Album')}</h6>
-                                </div>
-                            </div>`;
-                    } 
-                    else if (sectionId === 'teasers' || sectionId === 'live') {
-                        let ytId = "";
-                        if (item.file_path.includes('embed/')) ytId = item.file_path.split('embed/')[1].split('?')[0]; 
-                        else if (item.file_path.includes('v=')) ytId = item.file_path.split('v=')[1].split('&')[0]; 
-                        else if (item.file_path.includes('youtu.be/')) ytId = item.file_path.split('youtu.be/')[1].split('?')[0];
-                        
-                        let fallbackTitle = sectionId === 'teasers' ? 'Cinematic Film' : 'Live Stream';
+function trackAction(action, info) {
+    fetch(API_BASE + 'track.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device: deviceId, site: 'Main Website', event: 'Home Page', action, item_info: info || '' })
+    }).catch(() => {});
+}
 
-                        contentHtml += `
-                            <div class="gallery-item" onclick="openVideo('${ytId}')">
-                                <div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');">
-                                    <div class="folder-overlay"></div>
-                                    <i class="fas fa-play-circle text-white" style="font-size:3.5rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i>
-                                </div>
-                                <div class="p-3 text-center bg-white border-top">
-                                    <h6 class="m-0 font-weight-bold text-dark">${escapeHtml(item.title || fallbackTitle)}</h6>
-                                </div>
-                            </div>`;
-                    }
-                });
-            }
-            contentHtml += '</div>';
-            $(containerId).html(contentHtml);
+function ping() {
+    fetch(API_BASE + 'ping.php?device=' + deviceId).catch(() => {});
+    trackAction('ping');
+}
+ping(); setInterval(ping, 10000);
 
-            // Render Pagination
-            if (totalPages > 1) {
-                let paginationHtml = `<ul class="pagination justify-content-center">`;
-                paginationHtml += `<li class="page-item ${page === 1 ? 'disabled' : ''}" data-action="prev"><a class="page-link" href="#">«</a></li>`;
-                for (let i = 1; i <= totalPages; i++) {
-                    paginationHtml += `<li class="page-item ${i === page ? 'active' : ''}" data-page="${i}"><a class="page-link" href="#">${i}</a></li>`;
-                }
-                paginationHtml += `<li class="page-item ${page === totalPages ? 'disabled' : ''}" data-action="next"><a class="page-link" href="#">»</a></li></ul>`;
-                $(paginationId).html(paginationHtml);
-            } else {
-                $(paginationId).empty();
-            }
-        }
+// ──────────────────────────────────────────────
+//  HERO SLIDER
+// ──────────────────────────────────────────────
+const slides = document.querySelectorAll('.hero-slide');
+const heroTexts = [
+    { title: "Capturing Life's<br>Best Moments", sub: 'Professional photography & cinematography since 2001, Mangalagiri.' },
+    { title: 'We Create<br>Memories', sub: 'From candid moments to cinematic films — we tell your story beautifully.' },
+];
+let heroIdx = 0, heroTimer;
 
-        // --- UI INTERACTION LOGIC --- //
-        function openHighRes(url) {
-            trackAction('Viewed Image', url.split('/').pop()); 
-            $('#modalImage').attr('src', url);
-            $('#imageModal').modal('show');
-        }
+function buildDots() {
+    const d = document.getElementById('hero-dots');
+    slides.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+        dot.onclick = () => goHero(i);
+        d.appendChild(dot);
+    });
+}
 
-        function openVideo(ytId) {
-            trackAction('Viewed Video', 'YouTube ID: ' + ytId); 
-            $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1`);
-            $('#videoModal').modal('show');
-        }
-        $('#videoModal').on('hidden.bs.modal', function () { $('#ytIframe').attr('src', ''); });
+function goHero(idx) {
+    slides[heroIdx].classList.remove('active');
+    document.querySelectorAll('.hero-dot')[heroIdx].classList.remove('active');
+    heroIdx = (idx + slides.length) % slides.length;
+    slides[heroIdx].classList.add('active');
+    document.querySelectorAll('.hero-dot')[heroIdx].classList.add('active');
+    if (heroTexts[heroIdx]) {
+        document.getElementById('hero-title').innerHTML = heroTexts[heroIdx].title;
+        document.getElementById('hero-sub').textContent  = heroTexts[heroIdx].sub;
+    }
+}
 
-        $(document).ready(function () {
-            fetchAllMediaData();
-            
-            $('#header-carousel').carousel({ interval: 4000, pause: 'hover' });
-            $('[data-toggle="counter-up"]').counterUp({ delay: 10, time: 2000 });
+function heroChange(dir) { clearInterval(heroTimer); goHero(heroIdx + dir); heroTimer = setInterval(() => goHero(heroIdx + 1), 5000); }
+buildDots();
+heroTimer = setInterval(() => goHero(heroIdx + 1), 5000);
 
-            // Glass Navbar Scroll Effect
-            $(window).scroll(function () {
-                var scroll = $(this).scrollTop();
-                if (scroll > 50) $('.navbar').addClass('scrolled'); else $('.navbar').removeClass('scrolled');
-            });
+// ──────────────────────────────────────────────
+//  NAVBAR SCROLL
+// ──────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+    document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 50);
 
-            // Smooth Scrolling
-            $('.navbar-nav a, .btn-primary').on('click', function(event) {
-                if (this.hash !== "") {
-                    event.preventDefault();
-                    var hash = this.hash;
-                    $('html, body').animate({ scrollTop: $(hash).offset().top - 70 }, 800, function(){ window.location.hash = hash; });
-                }
-            });
+    // Highlight active nav link
+    const sections = ['home','about','services','works','albums','teasers','live','contact'];
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const top = el.getBoundingClientRect().top;
+        const link = document.querySelector(`.nav-link[href="#${id}"]`);
+        if (link) link.classList.toggle('active', top <= 80 && top > -el.offsetHeight + 80);
+    });
+});
 
-            // Pagination Clicks
-            $(document).on('click', '.pagination .page-item:not(.disabled)', function(e) {
-                e.preventDefault();
-                const $btn = $(this);
-                const $nav = $btn.closest('nav');
-                const sectionId = $nav.attr('id').replace('-pagination-nav', '');
-                const $active = $nav.find('.active');
-                let currentPage = parseInt($active.data('page'));
-                
-                let newPage = currentPage;
-                if ($btn.data('action') === 'prev') newPage--;
-                else if ($btn.data('action') === 'next') newPage++;
-                else newPage = $btn.data('page');
+// Smooth scroll nav links
+document.querySelectorAll('.navbar-nav .nav-link, .btn-hero').forEach(link => {
+    link.addEventListener('click', e => {
+        const hash = link.getAttribute('href');
+        if (!hash || !hash.startsWith('#')) return;
+        e.preventDefault();
+        const target = document.querySelector(hash);
+        if (target) { window.scrollTo({ top: target.offsetTop - 65, behavior: 'smooth' }); }
+        // Close mobile menu
+        const collapse = document.getElementById('navMenu');
+        if (collapse && collapse.classList.contains('show')) { $(collapse).collapse('hide'); }
+    });
+});
 
-                renderContent(sectionId, newPage);
-                // Scroll back to top of the section slightly
-                $('html, body').animate({ scrollTop: $(`#${sectionId}`).offset().top - 80 }, 300);
-            });
-            
-            // Auto close mobile navbar
-            $('.nav-link').click(function() { $('.navbar-collapse').collapse('hide'); });
+// ──────────────────────────────────────────────
+//  PORTAL SEARCH
+// ──────────────────────────────────────────────
+function openPortal(e) {
+    e.preventDefault();
+    const val = document.getElementById('portalInput').value.trim();
+    if (!val) return;
+    trackAction('Searched Portal', val);
+    window.location.href = `${VIEW_BASE}?event=${encodeURIComponent(val)}`;
+}
+
+// ──────────────────────────────────────────────
+//  DATA LAYER
+// ──────────────────────────────────────────────
+const media = { works: [], albums: [], teasers: [], live: [] };
+
+async function loadData() {
+    try {
+        const r = await fetch(`${API_BASE}fetch.php?mode=public&type=all`, { headers: { 'ngrok-skip-browser-warning': '1' } });
+        const res = await r.json();
+        if (!res.success) return;
+
+        res.data.forEach(item => {
+            if      (item.type === 'work' || item.type === 'link') media.works.push(item);
+            else if (item.type === 'album')  media.albums.push(item);
+            else if (item.type === 'teaser') media.teasers.push(item);
+            else if (item.type === 'live')   media.live.push(item);
         });
-        
-        // Formspree Contact Form
-        var form = document.getElementById("my-form");
-        if (form) form.addEventListener("submit", function(e) {
-            e.preventDefault();
-            var status = document.getElementById("my-form-status");
-            status.innerHTML = "<i class='fas fa-spinner fa-spin text-primary'></i> Sending...";
-            fetch(form.action, { method: form.method, body: new FormData(form), headers: {'Accept': 'application/json'} })
-            .then(r => { if(r.ok) { status.innerHTML = "<span class='text-success font-weight-bold'><i class='fas fa-check-circle'></i> Message Sent!</span>"; form.reset(); } else { status.innerHTML = "<span class='text-danger'>Error sending.</span>"; } })
-            .catch(e => status.innerHTML = "<span class='text-danger'>Network error.</span>");
+
+        renderWorks(1); renderAlbums(1); renderVideos('teasers', 1); renderVideos('live', 1);
+    } catch (e) { console.warn('Media load failed', e); }
+}
+
+// ──────────────────────────────────────────────
+//  GALLERY ITEM REGISTRY
+//  Store URLs in arrays so onclick only passes
+//  a safe integer index — no URL in HTML attrs.
+// ──────────────────────────────────────────────
+const _lbUrls = [];  // populated by renderWorks
+function lbOpen(idx) { openLb(_lbUrls[idx]); }
+
+// ──────────────────────────────────────────────
+//  WORKS RENDERER (masonry)
+// ──────────────────────────────────────────────
+function renderWorks(page) {
+    const grid  = document.getElementById('works-grid');
+    const pager = document.getElementById('works-pager');
+    const data  = media.works;
+    const total = Math.ceil(data.length / PER_PAGE);
+    const items = data.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+    if (items.length === 0) { grid.innerHTML = '<div class="empty-sec col-12">No photos yet — check back soon.</div>'; pager.innerHTML = ''; return; }
+
+    // Bug 4 Fix: store URLs in registry, pass only index to onclick
+    _lbUrls.length = 0;
+    grid.innerHTML = items.map((item, i) => {
+        const thumb = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
+        const full  = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}`;
+        _lbUrls.push(full);
+        return `<div class="gallery-item loading" onclick="lbOpen(${i})">
+            <div class="gallery-overlay"><i class="fas fa-expand"></i></div>
+            <img class="gallery-img" src="${escHtml(thumb)}" loading="lazy"
+                 onload="this.classList.add('loaded');this.closest('.gallery-item').classList.remove('loading')">
+        </div>`;
+    }).join('');
+
+    pager.innerHTML = buildPager(page, total, 'works', renderWorks);
+}
+
+// ──────────────────────────────────────────────
+//  ALBUMS RENDERER
+// ──────────────────────────────────────────────
+function renderAlbums(page) {
+    const grid  = document.getElementById('albums-grid');
+    const pager = document.getElementById('albums-pager');
+    const data  = media.albums;
+    const total = Math.ceil(data.length / PER_PAGE);
+    const items = data.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+    if (items.length === 0) { grid.innerHTML = '<div class="empty-sec col-12">No albums yet.</div>'; pager.innerHTML = ''; return; }
+
+    grid.innerHTML = items.map(item => {
+        const target  = item.pdf_link || item.file_path;
+        const hasThumb = item.file_path && !item.file_path.startsWith('http') || (item.file_path && item.file_path.includes('supriyadigitals.store'));
+        const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
+        const thumb   = hasThumb
+            ? `<img class="album-thumb" src="${escHtml(thumbUrl)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+               <div class="album-thumb-placeholder" style="display:none;"><i class="fas fa-book-open" style="font-size:2.5rem;color:var(--gold);"></i></div>`
+            : `<div class="album-thumb-placeholder"><i class="fas fa-book-open" style="font-size:2.5rem;color:var(--gold);"></i></div>`;
+
+        return `<div class="col-md-6 col-lg-4 mb-4">
+            <div class="album-card" onclick="trackAction('Viewed Album','${escHtml(item.title)}');window.open('${escHtml(target)}','_blank')">
+                ${thumb}
+                <div class="album-body">
+                    <div class="album-title">${escHtml(item.title || 'Digital Album')}</div>
+                    <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;"><i class="fas fa-external-link-alt mr-1"></i>View PDF</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    pager.innerHTML = buildPager(page, total, 'albums', renderAlbums);
+}
+
+// ──────────────────────────────────────────────
+//  VIDEO RENDERER (teasers & live)
+// ──────────────────────────────────────────────
+function renderVideos(type, page) {
+    const grid  = document.getElementById(`${type}-grid`);
+    const pager = document.getElementById(`${type}-pager`);
+    const data  = media[type];
+    const total = Math.ceil(data.length / PER_PAGE);
+    const items = data.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+    if (items.length === 0) { grid.innerHTML = `<div class="empty-sec col-12">No ${type} yet.</div>`; pager.innerHTML = ''; return; }
+
+    grid.innerHTML = items.map(item => {
+        const ytId = extractYtId(item.file_path);
+        const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
+        return `<div class="col-md-6 col-lg-4 mb-4">
+            <div class="video-card" onclick="openVideo('${escHtml(ytId)}','${escHtml(item.title)}')">
+                <div class="video-thumb" style="background-image:url('${thumb}');">
+                    <div class="video-play"><i class="fas fa-play-circle"></i></div>
+                </div>
+                <div class="video-card-body">
+                    <div class="video-card-title">${escHtml(item.title || 'Cinematic Film')}</div>
+                    <div class="video-card-sub"><i class="fab fa-youtube" style="color:#ef4444;margin-right:4px;"></i>Tap to Play</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    pager.innerHTML = buildPager(page, total, type, p => renderVideos(type, p));
+}
+
+// ──────────────────────────────────────────────
+//  PAGINATION BUILDER
+//  Bug 3 Fix: No longer uses fn.toString().
+//  Uses a named section string + a render callback
+//  stored in a lookup map — robust and clear.
+// ──────────────────────────────────────────────
+const _pageRenderFns = {};  // populated per section
+
+function buildPager(current, total, sectionId, renderFn) {
+    if (total <= 1) return '';
+
+    // Store the render function so the onclick can call it by name safely
+    _pageRenderFns[sectionId] = renderFn;
+
+    let html = '';
+
+    const btn = (label, page, disabled, active) => {
+        const clickAttr = disabled
+            ? 'disabled'
+            : `onclick="_pageRenderFns['${sectionId}'](${page});document.getElementById('${sectionId}')?.scrollIntoView({behavior:'smooth',block:'start'})"`;
+        html += `<button class="pager-btn ${active ? 'active' : ''}" ${clickAttr}>${label}</button>`;
+    };
+
+    btn('«', current - 1, current === 1,     false);
+    for (let i = 1; i <= total; i++) btn(i, i, false, i === current);
+    btn('»', current + 1, current === total, false);
+
+    return html;
+}
+
+// ──────────────────────────────────────────────
+//  LIGHTBOX
+// ──────────────────────────────────────────────
+function openLb(url) {
+    const lb = document.getElementById('lb');
+    document.getElementById('lb-img').src = url;
+    lb.classList.add('open');
+    trackAction('Viewed Image', url.split('/').pop());
+}
+function closeLb() { document.getElementById('lb').classList.remove('open'); document.getElementById('lb-img').src = ''; }
+document.getElementById('lb').addEventListener('click', e => { if (e.target === e.currentTarget) closeLb(); });
+window.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+// ──────────────────────────────────────────────
+//  VIDEO MODAL
+// ──────────────────────────────────────────────
+function openVideo(ytId, title) {
+    if (!ytId) return;
+    document.getElementById('yt-iframe').src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+    $('#videoModal').modal('show');
+    trackAction('Viewed Video', title);
+}
+$('#videoModal').on('hidden.bs.modal', () => { document.getElementById('yt-iframe').src = ''; });
+
+// ──────────────────────────────────────────────
+//  COUNTER ANIMATION
+// ──────────────────────────────────────────────
+function animateCounter(el, target) {
+    let start = 0; const step = Math.ceil(target / 60);
+    const timer = setInterval(() => {
+        start += step; if (start >= target) { start = target; clearInterval(timer); }
+        el.textContent = start;
+    }, 30);
+}
+
+function initCounters() {
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (!e.isIntersecting) return;
+            animateCounter(document.getElementById('cnt-years'),   20);
+            animateCounter(document.getElementById('cnt-clients'), 1500);
+            observer.disconnect();
         });
-    </script>
+    }, { threshold: 0.3 });
+    const about = document.getElementById('about');
+    if (about) observer.observe(about);
+}
+
+// ──────────────────────────────────────────────
+//  CONTACT FORM
+// ──────────────────────────────────────────────
+document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const status = document.getElementById('form-status');
+    status.innerHTML = '<span style="color:var(--gold);">Sending...</span>';
+    fetch(this.action, { method: 'POST', body: new FormData(this), headers: { 'Accept': 'application/json' } })
+        .then(r => {
+            if (r.ok) { status.innerHTML = '<span style="color:#4ade80;">✓ Message sent! We\'ll be in touch soon.</span>'; this.reset(); }
+            else status.innerHTML = '<span style="color:#ef4444;">Something went wrong. Please call us directly.</span>';
+        })
+        .catch(() => { status.innerHTML = '<span style="color:#ef4444;">Network error. Please try again.</span>'; });
+});
+
+// ──────────────────────────────────────────────
+//  UTILITIES
+// ──────────────────────────────────────────────
+function extractYtId(url) {
+    if (!url) return '';
+    let m;
+    if ((m = url.match(/embed\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/live\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    return '';
+}
+
+function escHtml(s) {
+    return (s || '').toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+</script>
 </body>
 </html>

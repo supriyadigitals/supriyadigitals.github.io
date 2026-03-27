@@ -5,1054 +5,1541 @@
     <title>Supriya Digitals | Client Gallery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="img/icon1.png" rel="icon" onerror="this.style.display='none'">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
-        /* ==========================================================================
-           YOUR ORIGINAL GLOBAL VARIABLES & BASE STYLES
-           ========================================================================== */
-        :root { --primary: #D4AF37; --text: #333; --bg: #fdfdfd; }
-        
-        body { background-color: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; -webkit-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; }
+        /* ── VARIABLES ── */
+        :root {
+            --gold:   #D4AF37;
+            --dark:   #0f0f0f;
+            --text:   #1a1a1a;
+            --muted:  #6b7280;
+            --border: #e8e8e8;
+            --bg:     #fafaf9;
+            --white:  #ffffff;
+            --red:    #ef4444;
+            --green:  #10b981;
+            --sans:   'Jost', sans-serif;
+            --serif:  'Cormorant Garamond', Georgia, serif;
+        }
+
+        /* ── BASE ── */
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            font-family: var(--sans); background: var(--bg); color: var(--text);
+            margin: 0; padding: 0; overflow-x: hidden;
+            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+        }
         img { pointer-events: none; -webkit-user-drag: none; }
 
-        .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .progress-container { width: 100%; max-width: 400px; background: #eee; border-radius: 20px; overflow: hidden; height: 15px; margin: 20px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s linear; }
+        /* ── LOADER ── */
+        #main-loader {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.97);
+            z-index: 9999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 20px; text-align: center;
+        }
+        .loader-spinner {
+            width: 48px; height: 48px; border: 3px solid #f0f0f0;
+            border-top-color: var(--gold); border-radius: 50%;
+            animation: spin 0.9s linear infinite; margin-bottom: 18px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #main-loader-text { font-weight: 700; font-size: 1rem; color: var(--text); }
 
+        /* ── CACHE PROGRESS SCREEN ── */
+        #cache-screen {
+            position: fixed; inset: 0; background: #fff;
+            z-index: 9998; display: none; flex-direction: column;
+            align-items: center; justify-content: center; padding: 30px; text-align: center;
+        }
+        .cache-title { font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .cache-sub { font-size: 0.85rem; color: var(--muted); max-width: 360px; line-height: 1.6; }
+        .cache-bar-wrap { width: 100%; max-width: 380px; height: 6px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin: 20px 0 8px; }
+        .cache-bar-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.2s linear; }
+        .cache-pct { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
+        .cache-stats { font-size: 0.8rem; color: var(--muted); font-weight: 600; margin-top: 4px; }
+        .btn-continue { display: none; margin-top: 20px; padding: 12px 32px; background: var(--dark); color: #fff; border: none; border-radius: 4px; font-family: var(--sans); font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+
+        /* ── SKELETON ── */
         .skeleton {
-            background: #e2e5e7;
-            background-image: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.6), rgba(255,255,255,0));
-            background-size: 40px 100%; background-repeat: no-repeat; background-position: left -40px top 0;
-            animation: shine 1.2s ease-in-out infinite; border-radius: 8px;
+            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+            background-size: 200% 100%;
+            animation: skeleton-shine 1.2s ease-in-out infinite;
+            border-radius: 4px;
         }
-        @keyframes shine { to { background-position: right -40px top 0; } }
+        @keyframes skeleton-shine { to { background-position-x: -200%; } }
 
-        /* ==========================================================================
-           HEADER & NAVIGATION
-           ========================================================================== */
-        .gallery-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px; }
-        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #000; margin: 0; font-weight: 700; letter-spacing: 1px; }
-        .brand-title span { color: var(--primary); }
-        
-        .btn-header { 
-            border: 1px solid #e5e7eb; color: #4b5563; border-radius: 50px; padding: 8px 20px; 
-            font-size: 0.85rem; transition: 0.2s; background: #fff; cursor: pointer; 
-            display: inline-flex; align-items: center; margin-left: 8px; font-weight: 600; 
-            text-decoration: none !important;
+        /* ── GALLERY HEADER ── */
+        .g-header {
+            background: var(--white); padding: 12px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 200;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            flex-wrap: wrap; gap: 10px;
         }
-        .btn-header:hover, .btn-header.active { background: #f9fafb; border-color: var(--primary); color: var(--primary); }
-
-        #sticky-pill-menu {
-            position: sticky; top: 66px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); z-index: 90;
-            padding: 12px 20px; display: none; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #eee;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); scroll-behavior: smooth;
+        .g-brand { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: var(--text); }
+        .g-brand span { color: var(--gold); }
+        .g-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .hbtn {
+            height: 34px; padding: 0 14px; border-radius: 4px; border: 1px solid var(--border);
+            background: var(--white); color: var(--text); font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;
+            font-family: var(--sans); white-space: nowrap; text-decoration: none;
         }
-        #sticky-pill-menu::-webkit-scrollbar { display: none; }
-        .pill-btn {
-            display: inline-block; padding: 8px 20px; background: #f3f4f6; color: #555; border-radius: 50px;
-            margin-right: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; border: 1px solid transparent;
+        .hbtn:hover { border-color: var(--gold); color: var(--gold); background: #fffdf5; }
+        .hbtn.active { background: var(--dark); color: var(--white); border-color: var(--dark); }
+        .hbtn-cart { border-color: var(--red); color: var(--red); }
+        .hbtn-cart:hover { background: #fee2e2; border-color: var(--red); color: var(--red); }
+
+        /* ── SEARCH BAR (inside gallery folder) ── */
+        #search-bar {
+            background: var(--white); padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            display: none; align-items: center; gap: 10px;
+            position: sticky; top: 57px; z-index: 190;
         }
-        .pill-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); }
+        .search-input-wrap { position: relative; flex: 1; max-width: 440px; }
+        .search-input {
+            width: 100%; padding: 9px 36px 9px 14px;
+            border: 1.5px solid var(--border); border-radius: 4px;
+            font-family: var(--sans); font-size: 0.88rem; color: var(--text); background: #fff;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { outline: none; border-color: var(--gold); }
+        .search-clear {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: var(--muted); font-size: 0.9rem; display: none;
+        }
+        #search-result-count { font-size: 0.8rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
 
-        /* ==========================================================================
-           GRID & GALLERY LAYOUT
-           ========================================================================== */
-        .section-header { margin: 40px 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
-        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 0 30px; margin-bottom: 40px; margin-top:30px; }
-        
-        .media-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
-        .media-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: var(--primary); }
-        .folder-cover { height: 200px; background-size: cover; background-position: center; position: relative; }
-        .folder-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); }
-        .card-details { padding: 20px; text-align: left; }
-        .card-details h5 { margin: 0 0 5px 0; font-weight: 700; font-size: 1.1rem; color: #111; }
-        .card-details small { color: #666; font-weight: 500; }
-        
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; } 
+        /* ── PILL MENU ── */
+        #pill-menu {
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+            padding: 10px 16px; border-bottom: 1px solid var(--border);
+            display: none; overflow-x: auto; white-space: nowrap; gap: 8px;
+            position: sticky; top: 57px; z-index: 180; scroll-behavior: smooth;
+        }
+        #pill-menu::-webkit-scrollbar { display: none; }
+        .pill {
+            display: inline-block; padding: 6px 18px;
+            background: #f3f4f6; color: var(--muted); border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
+            transition: 0.25s; border: 1px solid transparent; margin-right: 6px;
+        }
+        .pill.active { background: var(--gold); color: var(--dark); }
 
-        .container-fluid { padding: 30px; padding-bottom: 120px; }
-        .gallery-grid { column-count: 4; column-gap: 20px; }
-        
+        /* ── EVENT CONTENT (dashboard) ── */
+        #event-content { display: none; }
+
+        /* ── MEDIA GRID (folder cards on dashboard) ── */
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; padding: 20px; }
+        .media-card {
+            background: var(--white); border-radius: 8px; overflow: hidden;
+            border: 1px solid var(--border); cursor: pointer; transition: 0.25s;
+        }
+        .media-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); border-color: var(--gold); }
+        .folder-cover { height: 180px; background-size: cover; background-position: center; position: relative; }
+        .folder-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 55%); }
+        .card-body { padding: 16px; }
+        .card-title { font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 3px; }
+        .card-sub { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+        .video-play-icon {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 2.8rem; color: #fff; text-shadow: 0 3px 15px rgba(0,0,0,0.5);
+        }
+
+        /* ── MASONRY PHOTO GALLERY ── */
+        .gallery-container { padding: 16px; padding-bottom: 120px; }
+        .gallery-grid { column-count: 4; column-gap: 12px; }
         @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-        @media (max-width: 768px) { 
-            .gallery-grid { column-count: 2; column-gap: 10px; } .container-fluid { padding: 15px; } 
-            .brand-title { font-size: 1.1rem; } .section-header { margin: 20px 15px 15px; font-size: 1.4rem;} 
-            .media-grid { padding: 0 15px; } .gallery-header { justify-content: center; padding: 12px 15px;} 
-            #resume-toast { left: 15px; right: 15px; bottom: 20px; min-width: 0; }
-            #sticky-pill-menu { top: 104px; } 
-        }
-        @media (max-width: 480px) { 
-            .gallery-grid { column-count: 1; } 
-            .btn-text { display: none !important; }
-            .btn-header i.mr-1 { margin-right: 0 !important; } 
-            .btn-header { padding: 8px 15px; margin-left: 4px; font-size: 1rem;}
-            .brand-title { font-size: 1.2rem; margin-bottom: 10px; width: 100%; text-align: center;}
-        }
-        
-        .gallery-item { break-inside: avoid; margin-bottom: 20px; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; min-height: 250px; transition: transform 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .lazy-image { width: 100%; display: block; opacity: 0; transition: opacity 0.5s ease-out; }
-        .lazy-image.loaded { opacity: 1; }
-        
-        .gallery-item.selected { transform: scale(0.96); box-shadow: 0 0 0 3px var(--primary); }
-        .gallery-item.selected::after { content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; top: 10px; right: 10px; background: var(--primary); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        @media (max-width: 768px)  { .gallery-grid { column-count: 2; column-gap: 8px; } .gallery-container { padding: 8px; padding-bottom: 120px; } }
+        @media (max-width: 480px)  { .gallery-grid { column-count: 1; } }
 
-        /* ==========================================================================
-           INTERACTIVE UI (CART, TOAST, FLOATING BUTTON)
-           ========================================================================== */
-        .flying-heart { position: fixed; font-size: 5rem; color: var(--primary); z-index: 9999; animation: floatUp 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: none; text-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        @keyframes floatUp { 0% { transform: scale(0.5) translateY(0); opacity: 1; } 100% { transform: scale(1.5) translateY(-150px); opacity: 0; } }
+        .photo-item {
+            break-inside: avoid; margin-bottom: 12px; border-radius: 4px;
+            overflow: hidden; cursor: pointer; position: relative;
+            background: #eee; min-height: 200px; transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .photo-item:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .photo-img { width: 100%; display: block; opacity: 0; transition: opacity 0.45s ease-out; }
+        .photo-img.loaded { opacity: 1; }
+        .photo-item.skeleton { min-height: 240px; }
 
-        #resume-toast { position: fixed; bottom: 30px; left: 30px; z-index: 1060; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border-left: 4px solid var(--primary); display: flex; flex-direction: row; align-items: center; gap: 15px; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s; transform: translateY(150px); opacity: 0; pointer-events: none; min-width: 300px;}
+        /* Selected state */
+        .photo-item.selected { transform: scale(0.95); }
+        .photo-item.selected::after {
+            content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900;
+            position: absolute; top: 8px; right: 8px; background: var(--gold); color: var(--dark);
+            width: 26px; height: 26px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 0.75rem;
+        }
+        .photo-item.selected::before {
+            content: ''; position: absolute; inset: 0;
+            box-shadow: inset 0 0 0 3px var(--gold); border-radius: 4px; z-index: 1;
+        }
+
+        /* ── FLOATING CART BUTTON ── */
+        #cart-fab {
+            position: fixed; bottom: 28px; right: 24px; z-index: 500;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--white); color: var(--red); border: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+            cursor: pointer; transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275), opacity 0.4s;
+        }
+        #cart-fab.hidden { transform: translateY(100px); opacity: 0; pointer-events: none; }
+        #cart-fab:hover { transform: scale(1.08); }
+        #cart-badge {
+            position: absolute; top: -4px; right: -4px;
+            background: var(--gold); color: var(--dark);
+            font-size: 11px; font-weight: 800; width: 22px; height: 22px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 2px solid #fff;
+        }
+
+        /* ── DOWNLOAD MANAGER ── */
+        #dl-manager {
+            position: fixed; top: 70px; right: 18px; width: 300px;
+            background: rgba(255,255,255,0.97); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 10px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.14); z-index: 600;
+            padding: 18px; display: none;
+            transition: transform 0.3s, opacity 0.3s; transform: translateY(-20px); opacity: 0;
+        }
+        #dl-manager.active { transform: translateY(0); opacity: 1; }
+        .dl-title { font-weight: 700; font-size: 0.88rem; margin-bottom: 12px; }
+        .dl-bar-wrap { height: 6px; background: #e5e7eb; border-radius: 10px; overflow: hidden; }
+        .dl-bar-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.2s; }
+        .dl-status { font-size: 0.78rem; color: var(--muted); margin-top: 8px; font-weight: 600; display: flex; justify-content: space-between; }
+
+        /* ── QUALITY OVERLAY ── */
+        #quality-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 700; display: none;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .quality-box { background: #fff; border-radius: 10px; padding: 28px; max-width: 400px; width: 100%; }
+        .quality-box h5 { font-weight: 700; margin-bottom: 16px; color: var(--text); }
+        .quality-btn {
+            width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 6px;
+            margin-bottom: 10px; background: #fff; cursor: pointer; text-align: left;
+            display: flex; align-items: center; gap: 14px; transition: 0.2s; font-family: var(--sans);
+        }
+        .quality-btn:hover { border-color: var(--gold); background: #fffdf5; transform: translateY(-1px); }
+        .quality-btn i { font-size: 1.4rem; color: var(--gold); width: 24px; flex-shrink: 0; }
+        .quality-btn-title { font-weight: 700; font-size: 0.9rem; }
+        .quality-btn-sub { font-size: 0.78rem; color: var(--muted); }
+        .btn-cancel-dl { width: 100%; padding: 10px; background: #f3f4f6; border: none; border-radius: 6px; font-family: var(--sans); font-weight: 600; cursor: pointer; margin-top: 4px; }
+
+        /* ── RESUME TOAST ── */
+        #resume-toast {
+            position: fixed; bottom: 24px; left: 24px; z-index: 600;
+            background: var(--white); border-left: 4px solid var(--gold);
+            border-radius: 8px; box-shadow: 0 10px 32px rgba(0,0,0,0.15);
+            padding: 16px 18px; display: flex; align-items: center; gap: 14px;
+            min-width: 280px; max-width: 360px;
+            transform: translateY(120px); opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275), opacity 0.4s;
+            pointer-events: none;
+        }
         #resume-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
-        .toast-content { flex-grow: 1; text-align: left;}
-        .toast-content h6 { margin: 0 0 5px 0; font-weight: 700; color: #111; font-size: 1rem; }
-        .toast-content p { margin: 0; font-size: 0.85rem; color: #666; }
-        .toast-btn { background: var(--primary); color: #fff; border: none; padding: 8px 15px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.85rem;}
-        .toast-btn:hover { background: #b8962c; }
-        .toast-close { background: transparent; border: none; color: #999; font-size: 1.2rem; cursor: pointer; padding: 5px; }
+        .toast-content h6 { font-weight: 700; font-size: 0.9rem; margin: 0 0 3px; color: var(--text); }
+        .toast-content p { font-size: 0.78rem; color: var(--muted); margin: 0; }
+        .toast-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .toast-btn { padding: 7px 14px; border-radius: 4px; border: none; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 0.78rem; }
+        .toast-btn-yes { background: var(--gold); color: var(--dark); }
+        .toast-btn-no  { background: #f3f4f6; color: var(--muted); }
 
-        /* FLOATING CART BUTTON (BOTTOM RIGHT) */
-        #floating-cart-btn {
-            position: fixed; bottom: 30px; right: 30px; z-index: 1050;
-            width: 60px; height: 60px; border-radius: 50%;
-            background: #fff; color: #ef4444; border: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
-            pointer-events: auto;
-        }
-        #floating-cart-btn:hover { transform: scale(1.05); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        #floating-cart-btn.hidden { transform: translateY(150px); opacity: 0; pointer-events: none; }
-        
-        #floating-cart-badge {
-            position: absolute; top: -5px; right: -5px; background: var(--primary); color: #fff;
-            font-size: 12px; font-weight: 700; width: 24px; height: 24px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; border: 2px solid #fff;
+        /* ── LASSO ── */
+        #lasso-box {
+            position: absolute; background: rgba(212,175,55,0.15);
+            border: 1.5px solid var(--gold); display: none; z-index: 100;
+            pointer-events: none; border-radius: 2px;
         }
 
-        /* CUSTOM RIGHT CLICK MENU */
-        #custom-context-menu { position: absolute; background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); padding: 8px 0; z-index: 10000; display: none; min-width: 200px; border: 1px solid #eee; }
-        .ctx-item { padding: 10px 20px; color: #333; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 500; transition: 0.2s; }
-        .ctx-item:hover { background: #f9fafb; color: var(--primary); }
-        #lasso-box { position: absolute; background: rgba(212, 175, 55, 0.2); border: 1px solid var(--primary); display: none; z-index: 1000; pointer-events: none; border-radius: 4px; }
+        /* ── CONTEXT MENU ── */
+        #ctx-menu {
+            position: absolute; background: var(--white); border-radius: 8px;
+            box-shadow: 0 10px 36px rgba(0,0,0,0.15); padding: 6px 0; z-index: 800;
+            display: none; min-width: 190px; border: 1px solid var(--border);
+        }
+        .ctx-item {
+            padding: 10px 16px; cursor: pointer; display: flex; align-items: center;
+            gap: 10px; font-size: 0.85rem; font-weight: 500; transition: 0.15s;
+        }
+        .ctx-item:hover { background: #f9fafb; color: var(--gold); }
+        .ctx-sep { height: 1px; background: var(--border); margin: 4px 0; }
 
-        /* DOWNLOAD MANAGERS */
-        .overlay-box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; border: 1px solid #eee; }
-        .dl-opt-btn { display: flex; align-items: center; width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; background: #fff; cursor: pointer; transition: 0.2s; text-align: left; }
-        .dl-opt-btn:hover { border-color: var(--primary); background: #fffdf5; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .dl-opt-btn i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
+        /* ── SECTION HEADER (inside event content) ── */
+        .dash-section-head { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--text); margin: 8px 20px 4px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 
-        #floating-dl-manager { position: fixed; top: 80px; right: 20px; width: 320px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); z-index: 1050; padding: 20px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s; transform: translateY(-50px); opacity: 0; pointer-events: none; }
-        #floating-dl-manager.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
-        .dl-title { font-weight: 700; color: #111; margin-bottom: 15px; font-size: 0.95rem; }
-        .dl-progress-bar { height: 8px; background: #eee; border-radius: 10px; overflow: hidden; }
-        .dl-progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s linear; }
-        .dl-status-text { font-size: 0.8rem; color: #666; margin-top: 10px; display: flex; justify-content: space-between; font-weight: 600; }
-        .progress-fill-pulse { animation: progress-pulse 1.5s infinite ease-in-out; }
+        /* ── CART MODAL ── */
+        .modal-content-custom { background: #fdfdfd; border: none; border-radius: 12px; height: 85vh; overflow: hidden; }
+        .cart-folder-card { background: var(--white); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+        .cart-folder-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
 
-        /* CART MODAL UI CSS */
-        .cart-group { margin-bottom: 25px; width: 100%; display: block; clear: both; }
-        .cart-folder-header { display: block; background: #fff; padding: 10px 15px; border-radius: 8px; border-left: 4px solid var(--primary); margin-top: 0; margin-bottom: 15px; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .cart-grid-new { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; width: 100%; }
-        .cart-item-card { border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: #fff; border: 1px solid #eee; position: relative; display: flex; flex-direction: column;}
-        .cart-item-img { width: 100%; height: 110px; object-fit: cover; display: block; margin: 0; padding: 0;}
-        .cart-item-remove { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; background: rgba(239, 68, 68, 0.9); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; border: none; z-index: 10; transition: 0.2s; }
-        .cart-item-remove:hover { background: #dc2626; transform: scale(1.1); }
-        .cart-item-title { padding: 6px; font-size: 0.75rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #555; font-weight: 600; background: #f9fafb; border-top: 1px solid #eee; margin: 0;}
+        /* ── LIGHTBOX ── */
+        .lb-backdrop { position: fixed; inset: 0; background: rgba(8,8,8,0.97); z-index: 900; display: none; }
+        .lb-backdrop.open { display: flex; flex-direction: column; }
+        .lb-header {
+            position: absolute; top: 0; left: 0; right: 0; padding: 18px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            z-index: 910;
+        }
+        .lb-filename { color: #fff; font-size: 0.9rem; opacity: 0.8; font-weight: 500; }
+        .lb-actions-right { display: flex; align-items: center; gap: 18px; }
+        .lb-icon { font-size: 1.3rem; color: #fff; cursor: pointer; opacity: 0.75; transition: 0.2s; background: none; border: none; }
+        .lb-icon:hover { opacity: 1; color: var(--gold); }
+        .lb-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        #lb-img { max-height: 82vh; max-width: 94vw; object-fit: contain; will-change: transform; transition: transform 0.15s ease-out; cursor: zoom-in; }
+        .lb-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 44px; height: 44px; background: rgba(255,255,255,0.1);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #fff; cursor: pointer; transition: 0.25s; z-index: 910;
+        }
+        .lb-nav:hover { background: var(--gold); color: var(--dark); }
+        .lb-prev { left: 16px; } .lb-next { right: 16px; }
 
-        /* ADVANCED ZOOM LIGHTBOX CSS */
-        .modal-content-lb { background-color: rgba(10,10,10,0.98); border: none; height: 100vh; overflow: hidden; pointer-events: auto;}
-        .modal-body-lb { padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;}
-        .lb-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1060; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
-        .lb-header > * { pointer-events: auto; } 
-        .lb-title { color: #fff; font-size: 1.1rem; opacity: 0.8; }
-        .lb-actions { display: flex; align-items: center; }
-        .lb-icon { font-size: 1.4rem; color: #fff; cursor: pointer; margin-left: 25px; opacity: 0.7; transition: 0.3s; }
-        .lb-icon:hover { opacity: 1; color: var(--primary); }
-        
-        #lightboxImage { max-height: 80vh; max-width: 95vw; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: transform 0.15s ease-out; cursor: zoom-in; will-change: transform;}
-        
-        .lb-control { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.3s; z-index:1050; pointer-events: auto;}
-        .lb-control:hover { background: var(--primary); }
-        .lb-prev { left: 20px; } .lb-next { right: 20px; }
-        .dropdown-menu-dark { background: #222; border: 1px solid #444; }
-        .dropdown-item { color: #eee; padding: 10px 20px; border-bottom: 1px solid #333; }
-        .dropdown-item:hover { background: var(--primary); color: #fff; }
+        /* ── FLYING HEART ── */
+        .flying-check {
+            position: fixed; font-size: 4rem; color: var(--gold);
+            z-index: 9999; pointer-events: none;
+            animation: floatUp 0.8s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+        }
+        @keyframes floatUp { 0% { transform: scale(0.5) translateY(0); opacity: 1; } 100% { transform: scale(1.4) translateY(-120px); opacity: 0; } }
+
+        /* ── VIDEO WRAPPER (for video cards on dashboard) ── */
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+        /* ── MOBILE ADJUSTMENTS ── */
+        @media (max-width: 576px) {
+            .g-brand { font-size: 1.1rem; }
+            .hbtn span { display: none; }
+            .hbtn { padding: 0 10px; }
+            #resume-toast { left: 12px; right: 12px; min-width: 0; }
+            #dl-manager { left: 12px; right: 12px; width: auto; top: auto; bottom: 100px; }
+        }
     </style>
 </head>
+
 <body oncontextmenu="return false;">
+<!-- Hidden iframe for background form downloads -->
+<iframe name="dl-frame" style="display:none;"></iframe>
 
-    <iframe name="hidden_dl_iframe" style="display:none;"></iframe>
+<!-- Context Menu -->
+<div id="ctx-menu">
+    <div class="ctx-item" id="ctx-view"><i class="fas fa-expand" style="color:var(--gold);width:16px;"></i> View High-Res</div>
+    <div class="ctx-item" id="ctx-toggle"><i class="fas fa-check-circle" style="color:var(--green);width:16px;"></i> Select Photo</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item ctx-dl-item" id="ctx-dl-web"><i class="fas fa-bolt" style="color:#f59e0b;width:16px;"></i> Fast Download</div>
+    <div class="ctx-item ctx-dl-item" id="ctx-dl-orig"><i class="fas fa-star" style="color:var(--green);width:16px;"></i> Original Quality</div>
+</div>
 
-    <div id="custom-context-menu">
-        <div class="ctx-item" id="ctx-view"><i class="fas fa-expand text-primary" style="width:20px;"></i> View High-Res</div>
-        <div class="ctx-item" id="ctx-select"><i class="fas fa-check-circle text-success" style="width:20px;"></i> Select for Album</div>
-        <div style="height:1px; background:#eee; margin: 5px 0;"></div>
-        <div class="ctx-item" id="ctx-dl"><i class="fas fa-bolt text-warning" style="width:20px;"></i> Fast Download</div>
-        <div class="ctx-item" id="ctx-dl-full"><i class="fas fa-cloud-download-alt text-success" style="width:20px;"></i> Original Quality</div>
+<!-- Lasso Box -->
+<div id="lasso-box"></div>
+
+<!-- Main Loader -->
+<div id="main-loader">
+    <div class="loader-spinner"></div>
+    <div id="main-loader-text">Connecting to Studio</div>
+</div>
+
+<!-- Cache Progress Screen -->
+<div id="cache-screen">
+    <i class="fas fa-microchip" style="font-size:2.5rem;color:var(--gold);margin-bottom:14px;"></i>
+    <div class="cache-title">Preparing Your Gallery</div>
+    <p class="cache-sub">Optimising images for the best viewing experience. Please wait a moment.</p>
+    <div class="cache-bar-wrap"><div class="cache-bar-fill" id="cache-fill"></div></div>
+    <div class="cache-pct" id="cache-pct">0% Ready</div>
+    <div class="cache-stats" id="cache-stats">0 / 0 images</div>
+    <button class="btn-continue" id="btn-continue" onclick="finishCacheLoad()">Continue →</button>
+</div>
+
+<!-- Download Manager -->
+<div id="dl-manager">
+    <div class="dl-title" id="dl-title"><i class="fas fa-file-archive" style="color:var(--gold);margin-right:6px;"></i> Preparing...</div>
+    <div class="dl-bar-wrap"><div class="dl-bar-fill" id="dl-fill"></div></div>
+    <div class="dl-status"><span id="dl-text">Starting...</span></div>
+</div>
+
+<!-- Quality Selection Overlay -->
+<div id="quality-overlay">
+    <div class="quality-box">
+        <h5>Choose Download Quality</h5>
+        <button class="quality-btn" onclick="executeWebDownload()">
+            <i class="fas fa-bolt"></i>
+            <div><div class="quality-btn-title">Web Quality (Fast)</div><div class="quality-btn-sub">Downloads instantly. Good for sharing online.</div></div>
+        </button>
+        <button class="quality-btn" onclick="executeOriginalDownload()">
+            <i class="fas fa-star"></i>
+            <div><div class="quality-btn-title">Original Quality (Slow)</div><div class="quality-btn-sub">Full resolution. Best for printing.</div></div>
+        </button>
+        <button class="btn-cancel-dl" onclick="$('#quality-overlay').css('display','none')">Cancel</button>
     </div>
+</div>
 
-    <div id="lasso-box"></div>
-
-    <div id="main-loader" class="overlay-screen">
-        <div class="spinner"></div>
-        <h4 id="main-loader-text" style="color: #111; font-weight:700;">Connecting to Studio</h4>
+<!-- Resume Toast -->
+<div id="resume-toast">
+    <div class="toast-content">
+        <h6 id="resume-title">Welcome back!</h6>
+        <p>Continue where you left off?</p>
     </div>
-
-    <div id="floating-dl-manager" style="display: none;">
-        <div class="dl-title" id="dl-title">
-            <span><i class="fas fa-file-archive text-warning mr-2"></i> Preparing Download...</span>
-        </div>
-        <div class="dl-progress-bar">
-            <div class="dl-progress-fill" id="dl-fill"></div>
-        </div>
-        <div class="dl-status-text">
-            <span id="dl-text">Starting...</span>
-        </div>
+    <div class="toast-actions">
+        <button class="toast-btn toast-btn-yes" onclick="executeResume()">Continue</button>
+        <button class="toast-btn toast-btn-no"  onclick="dismissResume()">✕</button>
     </div>
+</div>
 
-    <div id="resume-toast">
-        <div class="toast-content">
-            <h6 id="resume-folder-name">Welcome Back!</h6>
-            <p>Continue exactly where you left off?</p>
-        </div>
-        <button class="toast-btn" onclick="executeResume()">Continue</button>
-        <button class="toast-close" onclick="closeResumeToast()"><i class="fas fa-times"></i></button>
+<!-- Gallery Header -->
+<div class="g-header">
+    <div class="g-brand"><span>Supriya</span> Studio</div>
+    <div class="g-actions">
+        <a href="index.html" class="hbtn"><i class="fas fa-home"></i> <span>Home</span></a>
+        <button class="hbtn" id="btn-back-folders" style="display:none;" onclick="goToDashboard()"><i class="fas fa-th-large"></i> <span>Folders</span></button>
+        <button class="hbtn hbtn-cart" id="btn-back-cart" style="display:none;" onclick="goBackToCart()"><i class="fas fa-shopping-cart"></i> <span>My Cart</span></button>
+        <button class="hbtn" id="btn-start"  style="display:none;" onclick="openLightbox(0)"><i class="fas fa-play"></i> <span>Slideshow</span></button>
+        <button class="hbtn" id="btn-select" style="display:none;" onclick="toggleSelectMode()"><i class="far fa-check-circle"></i> <span>Select</span></button>
+        <button class="hbtn" id="btn-dl-all" style="display:none;" onclick="promptDownloadAll()"><i class="fas fa-download"></i> <span>All</span></button>
     </div>
+</div>
 
-    <div id="cache-progress-screen" class="overlay-screen" style="display:none; background: #fff;">
-        <i class="fas fa-microchip text-warning mb-3" style="font-size: 3rem;"></i>
-        <h3 style="color: #111; font-weight:800; margin-bottom:5px;">Optimizing Gallery</h3>
-        <p style="color: #666; font-size:0.9rem; max-width: 400px;">Using Multi-Core Processing to prepare high-quality files.</p>
-        <div class="progress-container"><div class="progress-fill" id="cache-fill"></div></div>
-        <h5 id="cache-percent" style="font-weight:700; color:var(--primary);">0% Loaded</h5>
-        <small id="cache-stats" class="text-muted font-weight-bold mt-1">0 / 0 Images Ready</small>
-        <div class="mt-4 d-flex justify-content-center flex-wrap gap-3">
-            <button id="btnContinueLive" class="btn btn-primary font-weight-bold mr-3 mb-2" style="border-radius: 50px; padding: 10px 25px; display:none;" onclick="finishCacheOptimizer()">Continue</button>
-        </div>
+<!-- Pill Menu (shown when in a folder) -->
+<div id="pill-menu"></div>
+
+<!-- Search Bar (shown when in a folder) — NEW FEATURE -->
+<div id="search-bar">
+    <i class="fas fa-search" style="color:var(--muted);flex-shrink:0;"></i>
+    <div class="search-input-wrap">
+        <input type="text" class="search-input" id="search-input" placeholder="Search photos by filename..." oninput="handleSearch(this.value)">
+        <span class="search-clear" id="search-clear" onclick="clearSearch()">✕</span>
     </div>
+    <span id="search-result-count"></span>
+</div>
 
-    <div id="quality-overlay" class="overlay-screen" style="display:none; background:rgba(0,0,0,0.5);">
-        <div class="overlay-box">
-            <h4 style="margin-top: 0; color: #111; margin-bottom: 20px;">Choose Download Quality</h4>
-            <button class="dl-opt-btn" onclick="executeWebDownload()"><i class="fas fa-bolt"></i><div><div style="font-weight: 700; color: #111;">Web Quality (Fast)</div><div style="font-size: 0.8rem; color: #666;">Downloads instantly.</div></div></button>
-            <button class="dl-opt-btn" onclick="executeOriginalDownload()"><i class="fas fa-star"></i><div><div style="font-weight: 700; color: #111;">Original Quality (Slow)</div><div style="font-size: 0.8rem; color: #666;">Massive files. Best for printing.</div></div></button>
-            <button class="btn btn-light w-100 mt-2 font-weight-bold" onclick="$('#quality-overlay').fadeOut();">Cancel</button>
-        </div>
-    </div>
+<!-- Event Dashboard Content -->
+<div id="event-content"></div>
 
-    <div class="modal fade" id="cartModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content" style="background: #fdfdfd; height: 85vh; border:none; border-radius: 16px; overflow: hidden;">
-                <div class="modal-header border-0 pb-0 pt-4 px-4 align-items-center">
-                    <h4 class="modal-title font-weight-bold" style="font-family: 'Playfair Display', serif; color: #111;">
-                        <i class="fas fa-folder-open text-warning mr-2"></i> My Selection Folders
-                    </h4>
-                    <button type="button" class="close" data-dismiss="modal" style="font-size: 1.8rem; outline: none;">&times;</button>
-                </div>
-                <div class="modal-body px-4 pt-4" id="cart-items-container">
-                    </div>
-                <div class="modal-footer border-0 p-3" style="background: #fff; box-shadow: 0 -5px 20px rgba(0,0,0,0.05);">
-                    <div class="font-weight-bold mr-auto ml-2" style="font-size: 1.1rem; color:#111;">Total: <span id="cart-total-count" style="color: var(--primary);">0</span> Photos</div>
-                    <button class="btn btn-primary font-weight-bold px-4 py-2 mr-2" style="border-radius: 50px;" onclick="promptDownloadSelected()">
-                        <i class="fas fa-download mr-1"></i> Save
-                    </button>
-                    <button class="btn btn-success font-weight-bold px-4 py-2" style="border-radius: 50px;" onclick="sendToStudio()">
-                        <i class="fab fa-whatsapp mr-1"></i> Send
-                    </button>
-                </div>
+<!-- Gallery (photo grid) -->
+<div class="gallery-container" id="gallery-wrap" style="display:none;">
+    <div class="gallery-grid" id="gallery"></div>
+</div>
+
+<!-- Floating Cart Button -->
+<button id="cart-fab" class="hidden" onclick="openCart()">
+    <i class="fas fa-shopping-cart"></i>
+    <div id="cart-badge">0</div>
+</button>
+
+<!-- Cart Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content modal-content-custom">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title font-weight-bold" style="font-family:var(--serif);font-size:1.4rem;">
+                    <i class="fas fa-folder-open" style="color:var(--gold);margin-right:8px;"></i>My Selected Photos
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" style="font-size:1.8rem;">&times;</button>
+            </div>
+            <div class="modal-body px-4" id="cart-body"></div>
+            <div class="modal-footer border-0 p-3" style="background:#fff;box-shadow:0 -5px 20px rgba(0,0,0,0.05);">
+                <span class="font-weight-bold mr-auto" style="font-size:1rem;">Total: <span id="cart-total" style="color:var(--gold);">0</span> Photos</span>
+                <button class="btn btn-primary font-weight-bold px-4" style="border-radius:4px;background:var(--gold);border:none;color:var(--dark);" onclick="promptDownloadSelected()"><i class="fas fa-download mr-1"></i> Download</button>
+                <button class="btn btn-success font-weight-bold px-4" style="border-radius:4px;" onclick="sendToStudio()"><i class="fab fa-whatsapp mr-1"></i> Send to Studio</button>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="gallery-header">
-        <div class="d-flex align-items-center">
-            <h1 class="brand-title" id="pageTitleDisplay"><span>Supriya</span> Studio</h1>
-        </div>
-        <div>
-            <a href="index.html" class="btn-header">
-                <i class="fas fa-home mr-1"></i> <span class="btn-text">Home</span>
-            </a>
-            
-            <button class="btn-header" id="btnBackToCart" onclick="goBackToCart()" style="display: none; border-color: #ef4444; color: #ef4444;">
-                <i class="fas fa-shopping-cart mr-1"></i> <span class="btn-text">Back to Cart</span>
-            </button>
-            
-            <button class="btn-header" id="btnBackToFolders" onclick="goBackToFolders()" style="display: none;">
-                <i class="fas fa-th-large mr-1"></i> <span class="btn-text">Main Folders</span>
-            </button>
-            
-            <button class="btn-header" id="btnStartViewing" style="display: none;" onclick="openLightbox(0)">
-                <i class="fas fa-play mr-1"></i> <span class="btn-text">Start</span>
-            </button>
-            
-            <button class="btn-header" id="btnSelectMode" style="display: none;" onclick="toggleSelectMode()">
-                <i class="far fa-check-circle mr-1"></i> <span class="btn-text">Select</span>
-            </button>
-            
-            <button class="btn-header download-ui d-none" onclick="promptDownloadAll()">
-                <i class="fas fa-download mr-1"></i> <span class="btn-text">All</span>
-            </button>
-        </div>
-    </div>
-
-    <div id="sticky-pill-menu"></div>
-
-    <div id="event-content"></div>
-    
-    <div class="container-fluid">
-        <div id="cart-folder-header" style="display:none;" class="section-header mb-2">
-            <span id="cart-folder-name">Selected Photos</span>
-        </div>
-        <div id="gallery" class="gallery-grid" style="display:none;"></div>
-    </div>
-
-    <button id="floating-cart-btn" class="hidden" onclick="openCart()">
-        <i class="fas fa-shopping-cart"></i>
-        <div id="floating-cart-badge">0</div>
-    </button>
-
-    <div class="modal fade" id="lightboxModal" tabindex="-1" data-backdrop="static">
-        <div class="modal-dialog modal-xl" style="max-width: 100%; margin: 0;">
-            <div class="modal-content modal-content-lb">
-                <div class="modal-body modal-body-lb" id="lb-body-container">
-                    <div class="lb-header">
-                        <div class="lb-title" id="lbFileName">image.jpg</div>
-                        <div class="lb-actions">
-                            <span class="lb-icon" onclick="toggleSelection(currentIndex)"><i class="far fa-check-circle" id="lbHeartIcon"></i></span>
-                            <div class="dropdown download-ui d-none">
-                                <span class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></span>
-                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
-                                    <a class="dropdown-item fast-dl-btn" href="#" onclick="downloadSingleImage('normal', event)"><i class="fas fa-bolt mr-2 text-warning"></i> Fast Download (Web)</a>
-                                    <a class="dropdown-item" href="#" onclick="downloadSingleImage('full', event)"><i class="fas fa-star mr-2 text-primary"></i> Full Quality (Original)</a>
-                                </div>
-                            </div>
-                            <span class="lb-icon" data-dismiss="modal" onclick="resetZoom()"><i class="fas fa-times"></i></span>
-                        </div>
-                    </div>
-                    <div class="lb-control lb-prev" onclick="changeImage(-1)"><i class="fas fa-chevron-left"></i></div>
-                    <img id="lightboxImage" src="" style="opacity: 0;">
-                    <div class="lb-control lb-next" onclick="changeImage(1)"><i class="fas fa-chevron-right"></i></div>
-                </div>
+<!-- Video Modal -->
+<div class="modal fade" id="videoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background:#000;border:none;">
+            <div class="modal-header border-0 p-2" style="position:absolute;right:0;z-index:10;">
+                <button class="close text-white" data-dismiss="modal" style="font-size:2rem;opacity:0.8;">&times;</button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="video-wrapper"><iframe id="yt-iframe" src="" allowfullscreen></iframe></div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal fade" id="videoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="background: #000;">
-                <div class="modal-header border-0 p-2" style="position: absolute; right: 0; z-index: 10;">
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body p-0">
-                    <div class="video-wrapper"><iframe id="ytIframe" src="" frameborder="0" allowfullscreen></iframe></div>
+<!-- Lightbox -->
+<div class="lb-backdrop" id="lightbox">
+    <div class="lb-header">
+        <div class="lb-filename" id="lb-filename">photo.jpg</div>
+        <div class="lb-actions-right">
+            <button class="lb-icon" id="lb-select-btn" onclick="toggleSelection(currentIdx)"><i class="far fa-check-circle" id="lb-select-icon"></i></button>
+            <!-- Bug 2 Fix: Lightbox download button controlled separately from header.
+                 It uses its own id #lb-dl-btn and is shown/hidden based on item.can_download,
+                 NOT tied to the cart count like the old .download-ui class was. -->
+            <div class="dropdown" id="lb-dl-btn" style="display:none;">
+                <button class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></button>
+                <div class="dropdown-menu dropdown-menu-right" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;min-width:180px;">
+                    <a class="dropdown-item" href="#" style="color:#eee;padding:10px 16px;border-bottom:1px solid #2a2a2a;" onclick="dlSingle('web',event)"><i class="fas fa-bolt mr-2" style="color:#f59e0b;"></i> Web Quality</a>
+                    <a class="dropdown-item" href="#" style="color:#eee;padding:10px 16px;" onclick="dlSingle('orig',event)"><i class="fas fa-star mr-2" style="color:var(--gold);"></i> Original</a>
                 </div>
             </div>
+            <button class="lb-icon" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
         </div>
     </div>
+    <div class="lb-body" id="lb-body">
+        <div class="lb-nav lb-prev" onclick="changePhoto(-1)"><i class="fas fa-chevron-left"></i></div>
+        <img id="lb-img" src="" style="opacity:0;">
+        <div class="lb-nav lb-next" onclick="changePhoto(1)"><i class="fas fa-chevron-right"></i></div>
+    </div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        // ==========================================
-        // CORE CONFIGURATION
-        // ==========================================
-        const API_BASE = "https://supriyadigitals.store/api/";
-        const STUDIO_WHATSAPP_NUMBER = "919246789966"; 
-        
-        const params = new URLSearchParams(window.location.search);
-        let fullEventData = []; let galleryData = []; let selectedFiles = new Set();
-        let isSelectMode = false; let isCartView = false; let currentIndex = 0; let canDownload = 0; 
-        let pendingDownloadArray = []; let lastSelectedIndex = -1;
+<script>
+// ════════════════════════════════════════════════════════
+//  CONFIGURATION
+// ════════════════════════════════════════════════════════
+const API_BASE  = "https://supriyadigitals.store/api/";
+const WA_NUMBER = "919246789966";
 
-        let cacheMissingUrls = []; let cacheTotal = 0; let cacheCompleted = 0; let cacheWorkersActive = 0; const MAX_WORKERS = 4; 
+// ════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════
+const params = new URLSearchParams(window.location.search);
 
-        function escapeHtml(unsafe) { return (unsafe || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+let allEventData   = [];   // all items for this event
+let galleryData    = [];   // items in currently open folder
+let filteredData   = [];   // galleryData filtered by search
+let selectedFiles  = new Set();
+let canDownload    = 0;
+let isSelectMode   = false;
+let isCartView     = false;
+let currentIdx     = 0;
+let currentBatchId = null;
+let pendingDlFiles = [];
 
-        let deviceId = localStorage.getItem('supriya_device_id');
-        if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('supriya_device_id', deviceId); }
-        let currentEventTracker = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root Dashboard';
-        
-        function pingServer() { 
-            fetch(API_BASE + 'track.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device: deviceId, site: 'View Page', event: currentEventTracker, action: 'ping', item_info: '' }) }).catch(()=>{});
-        }
-        pingServer(); setInterval(pingServer, 10000);
+// Resume state
+let resumeBatchId  = null;
+let resumeIdx      = null;
 
-        // ==========================================
-        // PERSISTENT CART LOGIC & SCROLL LISTENER
-        // ==========================================
-        function loadCart() {
-            try {
-                let saved = localStorage.getItem('supriya_cart_' + currentEventTracker);
-                if (saved) {
-                    let arr = JSON.parse(saved);
-                    selectedFiles = new Set(arr);
-                    updateFloatingBar();
-                }
-            } catch(e) {}
-        }
+// Cache worker state
+let cacheMissing   = [];
+let cacheTotal     = 0;
+let cacheDone      = 0;
+const MAX_WORKERS  = 4;
+let activeWorkers  = 0;
 
-        function saveCart() {
-            localStorage.setItem('supriya_cart_' + currentEventTracker, JSON.stringify(Array.from(selectedFiles)));
-        }
+// Tracking
+let deviceId = localStorage.getItem('sds_device');
+if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2,9); localStorage.setItem('sds_device', deviceId); }
+const currentEvent = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root';
 
-        let lastScrollTop = 0;
-        window.addEventListener("scroll", function() {
-            let st = window.pageYOffset || document.documentElement.scrollTop;
-            let cartBtn = document.getElementById("floating-cart-btn");
-            if (selectedFiles.size > 0) {
-                if (st > lastScrollTop && st > 100){
-                    cartBtn.classList.add("hidden"); 
-                } else {
-                    cartBtn.classList.remove("hidden"); 
-                }
-            }
-            lastScrollTop = st <= 0 ? 0 : st;
-        }, false);
+// ════════════════════════════════════════════════════════
+//  TRACKING
+// ════════════════════════════════════════════════════════
+function track(action, info) {
+    fetch(API_BASE + 'track.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device: deviceId, site: 'View Page', event: currentEvent, action, item_info: info || '' })
+    }).catch(() => {});
+}
+function ping() {
+    fetch(API_BASE + 'ping.php?device=' + deviceId).catch(() => {});
+    track('ping');
+}
+ping(); setInterval(ping, 10000);
 
-        // ==========================================
-        // SMART RESUME LOGIC (PER FOLDER)
-        // ==========================================
-        let pendingResumeBatch = null;
-        let pendingResumeIndex = null;
+// ════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════
+async function init() {
+    loadCart();
+    try {
+        let url = API_BASE + 'fetch.php?mode=client';
+        const evt = params.get('event');
+        if (evt) url += '&event=' + encodeURIComponent(evt) + '&type=all';
 
-        function checkResumeToast(batchId) {
-            let savedIndex = parseInt(localStorage.getItem('supriya_resume_' + currentEventTracker + '_' + batchId));
-            if (!isNaN(savedIndex)) {
-                pendingResumeBatch = batchId;
-                pendingResumeIndex = savedIndex;
-                
-                let folderName = "this folder";
-                if(fullEventData && fullEventData.length > 0) {
-                    let f = fullEventData.find(i => i.batch_id === batchId);
-                    if (f) folderName = f.file_path.split('/').slice(-2, -1)[0] || "this folder";
-                }
-                $('#resume-folder-name').text(`Welcome back to ${escapeHtml(folderName)}`);
-                
-                setTimeout(() => { $('#resume-toast').addClass('show'); }, 1000);
-            }
-        }
+        const res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': '1' } });
+        const data = await res.json();
 
-        function executeResume() {
-            $('#resume-toast').removeClass('show');
-            if (pendingResumeBatch && pendingResumeIndex !== null && !isCartView) {
-                openLightbox(pendingResumeIndex);
-            }
-        }
-
-        function closeResumeToast() { 
-            $('#resume-toast').removeClass('show'); 
-            if(pendingResumeBatch) {
-                localStorage.removeItem('supriya_resume_' + currentEventTracker + '_' + pendingResumeBatch); 
-            }
-            pendingResumeBatch = null;
-            pendingResumeIndex = null;
-        }
-
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.gallery-item') && $('#resume-toast').hasClass('show')) {
-                closeResumeToast();
-            }
-        });
-
-        // ==========================================
-        // INITIALIZATION
-        // ==========================================
-        async function initializeGallery() {
-            loadCart(); 
-            try {
-                let url = `${API_BASE}fetch.php?mode=client`;
-                const eventName = params.get('event');
-                if (eventName) url += `&event=${encodeURIComponent(eventName)}&type=all`;
-                
-                const response = await fetch(url, { headers: { "ngrok-skip-browser-warning": "69420" } });
-                const result = await response.json();
-
-                if (!result.success || result.data.length === 0) { 
-                    $('#main-loader').html('<div class="text-center p-4"><h3 class="text-danger font-weight-bold mb-2">Link Expired or Private</h3><p class="text-muted">The gallery you are looking for is currently unavailable.</p></div>'); return; 
-                }
-
-                fullEventData = result.data;
-                if (eventName) { $('#main-loader').fadeOut(300); renderFolderDashboard(); } 
-                else {
-                    galleryData = fullEventData.filter(i => i.type === 'work' || i.type === 'link');
-                    canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
-                    $('#main-loader').fadeOut(300);
-                    if (galleryData.length > 0) openFolder(galleryData[0].batch_id); 
-                }
-            } catch (e) { $('#main-loader').html(`<h5 class="text-danger">Server Not Available</h5>`); }
-        }
-
-        // ==========================================
-        // SMART PILL MENU & DASHBOARD
-        // ==========================================
-        function renderFolderDashboard() {
-            $('#gallery').hide().empty(); $('#event-content').show(); $('#sticky-pill-menu').hide();
-            $('#btnSelectMode').hide(); $('#btnStartViewing').hide(); $('.download-ui').hide(); 
-            $('#btnBackToFolders').hide(); $('#btnBackToCart').hide(); $('#cart-folder-header').hide();
-            isCartView = false;
-            
-            if (isSelectMode) toggleSelectMode();
-
-            let html = '';
-            let displayName = params.get('event') ? decodeURIComponent(params.get('event')) : '';
-            if (!displayName && fullEventData.length > 0) displayName = fullEventData[0].title;
-            if (displayName) { html += `<div style="text-align: center; padding: 40px 20px 0;"><h2 style="font-family: 'Playfair Display', serif; font-weight: 700; color: #111; font-size: 2.2rem; margin: 0; letter-spacing: 1px;">${escapeHtml(displayName)}</h2><div style="width: 50px; height: 3px; background: var(--primary); margin: 15px auto 0;"></div></div>`; }
-
-            html += '<div class="section-header" style="margin-top:20px;">Collections</div><div class="media-grid">';
-
-            let dashboardItems = []; let seenBatches = new Set();
-            let sortedData = [...fullEventData].sort((a, b) => (parseInt(a.order_index) || 999999) - (parseInt(b.order_index) || 999999));
-
-            let pillHtml = `<div class="pill-btn active" onclick="goBackToFolders()"><i class="fas fa-th-large mr-1"></i> All Collections</div>`;
-
-            sortedData.forEach(item => {
-                let itemOrder = parseInt(item.order_index); if(isNaN(itemOrder)) itemOrder = 999999;
-                if (item.type === 'teaser' || item.type === 'live') { dashboardItems.push({ type: 'video', data: item, order: itemOrder }); }
-                else if (item.type === 'album') { dashboardItems.push({ type: 'album', data: item, order: itemOrder }); }
-                else if (item.batch_id && (item.type === 'work' || item.type === 'link')) {
-                    if (!seenBatches.has(item.batch_id)) {
-                        seenBatches.add(item.batch_id);
-                        let pathParts = item.file_path.split('/'); let actualFolderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : item.title;
-                        let count = sortedData.filter(i => i.batch_id === item.batch_id).length;
-                        dashboardItems.push({ type: 'folder', id: item.batch_id, title: actualFolderName, cover: item.file_path, count: count, order: itemOrder });
-                        pillHtml += `<div class="pill-btn" onclick="openFolder('${item.batch_id}')">${escapeHtml(actualFolderName)}</div>`;
-                    }
-                }
-            });
-
-            $('#sticky-pill-menu').html(pillHtml);
-            dashboardItems.sort((a, b) => a.order - b.order);
-
-            dashboardItems.forEach(card => {
-                if (card.type === 'folder') {
-                    const coverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(card.cover)}&thumb=1`;
-                    html += `<div class="media-card" onclick="openFolder('${card.id}')"><div class="folder-cover" style="background-image: url('${coverUrl}');"></div><div class="card-details"><h5><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(card.title)}</h5><small><i class="fas fa-image mr-1"></i> ${card.count} Photos</small></div></div>`;
-                }
-                else if (card.type === 'video') {
-                    let v = card.data; let ytId = "";
-                    if (v.file_path) { if (v.file_path.includes('embed/')) ytId = v.file_path.split('embed/')[1].split('?')[0]; else if (v.file_path.includes('v=')) ytId = v.file_path.split('v=')[1].split('&')[0]; else if (v.file_path.includes('youtu.be/')) ytId = v.file_path.split('youtu.be/')[1].split('?')[0]; }
-                    html += `<div class="media-card" onclick="openVideo('${ytId}')"><div class="folder-cover" style="background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');"><div class="folder-overlay"></div><i class="fas fa-play-circle text-white" style="font-size:3rem; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow:0 2px 10px rgba(0,0,0,0.5);"></i></div><div class="card-details"><h5><i class="fab fa-youtube text-danger mr-2"></i> ${escapeHtml(v.video_category || 'Cinematic Film')}</h5><small>Tap to Play Video</small></div></div>`;
-                }
-                else if (card.type === 'album') {
-                    let a = card.data; html += `<div class="media-card" onclick="window.open('${escapeHtml(a.file_path)}', '_blank')" style="text-align:center; padding: 40px 20px;"><i class="fas fa-book-reader text-success mb-3" style="font-size: 3.5rem;"></i><div class="card-details" style="text-align:center; padding:0;"><h5>${escapeHtml(a.title || 'Digital Album')}</h5><small>View PDF Document</small></div></div>`;
-                }
-            });
-            html += '</div>'; $('#event-content').html(html);
-        }
-
-        // ==========================================
-        // FOLDER & CART VIEW OPENING LOGIC
-        // ==========================================
-        function openFolder(batchId) {
-            isCartView = false;
-            if (isSelectMode) toggleSelectMode(); 
-            
-            galleryData = fullEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
-            canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
-            
-            galleryData.sort((a, b) => {
-                let orderA = parseInt(a.order_index); if(isNaN(orderA)) orderA = 999999;
-                let orderB = parseInt(b.order_index); if(isNaN(orderB)) orderB = 999999;
-                if (orderA !== orderB) return orderA - orderB;
-                let nameA = (a.title_from_filename || a.file_path.split('/').pop()).toLowerCase();
-                let nameB = (b.title_from_filename || b.file_path.split('/').pop()).toLowerCase();
-                return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
-            });
-            
-            $('#event-content').hide(); 
-            $('#cart-folder-header').hide();
-            $('#btnBackToCart').hide();
-            
-            $('#main-loader-text').text('Loading High-Res Preview...');
-            $('#main-loader').show();
-            
-            $.get(API_BASE + 'cache_manager.php?action=status&batch_id=' + batchId, function(res) {
-                let data = JSON.parse(res); cacheTotal = data.total; cacheCompleted = data.cached; cacheMissingUrls = data.missing;
-                updateCacheUI();
-                if (cacheMissingUrls.length === 0) { $('#main-loader').fadeOut(200); finishCacheOptimizer(); } 
-                else { $('#main-loader').fadeOut(200); $('#cache-progress-screen').fadeIn(); for(let i=0; i<MAX_WORKERS; i++) { runCacheWorker(); } }
-            }).fail(function() { $('#main-loader').fadeOut(200); finishCacheOptimizer(); });
-
-            $('#sticky-pill-menu').show();
-            $('.pill-btn').removeClass('active');
-            $(`.pill-btn[onclick="openFolder('${batchId}')"]`).addClass('active');
-            
-            let activePill = $(`.pill-btn[onclick="openFolder('${batchId}')"]`)[0];
-            if(activePill) activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            
-            checkResumeToast(batchId);
-        }
-
-        // NEW: OPENS A FOLDER SHOWING ONLY SELECTED PHOTOS
-        function openCartFolder(batchId, folderName) {
-            $('#cartModal').modal('hide');
-            isCartView = true;
-            if (isSelectMode) toggleSelectMode();
-            
-            galleryData = fullEventData.filter(i => i.batch_id === batchId && selectedFiles.has(i.file_path) && (i.type === 'work' || i.type === 'link'));
-            canDownload = Math.max(...galleryData.map(i => parseInt(i.can_download) || 0));
-            
-            galleryData.sort((a, b) => {
-                let orderA = parseInt(a.order_index); if(isNaN(orderA)) orderA = 999999;
-                let orderB = parseInt(b.order_index); if(isNaN(orderB)) orderB = 999999;
-                if (orderA !== orderB) return orderA - orderB;
-                let nameA = (a.title_from_filename || a.file_path.split('/').pop()).toLowerCase();
-                let nameB = (b.title_from_filename || b.file_path.split('/').pop()).toLowerCase();
-                return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
-            });
-
-            $('#event-content').hide(); 
-            $('#sticky-pill-menu').hide();
-            
-            // Header adjustments: Ensure BOTH Main Folders and Back to Cart are shown
-            $('#btnBackToFolders').show(); 
-            $('#btnBackToCart').show();
-
-            if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
-            $('#btnSelectMode').show(); 
-            $('#btnStartViewing').show();
-            $('#gallery').show();
-            
-            $('#cart-folder-name').text(folderName + ' - Selections');
-            $('#cart-folder-header').css('display', 'flex'); // Use flex to match header layout
-            
-            closeResumeToast(); 
-            renderGallery();
-        }
-
-        function updateCacheUI() { let pct = cacheTotal > 0 ? Math.round((cacheCompleted / cacheTotal) * 100) : 100; $('#cache-fill').css('width', pct + '%'); $('#cache-percent').text(pct + '% Loaded'); $('#cache-stats').text(cacheCompleted + ' / ' + cacheTotal + ' Images Ready'); if (cacheCompleted >= 5 || pct >= 10) { $('#btnContinueLive').fadeIn(); } }
-        function runCacheWorker() { if(cacheMissingUrls.length === 0) return; cacheWorkersActive++; const url = cacheMissingUrls.shift(); fetch(API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1').then(() => { cacheCompleted++; updateCacheUI(); cacheWorkersActive--; if (cacheCompleted >= cacheTotal && cacheWorkersActive === 0) finishCacheOptimizer(); else runCacheWorker(); }).catch(() => { cacheCompleted++; updateCacheUI(); cacheWorkersActive--; runCacheWorker(); }); }
-
-        function finishCacheOptimizer() {
-            $('#cache-progress-screen').fadeOut();
-            if (canDownload > 0) $('.download-ui').removeClass('d-none').show();
-            $('#btnSelectMode').show(); $('#btnBackToFolders').show(); $('#gallery').show();
-            $('#btnStartViewing').show();
-            renderGallery();
-        }
-
-        function goBackToFolders() { renderFolderDashboard(); }
-        
-        function goBackToCart() { 
-            renderFolderDashboard();
-            openCart();
-        }
-        
-        function openVideo(ytId) { if (!ytId) return; $('#ytIframe').attr('src', `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&showinfo=0`); $('#videoModal').modal('show'); }
-        $('#videoModal').on('hidden.bs.modal', function () { $('#ytIframe').attr('src', ''); });
-
-        // ==========================================
-        // MASONRY GALLERY RENDER & SKELETON LOADERS
-        // ==========================================
-        function renderGallery() {
-            let html = '';
-            galleryData.forEach((item, index) => {
-                const imgUrl = item.file_path; galleryData[index].fullUrl = imgUrl; 
-                galleryData[index].filename = item.title_from_filename || item.file_path.split('/').pop();
-                const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}&thumb=1`; 
-                galleryData[index].thumbUrl = thumbUrl; galleryData[index].highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(imgUrl)}`;
-                
-                let isSel = selectedFiles.has(imgUrl) ? 'selected' : '';
-                
-                html += `<div class="gallery-item skeleton ${isSel}" id="item-${index}" onclick="handleItemClick(${index}, event)" oncontextmenu="showContextMenu(event, ${index})"><img data-src="${thumbUrl}" class="lazy-image"></div>`;
-            });
-            document.getElementById('gallery').innerHTML = html; initLazyLoader(); updateFloatingBar();
-        }
-
-        let imageLoadQueue = []; let activeDownloads = 0; const MAX_LAZY_DOWNLOADS = 6;
-        function processImageLoadQueue() { if (imageLoadQueue.length === 0 || activeDownloads >= MAX_LAZY_DOWNLOADS) return; const img = imageLoadQueue.shift(); activeDownloads++; img.onload = () => { img.classList.add('loaded'); img.parentElement.classList.remove('skeleton'); activeDownloads--; processImageLoadQueue(); }; img.onerror = () => { activeDownloads--; processImageLoadQueue(); }; img.src = img.getAttribute('data-src'); }
-        function initLazyLoader() { const imageObserver = new IntersectionObserver((entries, observer) => { entries.forEach(entry => { if (entry.isIntersecting) { imageLoadQueue.push(entry.target); processImageLoadQueue(); observer.unobserve(entry.target); } }); }, { rootMargin: "0px 0px 1200px 0px" }); document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img)); }
-
-        // ==========================================
-        // ADVANCED SELECTION ENGINE
-        // ==========================================
-        function toggleSelectMode() { 
-            isSelectMode = !isSelectMode; 
-            $('#btnSelectMode').toggleClass('active'); 
-        }
-        
-        let lastTapTime = 0;
-        function handleItemClick(index, event) {
-            let currentTime = new Date().getTime();
-            let tapLength = currentTime - lastTapTime;
-            
-            if (tapLength < 300 && tapLength > 0) {
-                toggleSelection(index, true); 
-                showFlyingHeart(event.clientX, event.clientY);
-                event.preventDefault();
-                return;
-            }
-            lastTapTime = currentTime;
-
-            if (isSelectMode) {
-                if (event.shiftKey && lastSelectedIndex !== -1) {
-                    let start = Math.min(lastSelectedIndex, index);
-                    let end = Math.max(lastSelectedIndex, index);
-                    for(let i=start; i<=end; i++) { toggleSelection(i, true); }
-                } else {
-                    toggleSelection(index);
-                }
-                lastSelectedIndex = index;
-            } else { 
-                openLightbox(index); 
-            }
-        }
-
-        function toggleSelection(index, forceSelect = null) { 
-            const item = galleryData[index]; const $el = $(`#item-${index}`); 
-            let willBeSelected = forceSelect !== null ? forceSelect : !selectedFiles.has(item.fullUrl);
-            
-            if (willBeSelected) { 
-                selectedFiles.add(item.fullUrl); 
-                $el.addClass('selected'); 
-            } else { 
-                selectedFiles.delete(item.fullUrl); 
-                $el.removeClass('selected'); 
-                
-                if (isCartView) {
-                    $el.fadeOut(300, function() { $(this).remove(); });
-                    if (galleryData.filter(i => selectedFiles.has(i.fullUrl)).length === 0) {
-                        setTimeout(() => goBackToCart(), 300);
-                    }
-                }
-            } 
-            
-            updateFloatingBar(); 
-            updateLightboxHeart(); 
-            saveCart(); 
-        }
-        
-        function updateFloatingBar() { 
-            const count = selectedFiles.size; 
-            $('#cart-total-count').text(count); 
-            $('#floating-cart-badge').text(count);
-
-            if (count > 0) {
-                $('#floating-cart-btn').removeClass('hidden');
-                $('.download-ui').removeClass('d-none');
-            } else {
-                $('#floating-cart-btn').addClass('hidden');
-                $('.download-ui').addClass('d-none');
-            }
-        }
-
-        function showFlyingHeart(x, y) {
-            let heart = document.createElement('i');
-            heart.className = 'fas fa-check-circle flying-heart';
-            heart.style.color = 'var(--primary)';
-            heart.style.left = (x - 30) + 'px'; 
-            heart.style.top = (y - 30) + 'px';
-            document.body.appendChild(heart);
-            setTimeout(() => { heart.remove(); }, 900);
-        }
-
-        // ==========================================
-        // DEDICATED CART MODAL SHOWING FOLDERS
-        // ==========================================
-        function openCart() {
-            if (selectedFiles.size === 0) { 
-                alert("Your cart is empty. Double tap any photo to add it!");
-                return; 
-            }
-            renderCartItems();
-            $('#cartModal').modal('show');
-        }
-
-        function renderCartItems() {
-            let container = $('#cart-items-container');
-            container.empty();
-            let filesByFolder = {};
-            
-            selectedFiles.forEach(url => {
-                let parts = url.split('/');
-                let filename = parts.pop();
-                let foldername = parts.pop() || "Other";
-                
-                if (!filesByFolder[foldername]) filesByFolder[foldername] = [];
-                filesByFolder[foldername].push(url);
-            });
-
-            let html = '<div class="media-grid" style="margin-top:0;">';
-            
-            for (let folder in filesByFolder) {
-                let count = filesByFolder[folder].length;
-                let firstImage = filesByFolder[folder][0];
-                let thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(firstImage)}&thumb=1`;
-                
-                let matchingItem = fullEventData.find(i => i.file_path === firstImage);
-                let batchId = matchingItem ? matchingItem.batch_id : '';
-                
-                html += `
-                <div class="media-card" onclick="openCartFolder('${batchId}', '${escapeHtml(folder)}')">
-                    <div class="folder-cover" style="background-image: url('${thumbUrl}'); height: 140px;">
-                        <div class="folder-overlay" style="background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 80%);"></div>
-                    </div>
-                    <div class="card-details" style="padding: 15px;">
-                        <h5 style="font-size:1rem;"><i class="fas fa-folder-open text-warning mr-2"></i> ${escapeHtml(folder)}</h5>
-                        <small class="text-danger font-weight-bold"><i class="fas fa-heart mr-1"></i> ${count} Selected</small>
-                    </div>
+        if (!data.success || !data.data || data.data.length === 0) {
+            document.getElementById('main-loader').innerHTML =
+                `<div style="text-align:center;padding:30px;">
+                    <i class="fas fa-lock" style="font-size:3rem;color:var(--muted);margin-bottom:16px;"></i>
+                    <h4 style="font-weight:700;">Gallery Not Found</h4>
+                    <p style="color:var(--muted);">This link may have expired or the gallery is private.</p>
+                    <a href="index.html" style="color:var(--gold);font-weight:600;">← Go to Main Site</a>
                 </div>`;
+            return;
+        }
+
+        allEventData = data.data;
+        document.getElementById('main-loader').style.display = 'none';
+
+        if (evt) {
+            renderDashboard();
+        } else {
+            // No event specified — find first work batch and open it
+            const first = allEventData.find(i => i.type === 'work' || i.type === 'link');
+            if (first) openFolder(first.batch_id);
+            else renderDashboard();
+        }
+    } catch (e) {
+        document.getElementById('main-loader').innerHTML =
+            `<div style="text-align:center;"><h5 style="color:#ef4444;">Server unavailable. Please try again.</h5></div>`;
+    }
+}
+
+// ════════════════════════════════════════════════════════
+//  DASHBOARD RENDER
+// ════════════════════════════════════════════════════════
+function renderDashboard() {
+    isCartView = false;
+    if (isSelectMode) toggleSelectMode();
+
+    // Hide gallery, show dashboard
+    document.getElementById('gallery-wrap').style.display  = 'none';
+    document.getElementById('event-content').style.display = 'block';
+    document.getElementById('search-bar').style.display    = 'none';
+    document.getElementById('pill-menu').style.display     = 'none';
+    document.getElementById('btn-back-folders').style.display = 'none';
+    document.getElementById('btn-back-cart').style.display    = 'none';
+    document.getElementById('btn-start').style.display        = 'none';
+    document.getElementById('btn-select').style.display       = 'none';
+    document.getElementById('btn-dl-all').style.display       = 'none';
+
+    const evtName = params.get('event') ? decodeURIComponent(params.get('event')) : '';
+    let html = '';
+
+    if (evtName) {
+        html += `<div style="text-align:center;padding:32px 20px 0;">
+            <h2 style="font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--text);margin:0;">${escHtml(evtName)}</h2>
+            <div style="width:40px;height:2px;background:var(--gold);margin:14px auto 0;"></div>
+        </div>`;
+    }
+
+    // Build pill menu
+    let pillHtml = `<span class="pill active" onclick="renderDashboard()"><i class="fas fa-th-large mr-1"></i> All</span>`;
+
+    // Collect folders, videos, albums in order
+    const seenBatches = new Set();
+    const sorted = [...allEventData].sort((a,b) => (parseInt(a.order_index)||999999) - (parseInt(b.order_index)||999999));
+
+    let items = [];
+    sorted.forEach(item => {
+        if ((item.type === 'work' || item.type === 'link') && item.batch_id) {
+            if (!seenBatches.has(item.batch_id)) {
+                seenBatches.add(item.batch_id);
+                const count = sorted.filter(i => i.batch_id === item.batch_id).length;
+                const parts = item.file_path.split('/');
+                const folder = parts.length > 1 ? parts[parts.length - 2] : item.title;
+                items.push({ kind: 'folder', batchId: item.batch_id, name: folder, cover: item.file_path, count, order: parseInt(item.order_index)||999999 });
+                pillHtml += `<span class="pill" onclick="openFolder('${escHtml(item.batch_id)}')">${escHtml(folder)}</span>`;
             }
-            
-            html += '</div>';
-            container.html(html);
+        } else if (item.type === 'teaser' || item.type === 'live') {
+            items.push({ kind: 'video', data: item, order: parseInt(item.order_index)||999999 });
+        } else if (item.type === 'album') {
+            items.push({ kind: 'album', data: item, order: parseInt(item.order_index)||999999 });
         }
+    });
 
-        function sendToStudio() {
-            if (selectedFiles.size === 0) return;
-            let eventName = params.get('event') ? decodeURIComponent(params.get('event')) : 'Gallery';
-            let text = `Hello Supriya Digitals! Here are the photos I selected from *${eventName}*:\n\n`;
+    document.getElementById('pill-menu').innerHTML = pillHtml;
+    document.getElementById('pill-menu').style.display = 'flex';
 
-            let filesByFolder = {};
-            selectedFiles.forEach(url => {
-                let parts = url.split('/');
-                let filename = parts.pop();
-                let foldername = parts.pop() || "Unknown Folder";
-                if (!filesByFolder[foldername]) filesByFolder[foldername] = [];
-                filesByFolder[foldername].push(filename);
-            });
+    // Render cards
+    html += `<div class="media-grid">`;
+    items.sort((a,b) => a.order - b.order).forEach(item => {
+        if (item.kind === 'folder') {
+            const thumb = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.cover)}&thumb=1`;
+            html += `<div class="media-card" onclick="openFolder('${escHtml(item.batchId)}')">
+                <div class="folder-cover" style="background-image:url('${escHtml(thumb)}');">
+                    <div class="folder-overlay"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-title"><i class="fas fa-folder-open" style="color:#d97706;margin-right:6px;"></i>${escHtml(item.name)}</div>
+                    <div class="card-sub">${item.count} Photos</div>
+                </div>
+            </div>`;
+        } else if (item.kind === 'video') {
+            const v = item.data;
+            const ytId = extractYtId(v.file_path);
+            const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
+            const label = v.type === 'live' ? 'Live Event' : 'Cinematic Film';
+            html += `<div class="media-card" onclick="openVideoModal('${escHtml(ytId)}')">
+                <div class="folder-cover" style="background-image:url('${thumb}');">
+                    <div class="folder-overlay"></div>
+                    <div class="video-play-icon"><i class="fas fa-play-circle"></i></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-title"><i class="fab fa-youtube" style="color:#ef4444;margin-right:6px;"></i>${escHtml(v.title || label)}</div>
+                    <div class="card-sub">Tap to play video</div>
+                </div>
+            </div>`;
+        } else if (item.kind === 'album') {
+            const a = item.data;
+            const target = a.pdf_link || a.file_path;
+            html += `<div class="media-card" onclick="window.open('${escHtml(target)}','_blank')">
+                <div class="folder-cover" style="background:linear-gradient(135deg,#1a1a1a,#333);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-book-reader" style="font-size:3rem;color:var(--gold);"></i>
+                </div>
+                <div class="card-body">
+                    <div class="card-title">${escHtml(a.title || 'Digital Album')}</div>
+                    <div class="card-sub"><i class="fas fa-external-link-alt mr-1"></i>View PDF Document</div>
+                </div>
+            </div>`;
+        }
+    });
 
-            for (let folder in filesByFolder) {
-                text += `📁 *${folder}*\n`;
-                filesByFolder[folder].forEach((file, idx) => {
-                    text += `   ${idx + 1}. ${file}\n`;
-                });
-                text += `\n`;
+    html += `</div>`;
+    document.getElementById('event-content').innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════
+//  OPEN FOLDER
+// ════════════════════════════════════════════════════════
+function openFolder(batchId) {
+    isCartView    = false;
+    currentBatchId = batchId;
+    if (isSelectMode) toggleSelectMode();
+
+    galleryData = allEventData.filter(i => i.batch_id === batchId && (i.type === 'work' || i.type === 'link'));
+
+    // Bug 5 Fix: guard against empty array before Math.max
+    canDownload = galleryData.length > 0
+        ? Math.max(...galleryData.map(i => parseInt(i.can_download) || 0))
+        : 0;
+
+    // Natural sort by filename
+    galleryData.sort((a,b) => {
+        let oa = parseInt(a.order_index); if (isNaN(oa)) oa = 999999;
+        let ob = parseInt(b.order_index); if (isNaN(ob)) ob = 999999;
+        if (oa !== ob) return oa - ob;
+        const na = (a.title_from_filename || a.file_path.split('/').pop()).toLowerCase();
+        const nb = (b.title_from_filename || b.file_path.split('/').pop()).toLowerCase();
+        return na.localeCompare(nb, undefined, { numeric: true, sensitivity: 'base' });
+    });
+
+    galleryData.forEach((item, i) => {
+        item.fullUrl    = item.file_path;
+        item.filename   = item.title_from_filename || item.file_path.split('/').pop();
+        item.thumbUrl   = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
+        item.highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}`;
+        item._idx       = i;
+    });
+
+    filteredData = [...galleryData];
+
+    // Show loader while cache check runs
+    document.getElementById('event-content').style.display  = 'none';
+    document.getElementById('gallery-wrap').style.display   = 'none';
+    document.getElementById('main-loader-text').textContent = 'Loading gallery...';
+    document.getElementById('main-loader').style.display    = 'flex';
+
+    // Update pill menu active state
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+
+    // Check cache
+    fetch(API_BASE + 'cache_manager.php?action=status&batch_id=' + batchId)
+        .then(r => r.json())
+        .then(data => {
+            cacheTotal   = data.total  || 0;
+            cacheDone    = data.cached || 0;
+            cacheMissing = data.missing || [];
+            document.getElementById('main-loader').style.display = 'none';
+
+            if (cacheMissing.length === 0) {
+                finishCacheLoad();
+            } else {
+                const cs = document.getElementById('cache-screen');
+                cs.style.display = 'flex';
+                updateCacheUI();
+                for (let i = 0; i < Math.min(MAX_WORKERS, cacheMissing.length); i++) runWorker();
             }
-            
-            text += `*Total Selected: ${selectedFiles.size}*`;
-            let finalUrl = `https://wa.me/${STUDIO_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-            window.open(finalUrl, '_blank');
-        }
-
-        // ==========================================
-        // DESKTOP LASSO BOX
-        // ==========================================
-        let isLassoing = false; let startX, startY;
-        const lassoBox = document.getElementById('lasso-box');
-        
-        if (window.matchMedia("(hover: hover)").matches) {
-            document.addEventListener('mousedown', function(e) {
-                if (e.target.closest('button, a, .modal, .gallery-header, #sticky-pill-menu, #floating-cart-btn')) return;
-                if (!isSelectMode && !e.ctrlKey && !e.metaKey) return; 
-                
-                isLassoing = true; startX = e.pageX; startY = e.pageY; 
-                lassoBox.style.left = startX + 'px'; lassoBox.style.top = startY + 'px';
-                lassoBox.style.width = '0px'; lassoBox.style.height = '0px';
-                lassoBox.style.display = 'block';
-                e.preventDefault();
-            });
-
-            document.addEventListener('mousemove', function(e) {
-                if (!isLassoing) return;
-                let currentX = e.pageX; let currentY = e.pageY;
-                
-                let boxLeft = Math.min(startX, currentX); let boxTop = Math.min(startY, currentY);
-                let boxWidth = Math.abs(currentX - startX); let boxHeight = Math.abs(currentY - startY);
-                
-                lassoBox.style.left = boxLeft + 'px'; lassoBox.style.top = boxTop + 'px';
-                lassoBox.style.width = boxWidth + 'px'; lassoBox.style.height = boxHeight + 'px';
-                
-                let boxRect = { left: boxLeft, right: boxLeft + boxWidth, top: boxTop, bottom: boxTop + boxHeight };
-                document.querySelectorAll('.gallery-item').forEach((el, idx) => {
-                    let rect = el.getBoundingClientRect();
-                    let imgRect = { left: rect.left + window.scrollX, right: rect.right + window.scrollX, top: rect.top + window.scrollY, bottom: rect.bottom + window.scrollY };
-                    if (!(imgRect.right < boxRect.left || imgRect.left > boxRect.right || imgRect.bottom < boxRect.top || imgRect.top > boxRect.bottom)) {
-                        if (!el.classList.contains('lasso-hover')) {
-                            el.classList.add('lasso-hover');
-                            toggleSelection(idx, true);
-                        }
-                    }
-                });
-            });
-
-            document.addEventListener('mouseup', function(e) {
-                if (!isLassoing) return;
-                isLassoing = false; lassoBox.style.display = 'none';
-                document.querySelectorAll('.lasso-hover').forEach(el => el.classList.remove('lasso-hover'));
-            });
-        }
-
-        // ==========================================
-        // CONTEXTUAL RIGHT CLICK MENU
-        // ==========================================
-        let ctxTargetIndex = -1; const ctxMenu = document.getElementById('custom-context-menu');
-
-        function showContextMenu(e, index) {
-            e.preventDefault(); ctxTargetIndex = index;
-            let item = galleryData[index]; let dlState = parseInt(item.can_download) || 0;
-            if (dlState === 0) { $('#ctx-dl, #ctx-dl-full').hide(); } else if (dlState === 2) { $('#ctx-dl').hide(); $('#ctx-dl-full').show(); } else { $('#ctx-dl, #ctx-dl-full').show(); }
-            if (selectedFiles.has(item.fullUrl)) $('#ctx-select').html('<i class="fas fa-check-circle text-secondary"></i> Remove Selection'); else $('#ctx-select').html('<i class="fas fa-check-circle text-success"></i> Select for Album');
-
-            ctxMenu.style.display = 'block';
-            let menuX = e.clientX; let menuY = e.clientY + window.scrollY;
-            if (menuX + ctxMenu.offsetWidth > window.innerWidth) menuX = window.innerWidth - ctxMenu.offsetWidth - 10;
-            ctxMenu.style.left = menuX + 'px'; ctxMenu.style.top = menuY + 'px';
-        }
-        document.addEventListener('click', () => { ctxMenu.style.display = 'none'; });
-
-        $('#ctx-view').click((e) => { e.preventDefault(); openLightbox(ctxTargetIndex); });
-        $('#ctx-select').click((e) => { e.preventDefault(); toggleSelection(ctxTargetIndex); });
-        $('#ctx-dl').click((e) => { e.preventDefault(); currentIndex = ctxTargetIndex; downloadSingleImage('normal'); });
-        $('#ctx-dl-full').click((e) => { e.preventDefault(); currentIndex = ctxTargetIndex; downloadSingleImage('full'); });
-
-        // ==========================================
-        // DOWNLOAD MANAGERS
-        // ==========================================
-        function promptDownloadAll() { pendingDownloadArray = galleryData.map(i => i.fullUrl); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
-        function promptDownloadSelected() { if (selectedFiles.size === 0) return; pendingDownloadArray = Array.from(selectedFiles); if (canDownload == 2) executeOriginalDownload(); else $('#quality-overlay').css('display', 'flex'); }
-
-        async function executeWebDownload() {
-            if (typeof trackAction === "function") trackAction('download', 'Full Folder (Web Quality)');
-            $('#quality-overlay').fadeOut(); 
-            
-            // Fix: ensure manager is displayed
-            const dlManager = document.getElementById('floating-dl-manager'); 
-            dlManager.style.display = 'block';
-            setTimeout(() => { dlManager.classList.add('active'); }, 10);
-            
-            const dlFill = document.getElementById('dl-fill'); const dlText = document.getElementById('dl-text'); const dlTitle = document.getElementById('dl-title');
-            dlTitle.innerHTML = '<span><i class="fas fa-file-archive text-warning mr-2"></i> Zipping Photos...</span>'; dlFill.style.width = '0%'; dlText.innerText = `0 / ${pendingDownloadArray.length} Prepared`; 
-            const zip = new JSZip();
-            for(let i=0; i<pendingDownloadArray.length; i++) {
-                try {
-                    let cacheUrl = API_BASE + 'serve_image.php?file=' + encodeURIComponent(pendingDownloadArray[i]) + '&thumb=1'; let res = await fetch(cacheUrl); let blob = await res.blob(); let filename = pendingDownloadArray[i].split('/').pop();
-                    zip.file("Web_" + filename, blob); let pct = Math.round(((i + 1) / pendingDownloadArray.length) * 100); dlFill.style.width = pct + '%'; dlText.innerText = `${i + 1} / ${pendingDownloadArray.length} Prepared (${pct}%)`;
-                    await new Promise(r => setTimeout(r, 10));
-                } catch(e) { console.error("Skip", e); }
-            }
-            dlTitle.innerHTML = '<span><i class="fas fa-spinner fa-spin text-primary mr-2"></i> Finalizing ZIP...</span>'; dlText.innerText = "Please wait...";
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = "Supriya_Web_Photos.zip"; link.click();
-                dlTitle.innerHTML = '<span><i class="fas fa-check-circle text-success mr-2"></i> Complete!</span>'; dlText.innerText = "Saved to your device."; 
-                setTimeout(() => { 
-                    dlManager.classList.remove('active'); 
-                    setTimeout(() => { dlManager.style.display = 'none'; }, 400);
-                    clearSelection(); 
-                }, 4000);
-            });
-        }
-
-        function executeOriginalDownload() {
-            if (typeof trackAction === "function") trackAction('download', 'Full Folder (Original Quality)');
-            $('#quality-overlay').fadeOut(); 
-            
-            const dlManager = document.getElementById('floating-dl-manager'); 
-            dlManager.style.display = 'block';
-            setTimeout(() => { dlManager.classList.add('active'); }, 10);
-            
-            document.getElementById('dl-title').innerHTML = '<span><i class="fas fa-cloud-download-alt text-success mr-2"></i> Handing off to Device...</span>'; document.getElementById('dl-fill').style.width = '100%'; document.getElementById('dl-fill').classList.add('progress-fill-pulse'); document.getElementById('dl-text').innerText = "Downloading in background. You can lock your screen."; 
-            const form = document.createElement('form'); form.method = 'POST'; form.action = API_BASE + 'stream_zip.php'; form.target = 'hidden_dl_iframe'; 
-            const input = document.createElement('input'); input.type = 'hidden'; input.name = 'files_json'; input.value = JSON.stringify(pendingDownloadArray); form.appendChild(input); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
-            
-            setTimeout(() => { 
-                document.getElementById('dl-title').innerHTML = '<span><i class="fas fa-check-circle text-success mr-2"></i> Download Started</span>'; 
-                document.getElementById('dl-text').innerText = "Check your device's notification panel."; 
-                document.getElementById('dl-fill').classList.remove('progress-fill-pulse'); 
-                setTimeout(() => { 
-                    dlManager.classList.remove('active'); 
-                    setTimeout(() => { dlManager.style.display = 'none'; }, 400);
-                    clearSelection(); 
-                }, 5000); 
-            }, 2000);
-        }
-
-        function downloadSingleImage(type, event) {
-            if (event) event.preventDefault(); const item = galleryData[currentIndex]; if(item.can_download == 0) return;
-            if (typeof trackAction === "function") trackAction('download', (type === 'normal' ? 'Single Web: ' : 'Single Original: ') + (item.filename || 'unknown.jpg'));
-            let dlUrl = type === 'normal' ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}` : `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
-            const link = document.createElement('a'); link.href = dlUrl; link.setAttribute('download', item.filename || 'download.jpg'); document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
-
-        // ==========================================
-        // ADVANCED ZOOM LIGHTBOX & SWIPE TO CLOSE
-        // ==========================================
-        let currentZoom = 1; let imgPanX = 0, imgPanY = 0; let isDragging = false; let startDragX, startDragY; let currentHighResLoader = null; const imgEl = document.getElementById('lightboxImage');
-        
-        function openLightbox(index) { currentIndex = index; resetZoom(); updateLightbox(); $('#lightboxModal').modal('show'); }
-        
-        function updateLightbox() {
-            const item = galleryData[currentIndex]; $('#lbFileName').html(`<i class="fas fa-spinner fa-spin mr-2"></i> Enhancing...`); imgEl.src = item.thumbUrl; imgEl.style.opacity = '1';
-            
-            if (currentHighResLoader) currentHighResLoader.onload = null;
-            currentHighResLoader = new Image();
-            currentHighResLoader.onload = function() { if (galleryData[currentIndex].highResUrl === this.src) { imgEl.src = this.src; $('#lbFileName').text(item.filename); } };
-            currentHighResLoader.src = item.highResUrl;
-            
-            let nextIndex = (currentIndex + 1) % galleryData.length; let preloadNext = new Image(); preloadNext.src = galleryData[nextIndex].highResUrl;
-            let prevIndex = currentIndex - 1; if (prevIndex < 0) prevIndex = galleryData.length - 1; let preloadPrev = new Image(); preloadPrev.src = galleryData[prevIndex].highResUrl;
-            
-            updateLightboxHeart();
-            
-            // Only save resume location if NOT in Cart View
-            if (!isCartView) {
-                localStorage.setItem('supriya_resume_event', currentEventTracker);
-                localStorage.setItem('supriya_resume_batch', item.batch_id); 
-                localStorage.setItem('supriya_resume_index', currentIndex);
-            }
-        }
-
-        function updateLightboxHeart() {
-            const item = galleryData[currentIndex];
-            if (selectedFiles.has(item.fullUrl)) { $('#lbHeartIcon').removeClass('far').addClass('fas text-primary'); }
-            else { $('#lbHeartIcon').removeClass('fas text-primary').addClass('far'); }
-        }
-
-        function changeImage(dir) { currentIndex += dir; if (currentIndex >= galleryData.length) currentIndex = 0; if (currentIndex < 0) currentIndex = galleryData.length - 1; resetZoom(); updateLightbox(); }
-        function resetZoom() { currentZoom = 1; imgPanX = 0; imgPanY = 0; applyTransform(); }
-        function adjustZoom(delta) { currentZoom += delta; if(currentZoom <= 1) resetZoom(); else { if(currentZoom > 5) currentZoom = 5; applyTransform(); } }
-        function applyTransform() { imgEl.style.transform = `translate(${imgPanX}px, ${imgPanY}px) scale(${currentZoom})`; imgEl.style.cursor = currentZoom > 1 ? 'grab' : 'zoom-in'; }
-        imgEl.addEventListener('wheel', function(e) { e.preventDefault(); adjustZoom(e.deltaY * -0.005); }, {passive: false});
-        
-        let initialDistance = null; let initialZoom = 1;
-        
-        imgEl.addEventListener('touchstart', function(e) { 
-            if(e.touches.length === 2) { 
-                initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); initialZoom = currentZoom; 
-            } else if (e.touches.length === 1) { 
-                isDragging = true; startDragX = e.touches[0].pageX - imgPanX; startDragY = e.touches[0].pageY - imgPanY; 
-            } 
-        }, {passive: false});
-
-        imgEl.addEventListener('touchmove', function(e) { 
-            if(e.touches.length === 2 && initialDistance) { 
-                e.preventDefault(); let currentDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); currentZoom = Math.min(Math.max(1, initialZoom * (currentDist / initialDistance)), 5); applyTransform(); 
-            } else if (isDragging && e.touches.length === 1) { 
-                e.preventDefault(); 
-                imgPanX = e.touches[0].pageX - startDragX; 
-                imgPanY = e.touches[0].pageY - startDragY; 
-                
-                if (currentZoom === 1) { imgPanX = 0; imgEl.style.opacity = 1 - (Math.abs(imgPanY) / 500); } 
-                applyTransform(); 
-            } 
-        }, {passive: false});
-
-        imgEl.addEventListener('touchend', function(e) { 
-            initialDistance = null; isDragging = false; 
-            if (currentZoom === 1) {
-                if (Math.abs(imgPanY) > 120) { $('#lightboxModal').modal('hide'); resetZoom(); } 
-                else { resetZoom(); imgEl.style.opacity = 1; }
-            }
+        })
+        .catch(() => {
+            document.getElementById('main-loader').style.display = 'none';
+            finishCacheLoad();
         });
 
-        $('#lightboxModal').on('hidden.bs.modal', function () { resetZoom(); imgEl.style.opacity = 1; });
+    // Activate correct pill
+    document.querySelectorAll('.pill').forEach(p => {
+        if (p.getAttribute('onclick') && p.getAttribute('onclick').includes(batchId)) p.classList.add('active');
+    });
 
-        imgEl.addEventListener('touchend', function(e) { if (e.changedTouches.length === 1) { let currentTime = new Date().getTime(); let tapLength = currentTime - lastTapTime; if (tapLength < 300 && tapLength > 0) { if (currentZoom > 1) { resetZoom(); } else { adjustZoom(1.5); } e.preventDefault(); } lastTapTime = currentTime; } });
+    document.getElementById('pill-menu').style.display = 'flex';
+    document.getElementById('btn-back-folders').style.display = 'block';
+    document.getElementById('btn-back-cart').style.display    = 'none';
 
-        initializeGallery();
-    </script>
+    // Bug 4 Fix: Use consistent key format for resume save/read
+    checkResume(batchId);
+}
+
+// ════════════════════════════════════════════════════════
+//  CACHE WORKER
+// ════════════════════════════════════════════════════════
+function updateCacheUI() {
+    const pct = cacheTotal > 0 ? Math.round((cacheDone / cacheTotal) * 100) : 100;
+    document.getElementById('cache-fill').style.width = pct + '%';
+    document.getElementById('cache-pct').textContent  = pct + '% Ready';
+    document.getElementById('cache-stats').textContent = `${cacheDone} / ${cacheTotal} images`;
+    if (cacheDone >= 5 || pct >= 15) document.getElementById('btn-continue').style.display = 'block';
+}
+
+function runWorker() {
+    if (cacheMissing.length === 0) return;
+    activeWorkers++;
+    const url = cacheMissing.shift();
+    fetch(API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1')
+        .then(() => { cacheDone++; updateCacheUI(); activeWorkers--; checkCacheDone(); runWorker(); })
+        .catch(() => { cacheDone++; updateCacheUI(); activeWorkers--; checkCacheDone(); runWorker(); });
+}
+
+function checkCacheDone() {
+    if (cacheMissing.length === 0 && activeWorkers === 0 && cacheDone >= cacheTotal) {
+        finishCacheLoad();
+    }
+}
+
+function finishCacheLoad() {
+    document.getElementById('cache-screen').style.display = 'none';
+    document.getElementById('gallery-wrap').style.display = 'block';
+    document.getElementById('search-bar').style.display   = 'flex';
+
+    document.getElementById('btn-start').style.display  = 'block';
+    document.getElementById('btn-select').style.display = 'block';
+    if (canDownload > 0) document.getElementById('btn-dl-all').style.display = 'block';
+
+    renderGallery(filteredData);
+}
+
+// ════════════════════════════════════════════════════════
+//  SEARCH FEATURE (NEW)
+// ════════════════════════════════════════════════════════
+function handleSearch(query) {
+    const q = query.toLowerCase().trim();
+    const clearBtn = document.getElementById('search-clear');
+    const countEl  = document.getElementById('search-result-count');
+
+    clearBtn.style.display = q ? 'block' : 'none';
+
+    if (!q) {
+        filteredData = [...galleryData];
+        countEl.textContent = '';
+        renderGallery(filteredData);
+        return;
+    }
+
+    filteredData = galleryData.filter(item => {
+        const name = (item.filename || '').toLowerCase();
+        return name.includes(q);
+    });
+
+    countEl.textContent = filteredData.length > 0
+        ? `${filteredData.length} result${filteredData.length !== 1 ? 's' : ''}`
+        : 'No results';
+
+    renderGallery(filteredData);
+}
+
+function clearSearch() {
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-clear').style.display = 'none';
+    document.getElementById('search-result-count').textContent = '';
+    filteredData = [...galleryData];
+    renderGallery(filteredData);
+}
+
+// ════════════════════════════════════════════════════════
+//  GALLERY RENDER
+// ════════════════════════════════════════════════════════
+function renderGallery(data) {
+    const grid = document.getElementById('gallery');
+    grid.innerHTML = data.map((item, i) => {
+        const selected = selectedFiles.has(item.fullUrl) ? 'selected' : '';
+        return `<div class="photo-item skeleton ${selected}" id="pi-${i}" onclick="handleClick(${i},event)" oncontextmenu="showCtx(event,${i})">
+            <img class="photo-img" data-src="${escHtml(item.thumbUrl)}" loading="lazy">
+        </div>`;
+    }).join('');
+
+    if (data.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 20px;text-align:center;color:var(--muted);">
+            <i class="fas fa-search" style="font-size:2.5rem;margin-bottom:12px;opacity:0.4;"></i>
+            <div style="font-weight:600;">No photos found</div>
+        </div>`;
+    }
+
+    initLazy();
+    updateCartUI();
+}
+
+// ════════════════════════════════════════════════════════
+//  LAZY LOADER
+// ════════════════════════════════════════════════════════
+let imgQueue = []; let activeDl = 0; const MAX_LAZY = 6;
+
+function processQueue() {
+    if (!imgQueue.length || activeDl >= MAX_LAZY) return;
+    const img = imgQueue.shift();
+    activeDl++;
+    img.onload  = () => { img.classList.add('loaded'); img.closest('.photo-item')?.classList.remove('skeleton'); activeDl--; processQueue(); };
+    img.onerror = () => { activeDl--; processQueue(); };
+    img.src = img.dataset.src;
+}
+
+function initLazy() {
+    imgQueue = []; activeDl = 0;
+    const obs = new IntersectionObserver((entries, o) => {
+        entries.forEach(e => { if (e.isIntersecting) { imgQueue.push(e.target); processQueue(); o.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px 1200px 0px' });
+    document.querySelectorAll('.photo-img[data-src]').forEach(img => obs.observe(img));
+}
+
+// ════════════════════════════════════════════════════════
+//  SELECTION ENGINE
+// ════════════════════════════════════════════════════════
+let lastTap = 0; let lastIdx = -1;
+
+function handleClick(i, e) {
+    const now = Date.now();
+    const isDoubleTap = now - lastTap < 300;
+    lastTap = now;
+
+    if (isDoubleTap) {
+        // Double tap = toggle select with animation
+        const item = filteredData[i];
+        if (item) toggleSelection(i, true);
+        spawnCheck(e.clientX, e.clientY);
+        return;
+    }
+
+    if (isSelectMode) {
+        if (e.shiftKey && lastIdx !== -1) {
+            const start = Math.min(lastIdx, i);
+            const end   = Math.max(lastIdx, i);
+            for (let k = start; k <= end; k++) toggleSelection(k, true);
+        } else {
+            toggleSelection(i);
+        }
+        lastIdx = i;
+    } else {
+        openLightbox(i);
+    }
+}
+
+function toggleSelection(i, forceAdd = null) {
+    const item = filteredData[i];
+    if (!item) return;
+    const el = document.getElementById('pi-' + i);
+    const willSelect = forceAdd !== null ? forceAdd : !selectedFiles.has(item.fullUrl);
+
+    if (willSelect) {
+        selectedFiles.add(item.fullUrl);
+        el?.classList.add('selected');
+    } else {
+        selectedFiles.delete(item.fullUrl);
+        el?.classList.remove('selected');
+        // Bug 6 Fix: if in cart view and all deselected, go back to dashboard silently
+        if (isCartView) {
+            el?.addEventListener('transitionend', () => el.remove(), { once: true });
+            const remaining = filteredData.filter(f => selectedFiles.has(f.fullUrl));
+            if (remaining.length === 0) {
+                setTimeout(() => {
+                    // Bug 6 Fix: don't show alert — just silently go to dashboard
+                    goToDashboard();
+                }, 350);
+            }
+        }
+    }
+
+    saveCart();
+    updateCartUI();
+    updateLbSelectIcon();
+}
+
+function toggleSelectMode() {
+    isSelectMode = !isSelectMode;
+    const btn = document.getElementById('btn-select');
+    btn.classList.toggle('active', isSelectMode);
+    btn.innerHTML = isSelectMode
+        ? `<i class="fas fa-times"></i> <span>Done</span>`
+        : `<i class="far fa-check-circle"></i> <span>Select</span>`;
+}
+
+function updateCartUI() {
+    const count = selectedFiles.size;
+    document.getElementById('cart-badge').textContent = count;
+    document.getElementById('cart-total').textContent = count;
+    const fab = document.getElementById('cart-fab');
+    if (count > 0) { fab.classList.remove('hidden'); }
+    else           { fab.classList.add('hidden'); }
+    // Header all-download button: show if can download AND photos in view
+    if (canDownload > 0) document.getElementById('btn-dl-all').style.display = 'block';
+}
+
+// ════════════════════════════════════════════════════════
+//  CART PERSISTENCE
+// ════════════════════════════════════════════════════════
+function cartKey() { return 'sds_cart_' + currentEvent; }
+function loadCart() {
+    try {
+        const saved = localStorage.getItem(cartKey());
+        if (saved) selectedFiles = new Set(JSON.parse(saved));
+    } catch(e) {}
+    updateCartUI();
+}
+function saveCart() { localStorage.setItem(cartKey(), JSON.stringify([...selectedFiles])); }
+
+// ════════════════════════════════════════════════════════
+//  RESUME FEATURE — Bug 4 Fix: consistent key format
+// ════════════════════════════════════════════════════════
+function resumeKey(batchId) { return `sds_resume_${currentEvent}_${batchId}`; }
+
+function checkResume(batchId) {
+    // Bug 4 Fix: read with the SAME key format used when saving
+    const saved = parseInt(localStorage.getItem(resumeKey(batchId)));
+    if (!isNaN(saved) && saved > 0) {
+        resumeBatchId = batchId;
+        resumeIdx     = saved;
+        const folderName = galleryData.length > 0
+            ? (galleryData[0].file_path.split('/').slice(-2, -1)[0] || 'this folder')
+            : 'this folder';
+        document.getElementById('resume-title').textContent = `Back to "${folderName}"`;
+        setTimeout(() => document.getElementById('resume-toast').classList.add('show'), 1200);
+    }
+}
+
+function executeResume() {
+    dismissResume();
+    if (resumeIdx !== null && !isCartView) openLightbox(resumeIdx);
+}
+function dismissResume() {
+    document.getElementById('resume-toast').classList.remove('show');
+    if (resumeBatchId) localStorage.removeItem(resumeKey(resumeBatchId));
+    resumeBatchId = null; resumeIdx = null;
+}
+
+// ════════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════════
+function goToDashboard() {
+    clearSearch();
+    document.getElementById('gallery-wrap').style.display   = 'none';
+    document.getElementById('search-bar').style.display     = 'none';
+    document.getElementById('event-content').style.display  = 'block';
+    document.getElementById('btn-back-cart').style.display  = 'none';
+    document.getElementById('btn-dl-all').style.display     = 'none';
+    document.getElementById('btn-start').style.display      = 'none';
+    document.getElementById('btn-select').style.display     = 'none';
+    isCartView = false;
+    renderDashboard();
+}
+
+function goBackToCart() {
+    goToDashboard();
+    // Bug 6 Fix: only open cart if there are still selected photos
+    if (selectedFiles.size > 0) openCart();
+}
+
+function openVideoModal(ytId) {
+    if (!ytId) return;
+    document.getElementById('yt-iframe').src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+    $('#videoModal').modal('show');
+}
+$('#videoModal').on('hidden.bs.modal', () => { document.getElementById('yt-iframe').src = ''; });
+
+// ════════════════════════════════════════════════════════
+//  CART MODAL — grouped by folder
+// ════════════════════════════════════════════════════════
+function openCart() {
+    if (selectedFiles.size === 0) return; // Bug 6 Fix: don't alert, just silently do nothing
+    renderCartModal();
+    $('#cartModal').modal('show');
+}
+
+function renderCartModal() {
+    const byFolder = {};
+    selectedFiles.forEach(url => {
+        const parts  = url.split('/');
+        const fname  = parts.pop();
+        const folder = parts.pop() || 'Photos';
+        if (!byFolder[folder]) byFolder[folder] = [];
+        byFolder[folder].push(url);
+    });
+
+    let html = '<div class="media-grid" style="margin-top:0;">';
+    Object.keys(byFolder).forEach(folder => {
+        const count    = byFolder[folder].length;
+        const first    = byFolder[folder][0];
+        const thumb    = `${API_BASE}serve_image.php?file=${encodeURIComponent(first)}&thumb=1`;
+        const matchItem = allEventData.find(i => i.file_path === first || i.file_path.endsWith(first.split('/').pop()));
+        const batchId   = matchItem ? matchItem.batch_id : '';
+
+        html += `<div class="cart-folder-card" onclick="openCartFolder('${escHtml(batchId)}','${escHtml(folder)}')">
+            <div class="folder-cover" style="height:130px;background-image:url('${escHtml(thumb)}');">
+                <div class="folder-overlay"></div>
+            </div>
+            <div class="card-body" style="padding:12px;">
+                <div class="card-title" style="font-size:0.9rem;"><i class="fas fa-folder-open" style="color:#d97706;margin-right:6px;"></i>${escHtml(folder)}</div>
+                <div class="card-sub" style="color:var(--red);font-weight:700;"><i class="fas fa-heart mr-1"></i>${count} selected</div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    document.getElementById('cart-body').innerHTML = html;
+    document.getElementById('cart-total').textContent = selectedFiles.size;
+}
+
+function openCartFolder(batchId, folderName) {
+    $('#cartModal').modal('hide');
+    isCartView = true;
+    if (isSelectMode) toggleSelectMode();
+
+    galleryData = allEventData.filter(i => i.batch_id === batchId && selectedFiles.has(i.file_path) && (i.type === 'work' || i.type === 'link'));
+
+    // Bug 5 Fix: guard against empty array
+    canDownload = galleryData.length > 0
+        ? Math.max(...galleryData.map(i => parseInt(i.can_download) || 0))
+        : 0;
+
+    galleryData.forEach((item, i) => {
+        item.fullUrl    = item.file_path;
+        item.filename   = item.title_from_filename || item.file_path.split('/').pop();
+        item.thumbUrl   = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
+        item.highResUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}`;
+        item._idx       = i;
+    });
+
+    filteredData = [...galleryData];
+
+    document.getElementById('event-content').style.display  = 'none';
+    document.getElementById('gallery-wrap').style.display   = 'block';
+    document.getElementById('search-bar').style.display     = 'flex';
+    document.getElementById('pill-menu').style.display      = 'none';
+    document.getElementById('btn-back-folders').style.display = 'block';
+    document.getElementById('btn-back-cart').style.display    = 'block';
+    document.getElementById('btn-start').style.display        = 'block';
+    document.getElementById('btn-select').style.display       = 'block';
+    if (canDownload > 0) document.getElementById('btn-dl-all').style.display = 'block';
+
+    renderGallery(filteredData);
+    dismissResume();
+}
+
+// ════════════════════════════════════════════════════════
+//  SEND TO STUDIO — Bug 1 Fix: chunks for large selections
+// ════════════════════════════════════════════════════════
+async function sendToStudio() {
+    if (selectedFiles.size === 0) return;
+    const evtName   = params.get('event') ? decodeURIComponent(params.get('event')) : 'Gallery';
+
+    const sendBtn = document.querySelector('#cartModal .btn-success');
+    const origHtml = sendBtn ? sendBtn.innerHTML : '';
+    if (sendBtn) { sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Preparing...'; sendBtn.disabled = true; }
+
+    // Folder summary (always used)
+    const byFolder = {};
+    selectedFiles.forEach(url => {
+        const parts = url.split('/'); parts.pop();
+        const folder = parts.pop() || 'Main';
+        byFolder[folder] = (byFolder[folder] || 0) + 1;
+    });
+
+    const reset = () => { if (sendBtn) { sendBtn.innerHTML = origHtml; sendBtn.disabled = false; } };
+
+    // Small selection — send directly
+    if (selectedFiles.size <= 80) {
+        let text = `Hello Supriya Digitals! 📸\n\nEvent: *${evtName}*\nTotal: *${selectedFiles.size} photos*\n\n`;
+        for (const [folder, count] of Object.entries(byFolder)) text += `📁 *${folder}*: ${count} photos\n`;
+        text += `\nPlease prepare these for me.`;
+        reset();
+        window.open(`https://wa.me/${WA_NUMBER}?text=` + encodeURIComponent(text), '_blank');
+        return;
+    }
+
+    // Large selection — save to server and send reference code
+    try {
+        const res = await fetch(API_BASE + 'save_selection.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event: evtName, device: deviceId, files: [...selectedFiles] })
+        });
+        const data = await res.json();
+
+        let text = `Hello Supriya Digitals! 📸\n\nEvent: *${evtName}*\nSelection Code: *#${data.code}*\n\n*${selectedFiles.size} photos total:*\n`;
+        for (const [folder, count] of Object.entries(byFolder)) text += `📁 ${folder}: ${count} photos\n`;
+        text += `\nPlease look up *#${data.code}* to find my exact selection.`;
+
+        reset();
+        window.open(`https://wa.me/${WA_NUMBER}?text=` + encodeURIComponent(text), '_blank');
+    } catch(e) {
+        // Fallback: chunked messages
+        reset();
+        const all    = [...selectedFiles];
+        const chunks = [];
+        for (let i = 0; i < all.length; i += 50) chunks.push(all.slice(i, i + 50));
+
+        let text = `Hello Supriya Digitals!\nEvent: *${evtName}* — Part 1 of ${chunks.length}\n\n`;
+        chunks[0].forEach((url, i) => { text += `${i+1}. ${url.split('/').pop()}\n`; });
+        window.open(`https://wa.me/${WA_NUMBER}?text=` + encodeURIComponent(text), '_blank');
+
+        if (chunks.length > 1) {
+            alert(`Your selection is large (${selectedFiles.size} photos). It's split into ${chunks.length} messages. Please send all of them.`);
+            chunks.slice(1).forEach((chunk, ci) => {
+                setTimeout(() => {
+                    let t = `*${evtName}* — Part ${ci+2} of ${chunks.length}\n\n`;
+                    chunk.forEach((url, i) => { t += `${i+1}. ${url.split('/').pop()}\n`; });
+                    window.open(`https://wa.me/${WA_NUMBER}?text=` + encodeURIComponent(t), '_blank');
+                }, (ci + 1) * 1500);
+            });
+        }
+    }
+}
+
+// ════════════════════════════════════════════════════════
+//  DOWNLOAD
+// ════════════════════════════════════════════════════════
+function promptDownloadAll()      { pendingDlFiles = galleryData.map(i => i.fullUrl); triggerDlPrompt(); }
+function promptDownloadSelected() { if (!selectedFiles.size) return; pendingDlFiles = [...selectedFiles]; triggerDlPrompt(); }
+
+function triggerDlPrompt() {
+    if (canDownload === 2) executeOriginalDownload();
+    else document.getElementById('quality-overlay').style.display = 'flex';
+}
+
+async function executeWebDownload() {
+    document.getElementById('quality-overlay').style.display = 'none';
+    track('download', 'Web Quality ZIP');
+    showDlManager('Preparing web quality ZIP...');
+
+    const zip = new JSZip();
+    for (let i = 0; i < pendingDlFiles.length; i++) {
+        try {
+            const url = `${API_BASE}serve_image.php?file=${encodeURIComponent(pendingDlFiles[i])}&thumb=1`;
+            const blob = await fetch(url).then(r => r.blob());
+            zip.file('Web_' + pendingDlFiles[i].split('/').pop(), blob);
+            const pct = Math.round(((i+1) / pendingDlFiles.length) * 100);
+            document.getElementById('dl-fill').style.width  = pct + '%';
+            document.getElementById('dl-text').textContent  = `${i+1} / ${pendingDlFiles.length} prepared (${pct}%)`;
+            await new Promise(r => setTimeout(r, 8));
+        } catch(e) { /* skip failed */ }
+    }
+
+    document.getElementById('dl-title').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--gold);margin-right:6px;"></i> Finalising...';
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Supriya_Gallery.zip';
+    link.click();
+
+    document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);margin-right:6px;"></i> Download Complete!';
+    document.getElementById('dl-text').textContent = 'Saved to your device.';
+    setTimeout(hideDlManager, 4000);
+}
+
+function executeOriginalDownload() {
+    document.getElementById('quality-overlay').style.display = 'none';
+    track('download', 'Original Quality ZIP');
+    showDlManager('Starting background download...');
+    document.getElementById('dl-fill').style.width = '100%';
+    document.getElementById('dl-text').textContent = 'Download running in background. You can lock your screen.';
+
+    const form  = document.createElement('form');
+    form.method = 'POST';
+    form.action = API_BASE + 'stream_zip.php';
+    form.target = 'dl-frame';
+    const input = document.createElement('input');
+    input.type  = 'hidden'; input.name = 'files_json'; input.value = JSON.stringify(pendingDlFiles);
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+
+    setTimeout(() => {
+        document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);margin-right:6px;"></i> Download Started';
+        document.getElementById('dl-text').textContent = 'Check your download notifications.';
+        setTimeout(hideDlManager, 5000);
+    }, 2000);
+}
+
+function dlSingle(type, e) {
+    e.preventDefault();
+    const item = filteredData[currentIdx];
+    if (!item || item.can_download == 0) return;
+    track('download', (type === 'web' ? 'Single Web: ' : 'Single Original: ') + item.filename);
+    const url = type === 'web'
+        ? `${API_BASE}serve_image.php?dl=1&file=${encodeURIComponent(item.fullUrl)}`
+        : `${API_BASE}download_full.php?file=${encodeURIComponent(item.fullUrl)}`;
+    const a = document.createElement('a'); a.href = url; a.setAttribute('download', item.filename || 'download.jpg');
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+function showDlManager(msg) {
+    const m = document.getElementById('dl-manager');
+    m.style.display = 'block';
+    document.getElementById('dl-title').innerHTML = `<i class="fas fa-file-archive" style="color:var(--gold);margin-right:6px;"></i> ${msg}`;
+    document.getElementById('dl-fill').style.width = '0%';
+    setTimeout(() => m.classList.add('active'), 10);
+}
+function hideDlManager() {
+    const m = document.getElementById('dl-manager');
+    m.classList.remove('active');
+    setTimeout(() => { m.style.display = 'none'; }, 350);
+}
+
+// ════════════════════════════════════════════════════════
+//  LIGHTBOX
+// ════════════════════════════════════════════════════════
+let lbZoom = 1; let lbPanX = 0; let lbPanY = 0; let lbDrag = false; let lbDragSX, lbDragSY;
+let lbHighResLoader = null; let pinchDist0 = null; let pinchZoom0 = 1;
+
+function openLightbox(i) {
+    currentIdx = i;
+    lbZoom = 1; lbPanX = 0; lbPanY = 0;
+    document.getElementById('lightbox').classList.add('open');
+    updateLb();
+}
+
+function updateLb() {
+    const item = filteredData[currentIdx];
+    if (!item) return;
+
+    const imgEl = document.getElementById('lb-img');
+    imgEl.style.opacity     = '0';
+    imgEl.style.transform   = 'translate(0,0) scale(1)';
+    imgEl.src               = item.thumbUrl;
+    imgEl.style.opacity     = '1';
+    document.getElementById('lb-filename').innerHTML = `<i class="fas fa-spinner fa-spin mr-2" style="font-size:0.8rem;"></i>${escHtml(item.filename)}`;
+
+    // Bug 2 Fix: Lightbox download controlled purely by item.can_download
+    // NOT by cart count. It uses its own element #lb-dl-btn.
+    const dlBtn = document.getElementById('lb-dl-btn');
+    dlBtn.style.display = (parseInt(item.can_download) || 0) > 0 ? 'block' : 'none';
+
+    // Load high-res
+    if (lbHighResLoader) lbHighResLoader.onload = null;
+    lbHighResLoader = new Image();
+    lbHighResLoader.onload = function() {
+        if (filteredData[currentIdx]?.highResUrl === this.src) {
+            document.getElementById('lb-img').src = this.src;
+            document.getElementById('lb-filename').textContent = item.filename;
+        }
+    };
+    lbHighResLoader.src = item.highResUrl;
+
+    // Preload neighbours
+    const next = filteredData[(currentIdx + 1) % filteredData.length];
+    const prev = filteredData[(currentIdx - 1 + filteredData.length) % filteredData.length];
+    if (next) new Image().src = next.highResUrl;
+    if (prev) new Image().src = prev.highResUrl;
+
+    updateLbSelectIcon();
+
+    // Bug 4 Fix: Save resume using consistent key
+    if (!isCartView && item.batch_id) {
+        localStorage.setItem(resumeKey(item.batch_id), currentIdx);
+    }
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.getElementById('lb-img').src = '';
+    lbZoom = 1; lbPanX = 0; lbPanY = 0;
+}
+
+function changePhoto(dir) {
+    currentIdx = (currentIdx + dir + filteredData.length) % filteredData.length;
+    lbZoom = 1; lbPanX = 0; lbPanY = 0;
+    updateLb();
+}
+
+function updateLbSelectIcon() {
+    const item = filteredData[currentIdx];
+    if (!item) return;
+    const isSel = selectedFiles.has(item.fullUrl);
+    const icon  = document.getElementById('lb-select-icon');
+    if (isSel) { icon.className = 'fas fa-check-circle'; icon.style.color = 'var(--gold)'; }
+    else        { icon.className = 'far fa-check-circle'; icon.style.color = ''; }
+}
+
+// Keyboard navigation
+window.addEventListener('keydown', e => {
+    if (!document.getElementById('lightbox').classList.contains('open')) return;
+    if (e.key === 'ArrowRight') changePhoto(1);
+    if (e.key === 'ArrowLeft')  changePhoto(-1);
+    if (e.key === 'Escape')     closeLightbox();
+});
+
+// Touch gestures (pinch zoom + swipe to close)
+const imgEl = document.getElementById('lb-img');
+
+imgEl.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+        pinchDist0 = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+        pinchZoom0 = lbZoom;
+    } else if (e.touches.length === 1) {
+        lbDrag = true; lbDragSX = e.touches[0].pageX - lbPanX; lbDragSY = e.touches[0].pageY - lbPanY;
+    }
+}, { passive: false });
+
+imgEl.addEventListener('touchmove', e => {
+    if (e.touches.length === 2 && pinchDist0) {
+        e.preventDefault();
+        const d = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+        lbZoom = Math.min(5, Math.max(1, pinchZoom0 * (d / pinchDist0)));
+        applyLbTransform();
+    } else if (lbDrag && e.touches.length === 1) {
+        e.preventDefault();
+        lbPanX = e.touches[0].pageX - lbDragSX;
+        lbPanY = e.touches[0].pageY - lbDragSY;
+        if (lbZoom === 1) { imgEl.style.opacity = Math.max(0, 1 - Math.abs(lbPanY) / 400); }
+        applyLbTransform();
+    }
+}, { passive: false });
+
+imgEl.addEventListener('touchend', e => {
+    pinchDist0 = null; lbDrag = false;
+    if (lbZoom === 1) {
+        if (Math.abs(lbPanY) > 100) { closeLightbox(); }
+        else { lbPanX = 0; lbPanY = 0; imgEl.style.opacity = '1'; applyLbTransform(); }
+    }
+});
+
+// Double tap to zoom
+let lbLastTap = 0;
+imgEl.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lbLastTap < 300) {
+        lbZoom = lbZoom > 1 ? 1 : 2.5;
+        lbPanX = 0; lbPanY = 0; applyLbTransform();
+        e.preventDefault();
+    }
+    lbLastTap = now;
+});
+
+// Mouse wheel zoom
+imgEl.addEventListener('wheel', e => { e.preventDefault(); lbZoom = Math.min(5, Math.max(1, lbZoom - e.deltaY * 0.004)); applyLbTransform(); }, { passive: false });
+
+function applyLbTransform() {
+    imgEl.style.transform = `translate(${lbPanX}px, ${lbPanY}px) scale(${lbZoom})`;
+    imgEl.style.cursor    = lbZoom > 1 ? 'grab' : 'zoom-in';
+}
+
+// ════════════════════════════════════════════════════════
+//  CONTEXT MENU
+// ════════════════════════════════════════════════════════
+let ctxIdx = -1;
+const ctxMenu = document.getElementById('ctx-menu');
+
+function showCtx(e, i) {
+    e.preventDefault(); ctxIdx = i;
+    const item = filteredData[i];
+    if (!item) return;
+    const dl = parseInt(item.can_download) || 0;
+    document.querySelectorAll('.ctx-dl-item').forEach(el => el.style.display = dl > 0 ? 'flex' : 'none');
+    const isSel = selectedFiles.has(item.fullUrl);
+    document.getElementById('ctx-toggle').innerHTML = isSel
+        ? `<i class="fas fa-times-circle" style="color:var(--red);width:16px;"></i> Remove Selection`
+        : `<i class="fas fa-check-circle" style="color:var(--green);width:16px;"></i> Select Photo`;
+
+    ctxMenu.style.display = 'block';
+    let x = e.clientX, y = e.clientY + window.scrollY;
+    if (x + 200 > window.innerWidth) x = window.innerWidth - 210;
+    ctxMenu.style.left = x + 'px'; ctxMenu.style.top = y + 'px';
+}
+
+document.addEventListener('click', () => { ctxMenu.style.display = 'none'; });
+document.getElementById('ctx-view').addEventListener('click', () => openLightbox(ctxIdx));
+document.getElementById('ctx-toggle').addEventListener('click', () => toggleSelection(ctxIdx));
+document.getElementById('ctx-dl-web').addEventListener('click', () => { currentIdx = ctxIdx; dlSingle('web', event); });
+document.getElementById('ctx-dl-orig').addEventListener('click', () => { currentIdx = ctxIdx; dlSingle('orig', event); });
+
+// ════════════════════════════════════════════════════════
+//  DESKTOP LASSO SELECTION
+// ════════════════════════════════════════════════════════
+let lassoing = false; let lassoSX, lassoSY;
+const lassoEl = document.getElementById('lasso-box');
+
+if (window.matchMedia('(hover: hover)').matches) {
+    document.addEventListener('mousedown', e => {
+        if (e.target.closest('button, a, .modal, .g-header, #pill-menu, #search-bar, #cart-fab')) return;
+        if (!isSelectMode && !e.ctrlKey && !e.metaKey) return;
+        lassoing = true; lassoSX = e.pageX; lassoSY = e.pageY;
+        lassoEl.style.cssText = `display:block;left:${lassoSX}px;top:${lassoSY}px;width:0;height:0;`;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', e => {
+        if (!lassoing) return;
+        const x = Math.min(lassoSX, e.pageX); const y = Math.min(lassoSY, e.pageY);
+        const w = Math.abs(e.pageX - lassoSX);  const h = Math.abs(e.pageY - lassoSY);
+        lassoEl.style.cssText = `display:block;left:${x}px;top:${y}px;width:${w}px;height:${h}px;position:absolute;`;
+        const box = { left: x, right: x+w, top: y, bottom: y+h };
+        document.querySelectorAll('.photo-item').forEach((el, i) => {
+            const r = el.getBoundingClientRect();
+            const er = { left: r.left + scrollX, right: r.right + scrollX, top: r.top + scrollY, bottom: r.bottom + scrollY };
+            const overlaps = !(er.right < box.left || er.left > box.right || er.bottom < box.top || er.top > box.bottom);
+            if (overlaps && !el.classList.contains('lasso-hover')) { el.classList.add('lasso-hover'); toggleSelection(i, true); }
+        });
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (!lassoing) return; lassoing = false; lassoEl.style.display = 'none';
+        document.querySelectorAll('.lasso-hover').forEach(el => el.classList.remove('lasso-hover'));
+    });
+}
+
+// ════════════════════════════════════════════════════════
+//  FLYING CHECK ANIMATION
+// ════════════════════════════════════════════════════════
+function spawnCheck(x, y) {
+    const el = document.createElement('i');
+    el.className = 'fas fa-check-circle flying-check';
+    el.style.left = (x - 30) + 'px'; el.style.top = (y - 30) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+}
+
+// ════════════════════════════════════════════════════════
+//  SCROLL HIDE/SHOW CART FAB
+// ════════════════════════════════════════════════════════
+let lastScrollY = 0;
+window.addEventListener('scroll', () => {
+    const st = window.scrollY;
+    if (selectedFiles.size > 0) {
+        const fab = document.getElementById('cart-fab');
+        fab.classList.toggle('hidden', st > lastScrollY && st > 60);
+    }
+    lastScrollY = st <= 0 ? 0 : st;
+});
+
+// ════════════════════════════════════════════════════════
+//  UTILITIES
+// ════════════════════════════════════════════════════════
+function extractYtId(url) {
+    if (!url) return '';
+    let m;
+    if ((m = url.match(/embed\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    if ((m = url.match(/live\/([a-zA-Z0-9_-]{11})/))) return m[1];
+    return '';
+}
+
+function escHtml(s) {
+    return (s || '').toString()
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+// ════════════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════════════
+init();
+</script>
 </body>
 </html>
