@@ -852,9 +852,6 @@ function renderVideos(type, page) {
 
 // ──────────────────────────────────────────────
 //  PAGINATION BUILDER
-//  Bug 3 Fix: No longer uses fn.toString().
-//  Uses a named section string + a render callback
-//  stored in a lookup map — robust and clear.
 // ──────────────────────────────────────────────
 const _pageRenderFns = {};  // populated per section
 
@@ -962,8 +959,15 @@ function escHtml(s) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+        .replace(/'/g, '&#039;');
 }
+
+// ──────────────────────────────────────────────
+//  BOOT UP THE PAGE
+// ──────────────────────────────────────────────
+initCounters();
+loadData();
+
 </script>
 </body>
 </html>
