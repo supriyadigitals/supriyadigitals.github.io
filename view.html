@@ -577,7 +577,9 @@ function renderDashboard() {
     let pillHtml = `<span class="pill active" onclick="renderDashboard()"><i class="fas fa-th-large mr-1"></i> All</span>`;
 
     const seenBatches = new Set();
-    const sorted = [...allEventData].sort((a,b) => (parseInt(a.order_index)||999999) - (parseInt(b.order_index)||999999));
+// Helper function to safely read the order without breaking on position 0
+    const getOrder = (val) => { let o = parseInt(val); return isNaN(o) ? 999999 : o; };
+    const sorted = [...allEventData].sort((a,b) => getOrder(a.order_index) - getOrder(b.order_index));
 
     let items = [];
     sorted.forEach(item => {
@@ -587,13 +589,13 @@ function renderDashboard() {
                 const count = sorted.filter(i => i.batch_id === item.batch_id).length;
                 const parts = item.file_path.split('/');
                 const folder = parts.length > 1 ? parts[parts.length - 2] : item.title;
-                items.push({ kind: 'folder', batchId: item.batch_id, name: folder, cover: item.file_path, count, order: parseInt(item.order_index)||999999 });
+                items.push({ kind: 'folder', batchId: item.batch_id, name: folder, cover: item.file_path, count, order: getOrder(item.order_index) });
                 pillHtml += `<span class="pill" onclick="openFolder('${escHtml(item.batch_id)}')">${escHtml(folder)}</span>`;
             }
         } else if (item.type === 'teaser' || item.type === 'live') {
-            items.push({ kind: 'video', data: item, order: parseInt(item.order_index)||999999 });
+            items.push({ kind: 'video', data: item, order: getOrder(item.order_index) });
         } else if (item.type === 'album') {
-            items.push({ kind: 'album', data: item, order: parseInt(item.order_index)||999999 });
+            items.push({ kind: 'album', data: item, order: getOrder(item.order_index) });
         }
     });
 
