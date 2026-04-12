@@ -1918,28 +1918,62 @@ async function executeWebDownload() {
     showDlManager('Preparing web quality ZIP...');
 
     const zip = new JSZip();
-    for (let i = 0; i < pendingDlFiles.length; i++) {
-        try {
-            const url = `${API_BASE}serve_image.php?file=${encodeURIComponent(pendingDlFiles[i])}&thumb=1`;
-            const blob = await fetch(url).then(r => r.blob());
-            zip.file('Web_' + pendingDlFiles[i].split('/').pop(), blob);
-            const pct = Math.round(((i+1) / pendingDlFiles.length) * 100);
-            document.getElementById('dl-fill').style.width  = pct + '%';
-            document.getElementById('dl-text').textContent  = `${i+1} / ${pendingDlFiles.length} prepared (${pct}%)`;
-            await new Promise(r => setTimeout(r, 8));
-        } catch(e) { /* skip failed */ }
+    let completed = 0;
+    let failed = 0;
+    const total = pendingDlFiles.length;
+    
+    // ── Download in concurrent batches to drastically improve speed ──
+    const BATCH_SIZE = 10; 
+
+    for (let i = 0; i < total; i += BATCH_SIZE) {
+        const batch = pendingDlFiles.slice(i, i + BATCH_SIZE);
+        
+        await Promise.all(batch.map(async (fileUrl) => {
+            try {
+                const url = `${API_BASE}serve_image.php?file=${encodeURIComponent(fileUrl)}&thumb=1`;
+                // Fetch image data
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) throw new Error('Failed');
+                const blob = await res.blob();
+                // Append directly to zip
+                zip.file('Web_' + fileUrl.split('/').pop(), blob);
+            } catch(e) {
+                failed++;
+            } finally {
+                completed++;
+            }
+        }));
+
+        // Update UI progress after every batch completes
+        const pct = Math.round((completed / total) * 100);
+        document.getElementById('dl-fill').style.width  = pct + '%';
+        document.getElementById('dl-text').textContent  = `${completed} / ${total} prepared (${pct}%)`;
     }
 
     document.getElementById('dl-title').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--gold);margin-right:6px;"></i> Finalising...';
-    const blob = await zip.generateAsync({ type: 'blob' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'Supriya_Gallery.zip';
-    link.click();
+    
+    try {
+        // ── STORE Compression: JPEGs are already compressed! 
+        // Using DEFLATE here causes mobiles to freeze and crash. STORE is instant. ──
+        const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const evtName = params.get('event') ? decodeURIComponent(params.get('event')).replace(/[^a-zA-Z0-9]/g, '_') : 'Gallery';
+        link.download = `Supriya_Web_${evtName}.zip`;
+        link.click();
+        
+        // Cleanup memory
+        setTimeout(() => URL.revokeObjectURL(link.href), 5000);
 
-    document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);margin-right:6px;"></i> Download Complete!';
-    document.getElementById('dl-text').textContent = 'Saved to your device.';
-    setTimeout(hideDlManager, 4000);
+        document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);margin-right:6px;"></i> Download Complete!';
+        document.getElementById('dl-text').textContent = failed > 0 ? `Saved to device. (${failed} failed)` : 'Saved to your device.';
+    } catch(e) {
+        document.getElementById('dl-title').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red);margin-right:6px;"></i> Error';
+        document.getElementById('dl-text').textContent = 'Memory limit reached. Try downloading fewer photos at once.';
+    }
+    
+    setTimeout(hideDlManager, 6000);
 }
 
 function executeOriginalDownload() {
@@ -1947,7 +1981,11 @@ function executeOriginalDownload() {
     track('download', 'Original Quality ZIP');
     showDlManager('Starting background download...');
     document.getElementById('dl-fill').style.width = '100%';
-    document.getElementById('dl-text').textContent = 'Download running in background. You can lock your screen.';
+    
+    // Add specific warning for huge downloads
+    document.getElementById('dl-text').textContent = pendingDlFiles.length > 100 
+        ? 'Large download starting. This may take several minutes on the server.'
+        : 'Download running in background. You can lock your screen.';
 
     const form  = document.createElement('form');
     form.method = 'POST';
@@ -1962,9 +2000,11 @@ function executeOriginalDownload() {
 
     setTimeout(() => {
         document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);margin-right:6px;"></i> Download Started';
-        document.getElementById('dl-text').textContent = 'Check your download notifications.';
-        setTimeout(hideDlManager, 5000);
-    }, 2000);
+        if (pendingDlFiles.length <= 100) {
+            document.getElementById('dl-text').textContent = 'Check your download notifications.';
+        }
+        setTimeout(hideDlManager, 6000);
+    }, 2500);
 }
 
 function dlSingle(type, e) {
@@ -2783,6 +2823,9 @@ init();
             <i class="fab fa-youtube"></i>
         </a>
     </div>
+    <hr class="footer-divider">
+    <div class="footer-powered">POWERED BY <span>FOTO OWL</span></div>
 </footer>
+
 </body>
 </html>
