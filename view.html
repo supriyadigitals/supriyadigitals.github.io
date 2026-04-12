@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Supriya Digitals | Client Gallery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="img/icon1.png" rel="icon" onerror="this.style.display='none'">
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -359,7 +359,7 @@
         .lb-actions-right { display: flex; align-items: center; gap: 18px; }
         .lb-icon { font-size: 1.3rem; color: #fff; cursor: pointer; opacity: 0.75; transition: 0.2s; background: none; border: none; }
         .lb-icon:hover { opacity: 1; color: var(--gold); }
-        .lb-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; touch-action: manipulation; cursor: grab; user-select: none; }
+        .lb-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; touch-action: none; cursor: grab; user-select: none; }
         .lb-body.zoomed { cursor: grabbing; }
         #lb-img { max-height: 82vh; max-width: 94vw; object-fit: contain; will-change: transform; transition: opacity 0.2s; cursor: inherit; pointer-events: none; display: block; }
         #lb-img.swiping { transition: transform 0.05s linear; }
@@ -1218,7 +1218,36 @@ function initLazy() {
 // ════════════════════════════════════════════════════════
 let lastTap = 0; let lastIdx = -1;
 
+// ── Instagram-style: track whether a pinch (2+ fingers) happened
+//    so we can suppress double-tap-like when the user is just zooming ──
+let _pinchOccurred = false;   // true if ≥2 fingers touched during this gesture
+let _touchCount    = 0;       // max simultaneous fingers in current gesture
+
+function _onPhotoTouchStart(e) {
+    _touchCount = Math.max(_touchCount, e.touches.length);
+    if (e.touches.length >= 2) _pinchOccurred = true;
+}
+
+// Attach touch tracking to the gallery grid (delegated, once)
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('gallery');
+    if (grid) {
+        grid.addEventListener('touchstart', _onPhotoTouchStart, { passive: true });
+        grid.addEventListener('touchend', () => {
+            // Reset after gesture ends (short delay so click event can read the flag)
+            setTimeout(() => { _pinchOccurred = false; _touchCount = 0; }, 50);
+        }, { passive: true });
+    }
+});
+
 function handleClick(i, e) {
+    // ── If this click was produced by a pinch-zoom gesture, ignore it entirely ──
+    if (_pinchOccurred) {
+        _pinchOccurred = false;
+        _touchCount    = 0;
+        return;
+    }
+
     const now = Date.now();
     const isDoubleTap = (now - lastTap < 350) && (lastIdx === i);
     lastTap = now; lastIdx = i;
@@ -1912,7 +1941,6 @@ lbBody.addEventListener('touchend', e => {
         const now = Date.now();
         if (now - lbLastTap < 300) {
             // Double tap → Instagram like + add to cart
-            e.preventDefault();
             triggerLightboxDoubleTapLike();
         }
         lbLastTap = now;
