@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Supriya Digitals | Client Gallery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <link href="img/icon1.png" rel="icon" onerror="this.style.display='none'">
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -359,7 +359,7 @@
         .lb-actions-right { display: flex; align-items: center; gap: 18px; }
         .lb-icon { font-size: 1.3rem; color: #fff; cursor: pointer; opacity: 0.75; transition: 0.2s; background: none; border: none; }
         .lb-icon:hover { opacity: 1; color: var(--gold); }
-        .lb-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; touch-action: none; cursor: grab; user-select: none; }
+        .lb-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; touch-action: manipulation; cursor: grab; user-select: none; }
         .lb-body.zoomed { cursor: grabbing; }
         #lb-img { max-height: 82vh; max-width: 94vw; object-fit: contain; will-change: transform; transition: opacity 0.2s; cursor: inherit; pointer-events: none; display: block; }
         #lb-img.swiping { transition: transform 0.05s linear; }
@@ -1912,6 +1912,7 @@ lbBody.addEventListener('touchend', e => {
         const now = Date.now();
         if (now - lbLastTap < 300) {
             // Double tap → Instagram like + add to cart
+            e.preventDefault();
             triggerLightboxDoubleTapLike();
         }
         lbLastTap = now;
