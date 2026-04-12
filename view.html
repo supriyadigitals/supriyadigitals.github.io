@@ -1236,32 +1236,33 @@ function initLazy() {
 let lastTap = 0; let lastIdx = -1;
 
 // ── Instagram-style: track whether a pinch (2+ fingers) happened
-//    so we can suppress double-tap-like when the user is just zooming ──
-let _pinchOccurred = false;   // true if ≥2 fingers touched during this gesture
-let _touchCount    = 0;       // max simultaneous fingers in current gesture
-
-function _onPhotoTouchStart(e) {
-    _touchCount = Math.max(_touchCount, e.touches.length);
-    if (e.touches.length >= 2) _pinchOccurred = true;
-}
+//    Use a timestamp so click handler can reliably detect it
+//    regardless of setTimeout race conditions ──
+let _pinchEndTime = 0;  // timestamp of last pinch-end; 0 = no pinch
+let _maxTouches   = 0;  // max simultaneous fingers in current gesture
 
 // Attach touch tracking to the gallery grid (delegated, once)
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('gallery');
     if (grid) {
-        grid.addEventListener('touchstart', _onPhotoTouchStart, { passive: true });
-        grid.addEventListener('touchend', () => {
-            // Reset after gesture ends (short delay so click event can read the flag)
-            setTimeout(() => { _pinchOccurred = false; _touchCount = 0; }, 50);
+        grid.addEventListener('touchstart', e => {
+            _maxTouches = Math.max(_maxTouches, e.touches.length);
+        }, { passive: true });
+
+        grid.addEventListener('touchend', e => {
+            // When ALL fingers lift, record pinch-end if 2+ fingers were involved
+            if (e.touches.length === 0 && _maxTouches >= 2) {
+                _pinchEndTime = Date.now();
+            }
+            if (e.touches.length === 0) _maxTouches = 0;
         }, { passive: true });
     }
 });
 
 function handleClick(i, e) {
-    // ── If this click was produced by a pinch-zoom gesture, ignore it entirely ──
-    if (_pinchOccurred) {
-        _pinchOccurred = false;
-        _touchCount    = 0;
+    // ── If this click followed a pinch gesture within 600ms, ignore it ──
+    if (Date.now() - _pinchEndTime < 600) {
+        _pinchEndTime = 0;
         return;
     }
 
@@ -1893,6 +1894,8 @@ lbBody.addEventListener('touchstart', e => {
         );
         pinchZoom0 = lbZoom;
         touchMoveStarted = false;
+        // ── CRITICAL: reset tap timer so pinch-end is never treated as a tap ──
+        lbLastTap = 0;
         hideGhost();
         setStripX(0);
     } else if (e.touches.length === 1) {
@@ -1983,7 +1986,18 @@ lbBody.addEventListener('touchmove', e => {
 
 lbBody.addEventListener('touchend', e => {
     e.stopPropagation();
+    const wasPinch = (pinchDist0 !== null); // was this a pinch gesture?
     pinchDist0 = null;
+
+    // ── If fingers are still on screen (one lifted during pinch), just reset ──
+    if (e.touches.length > 0) return;
+
+    // ── If it was a pinch, NEVER treat it as a tap ──
+    if (wasPinch) {
+        lbLastTap = 0;  // kill tap timer so next single tap starts fresh
+        dragActive = false;
+        return;
+    }
 
     const dx      = touchLastX - touchStartX;
     const dy      = touchLastY - touchStartY;
