@@ -200,16 +200,32 @@
             background: rgba(212,175,55,0.1); z-index: 1; border-radius: 6px;
         }
 
-        /* ── FLYING HEART (gallery double-tap) ── */
-        .flying-heart-gallery {
-            position: fixed; font-size: 5rem; color: #ef4444; z-index: 9999;
-            pointer-events: none; transform: translate(-50%, -50%);
-            animation: flyHeartGallery 0.75s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+        /* ── INSTAGRAM HEART (gallery & lightbox double-tap) ── */
+        .insta-heart-container {
+            position: absolute; inset: 0; display: flex; align-items: center;
+            justify-content: center; pointer-events: none; z-index: 20;
         }
-        @keyframes flyHeartGallery {
-            0%   { transform: translate(-50%,-50%) scale(0.2); opacity: 1; }
-            40%  { transform: translate(-50%,-50%) scale(1.3); opacity: 1; }
-            100% { transform: translate(-50%,-170%) scale(0.9); opacity: 0; }
+        .insta-heart-icon {
+            font-size: 7rem; color: rgba(255,255,255,0.95);
+            filter: drop-shadow(0 0 20px rgba(239,68,68,0.8)) drop-shadow(0 4px 14px rgba(0,0,0,0.45));
+            animation: instaHeartPop 0.85s ease-out forwards;
+        }
+        @keyframes instaHeartPop {
+            0%   { transform: scale(0);    opacity: 0; }
+            15%  { transform: scale(1.3);  opacity: 1; }
+            30%  { transform: scale(0.88); opacity: 1; }
+            50%  { transform: scale(1.1);  opacity: 1; }
+            70%  { transform: scale(1.0);  opacity: 1; }
+            100% { transform: scale(0.85); opacity: 0; }
+        }
+        /* Big centered heart inside lightbox (double-tap) */
+        .lb-doubletap-heart {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%,-50%) scale(0);
+            font-size: 10rem; color: rgba(255,255,255,0.96);
+            pointer-events: none; z-index: 925;
+            filter: drop-shadow(0 0 30px rgba(239,68,68,0.85)) drop-shadow(0 6px 22px rgba(0,0,0,0.5));
+            animation: instaHeartPop 0.85s ease-out forwards;
         }
         /* Liked badge (red heart, bottom-left) */
         .liked-badge { display: none; }
@@ -427,6 +443,48 @@
             #resume-toast { left: 12px; right: 12px; min-width: 0; }
             #dl-manager { left: 12px; right: 12px; width: auto; top: auto; bottom: 100px; }
         }
+
+        /* ── GHOST IMAGE FOR SWIPE (lightbox) ── */
+        #lb-img-ghost {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto;
+            max-height: 82vh; max-width: 94vw; object-fit: contain;
+            pointer-events: none; display: none;
+        }
+
+        /* ── SLIDESHOW SPEED PICKER ── */
+        #ss-speed-modal {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.88);
+            z-index: 950; display: none; flex-direction: column;
+            align-items: center; justify-content: center; padding: 30px; text-align: center;
+        }
+        #ss-speed-modal.open { display: flex; }
+        .ss-pick-title { color: #fff; font-family: var(--serif); font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+        .ss-pick-sub   { color: rgba(255,255,255,0.55); font-size: 0.82rem; margin-bottom: 24px; }
+        .ss-speed-grid { display: flex; gap: 12px; margin-bottom: 20px; }
+        .ss-speed-btn {
+            width: 74px; height: 74px; border-radius: 14px;
+            border: 2px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.07);
+            color: #fff; cursor: pointer; font-family: var(--sans);
+            font-size: 1.15rem; font-weight: 800; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+        }
+        .ss-speed-btn small { font-size: 0.6rem; font-weight: 500; color: rgba(255,255,255,0.45); }
+        .ss-speed-btn:hover, .ss-speed-btn.sel {
+            border-color: var(--gold); background: rgba(212,175,55,0.22); color: var(--gold);
+        }
+        .ss-speed-btn.sel small, .ss-speed-btn:hover small { color: var(--gold); }
+        .ss-resume-row { display: none; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 6px; width: 100%; max-width: 280px; }
+        .ss-resume-row.show { display: flex; }
+        .ss-resume-info { color: rgba(255,255,255,0.7); font-size: 0.82rem; }
+        .ss-resume-btn  { width: 100%; padding: 13px; background: var(--gold); color: var(--dark); border: none; border-radius: 6px; font-family: var(--sans); font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        .ss-start-btn   { width: 100%; max-width: 280px; padding: 13px; background: rgba(255,255,255,0.12); color: #fff; border: 1.5px solid rgba(255,255,255,0.25); border-radius: 6px; font-family: var(--sans); font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        .ss-close-btn   { position: absolute; top: 18px; right: 18px; background: none; border: none; color: rgba(255,255,255,0.55); font-size: 1.5rem; cursor: pointer; }
+
+        /* ── GALLERY PAGINATION ── */
+        #gallery-sentinel { height: 60px; display: flex; align-items: center; justify-content: center; }
+        .pg-loader { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+        .pg-loader i { color: var(--gold); animation: spin 0.9s linear infinite; }
+        #lightbox.ss-active .lb-counter { display: none !important; }
     </style>
 </head>
 
@@ -586,7 +644,6 @@
             <button class="lb-icon lb-heart-btn" id="lb-heart-btn" onclick="toggleLike()" title="Like"><i class="far fa-heart" id="lb-heart-icon"></i></button>
             <button class="lb-icon" id="lb-share-btn" onclick="sharePhoto()" title="Share"><i class="fas fa-share-alt"></i></button>
             <button class="lb-icon" id="lb-slideshow-btn" onclick="toggleSlideshow()" title="Slideshow"><i class="fas fa-play-circle" id="lb-ss-icon"></i></button>
-            <button class="lb-icon" id="lb-select-btn" onclick="toggleSelection(currentIdx)"><i class="far fa-check-circle" id="lb-select-icon"></i></button>
             <div class="dropdown" id="lb-dl-btn" style="display:none;">
                 <button class="lb-icon" data-toggle="dropdown"><i class="fas fa-download"></i></button>
                 <div class="dropdown-menu dropdown-menu-right" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;min-width:180px;">
@@ -600,11 +657,32 @@
     <div class="lb-body" id="lb-body">
         <div class="lb-nav lb-prev" id="lb-prev" onclick="changePhoto(-1)"><i class="fas fa-chevron-left"></i></div>
         <img id="lb-img" src="" style="opacity:0;">
+        <img id="lb-img-ghost" src="">
         <div class="lb-nav lb-next" id="lb-next" onclick="changePhoto(1)"><i class="fas fa-chevron-right"></i></div>
     </div>
     <div class="lb-footer"><div class="lb-counter" id="lb-counter">1 / 1</div></div>
     <div id="slideshow-counter"></div>
     <div id="slideshow-bar"><div id="slideshow-progress"></div></div>
+
+    <!-- Slideshow Speed Picker -->
+    <div id="ss-speed-modal">
+        <button class="ss-close-btn" onclick="closeSsModal()"><i class="fas fa-times"></i></button>
+        <div class="ss-pick-title">Slideshow</div>
+        <div class="ss-pick-sub">Choose playback speed</div>
+        <div class="ss-speed-grid">
+            <button class="ss-speed-btn" data-speed="5000" onclick="selectSsSpeed(this)">1×<small>Slow</small></button>
+            <button class="ss-speed-btn" data-speed="3000" onclick="selectSsSpeed(this)">2×<small>Normal</small></button>
+            <button class="ss-speed-btn sel" data-speed="2000" onclick="selectSsSpeed(this)">3×<small>Fast</small></button>
+            <button class="ss-speed-btn" data-speed="1000" onclick="selectSsSpeed(this)">4×<small>Turbo</small></button>
+        </div>
+        <div class="ss-resume-row" id="ss-resume-row">
+            <div class="ss-resume-info" id="ss-resume-info">Paused at photo <span id="ss-resume-num"></span></div>
+            <button class="ss-resume-btn" onclick="resumeSlideshow()"><i class="fas fa-play mr-2"></i>Continue</button>
+        </div>
+        <button class="ss-start-btn" onclick="startSlideshowFromPicker()">
+            <i class="fas fa-redo mr-2"></i>Start from Beginning
+        </button>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -637,6 +715,23 @@ let pendingDlFiles = [];
 // Resume state
 let resumeBatchId  = null;
 let resumeIdx      = null;
+
+// Pagination
+const PAGE_SIZE     = 30;
+let renderedCount   = 0;
+let pgObserver      = null;
+let currentGalleryData = [];  // reference for appending
+
+// Slideshow speed & resume
+const SS_SPEEDS     = { 5000:'1×', 3000:'2×', 2000:'3×', 1000:'4×' };
+let ssSpeed         = 2000; // default 3× (2 s per photo)
+let ssPaused        = false;
+let ssPausedIdx     = null;
+
+// Swipe ghost state
+let ghostEl         = null; // set after DOM ready
+let ghostReady      = false;
+let ghostInitOffset = 0;
 
 // Cache worker state
 let cacheMissing   = [];
@@ -972,7 +1067,15 @@ function clearSearch() {
 const ASPECT_RATIOS = [1.33, 0.75, 1.0, 1.5, 0.67, 1.2, 0.8, 1.33, 1.0, 0.75];
 
 function renderGallery(data) {
-    const grid = document.getElementById('gallery');
+    const grid    = document.getElementById('gallery');
+    const wrap    = document.getElementById('gallery-wrap');
+    currentGalleryData = data;
+    renderedCount = 0;
+
+    // Remove any existing sentinel
+    const oldSent = document.getElementById('gallery-sentinel');
+    if (oldSent) oldSent.remove();
+    if (pgObserver) { pgObserver.disconnect(); pgObserver = null; }
 
     if (data.length === 0) {
         grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 20px;text-align:center;color:var(--muted);">
@@ -982,15 +1085,55 @@ function renderGallery(data) {
         initLazy(); updateCartUI(); return;
     }
 
-    grid.innerHTML = data.map((item, i) => {
+    grid.innerHTML = '';
+    appendGalleryPage();
+
+    // Sentinel for infinite scroll
+    const sentinel = document.createElement('div');
+    sentinel.id = 'gallery-sentinel';
+    if (renderedCount < data.length) {
+        sentinel.innerHTML = '<div class="pg-loader"><i class="fas fa-spinner"></i> Loading more...</div>';
+    }
+    wrap.appendChild(sentinel);
+
+    pgObserver = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && renderedCount < currentGalleryData.length) {
+            appendGalleryPage();
+            if (renderedCount >= currentGalleryData.length) {
+                sentinel.innerHTML = '';
+                pgObserver.disconnect();
+            }
+        }
+    }, { rootMargin: '300px' });
+    pgObserver.observe(sentinel);
+
+    initLazy();
+    updateCartUI();
+
+    // Double-tap hint (first-time users)
+    if (!localStorage.getItem('sds_dt_hint_shown')) {
+        setTimeout(() => {
+            const h = document.getElementById('dt-hint');
+            h.classList.add('show');
+            setTimeout(() => { h.classList.remove('show'); localStorage.setItem('sds_dt_hint_shown','1'); }, 3500);
+        }, 1200);
+    }
+}
+
+function appendGalleryPage() {
+    const data  = currentGalleryData;
+    const grid  = document.getElementById('gallery');
+    const start = renderedCount;
+    const end   = Math.min(start + PAGE_SIZE, data.length);
+
+    let html = '';
+    for (let i = start; i < end; i++) {
+        const item      = data[i];
         const isSelected = selectedFiles.has(item.fullUrl);
         const isLiked    = likedSet.has(item.fullUrl);
         const ar         = ASPECT_RATIOS[i % ASPECT_RATIOS.length];
         const padPct     = (1 / ar * 100).toFixed(1);
-        const selClass   = isSelected ? 'selected' : '';
-        const likedClass = isLiked    ? 'liked-item' : '';
-
-        return `<div class="photo-item ${selClass} ${likedClass}" id="pi-${i}"
+        html += `<div class="photo-item ${isSelected ? 'selected' : ''} ${isLiked ? 'liked-item' : ''}" id="pi-${i}"
                      onclick="handleClick(${i},event)"
                      oncontextmenu="showCtx(event,${i})">
             <div class="ph-wrap" style="padding-bottom:${padPct}%">
@@ -999,24 +1142,16 @@ function renderGallery(data) {
                      alt="${escHtml(item.filename)}">
             </div>
             <div class="heart-hint"><i class="fas fa-heart"></i></div>
-            ${isSelected ? `<div class="heart-overlay"><i class="fas fa-heart"></i></div>` : ''}
+            ${isSelected ? '<div class="heart-overlay"><i class="fas fa-heart"></i></div>' : ''}
             <i class="fas fa-heart liked-badge"></i>
         </div>`;
-    }).join('');
+    }
+    grid.insertAdjacentHTML('beforeend', html);
+    renderedCount = end;
 
-    initLazy();
-    updateCartUI();
-
-    // Show double-tap hint to first-time users
-    if (!localStorage.getItem('sds_dt_hint_shown')) {
-        setTimeout(() => {
-            const h = document.getElementById('dt-hint');
-            h.classList.add('show');
-            setTimeout(() => {
-                h.classList.remove('show');
-                localStorage.setItem('sds_dt_hint_shown', '1');
-            }, 3500);
-        }, 1200);
+    // Observe newly added images
+    if (lazyObserver) {
+        grid.querySelectorAll('.photo-img[data-src]:not([data-loaded])').forEach(img => lazyObserver.observe(img));
     }
 }
 
@@ -1139,21 +1274,25 @@ function doubleTapLike(i, cx, cy) {
         }
     }
 
-    // Only show flying heart if newly liked (not if already liked)
-    spawnFlyingHeart(cx, cy);
+    // Instagram-style heart centered on photo
+    spawnFlyingHeart(cx, cy, el);
 
     // Lightbox sync
     updateLbSelectIcon();
     updateLbLikeIcon();
 }
 
-function spawnFlyingHeart(cx, cy) {
-    const el = document.createElement('i');
-    el.className = 'fas fa-heart flying-heart-gallery';
-    el.style.left = cx + 'px';
-    el.style.top  = cy + 'px';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 800);
+function spawnFlyingHeart(cx, cy, photoEl) {
+    // Instagram-style: big heart centered on the photo element
+    const container = document.createElement('div');
+    container.className = 'insta-heart-container';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-heart insta-heart-icon';
+    container.appendChild(icon);
+    if (photoEl) {
+        photoEl.appendChild(container);
+        setTimeout(() => container.remove(), 920);
+    }
 }
 
 function toggleSelection(i, forceAdd = null) {
@@ -1581,7 +1720,15 @@ function updateLb() {
 }
 
 function closeLightbox() {
-    stopSlideshow();
+    // If slideshow was running, save pause position
+    if (ssTimeout !== null) {
+        const idx = currentIdx;
+        stopSlideshow(false);
+        if (currentBatchId) localStorage.setItem(ssPauseKey(), JSON.stringify({ idx, speed: ssSpeed }));
+    } else {
+        stopSlideshow(true);
+    }
+    document.getElementById('ss-speed-modal').classList.remove('open');
     document.getElementById('lightbox').classList.remove('open');
     imgEl.style.transform = '';
     imgEl.style.opacity   = '';
@@ -1602,6 +1749,7 @@ function updateLbSelectIcon() {
     if (!item) return;
     const isSel = selectedFiles.has(item.fullUrl);
     const icon  = document.getElementById('lb-select-icon');
+    if (!icon) return; // button removed from header
     if (isSel) { icon.className = 'fas fa-check-circle'; icon.style.color = 'var(--gold)'; }
     else        { icon.className = 'far fa-check-circle'; icon.style.color = ''; }
 }
@@ -1624,6 +1772,7 @@ window.addEventListener('keydown', e => {
 // ════════════════════════════════════════════════════════
 const lbBody = document.getElementById('lb-body');
 const imgEl  = document.getElementById('lb-img');
+ghostEl      = document.getElementById('lb-img-ghost');
 
 let lbZoom = 1, lbPanX = 0, lbPanY = 0;
 let lbHighResLoader = null;
@@ -1672,6 +1821,8 @@ lbBody.addEventListener('touchstart', e => {
         touchIsHoriz = false;
         dragActive   = false;
         swipeOffset  = 0;
+        ghostReady   = false;
+        if (ghostEl) { ghostEl.style.display = 'none'; ghostEl.style.transition = ''; ghostEl.style.transform = ''; }
     }
 }, { passive: true });
 
@@ -1703,11 +1854,29 @@ lbBody.addEventListener('touchmove', e => {
     }
 
     if (touchIsHoriz && lbZoom <= 1) {
-        // ── HORIZONTAL SWIPE → navigate ──
+        // ── HORIZONTAL SWIPE → navigate with ghost preview ──
         swipeOffset = dx;
         imgEl.classList.add('swiping');
+
+        // Load & show ghost neighbour on first move
+        if (!ghostReady) {
+            const neighborDir = dx < 0 ? 1 : -1;
+            const neighborIdx = (currentIdx + neighborDir + filteredData.length) % filteredData.length;
+            const neighbor    = filteredData[neighborIdx];
+            if (neighbor && ghostEl) {
+                ghostEl.src             = neighbor.thumbUrl;
+                ghostEl.style.display   = 'block';
+                ghostEl.style.transition = '';
+                // Position: next photo starts from right (+vw), prev from left (-vw)
+                ghostInitOffset = dx < 0 ? window.innerWidth : -window.innerWidth;
+                ghostReady = true;
+            }
+        }
+        if (ghostEl && ghostReady) {
+            ghostEl.style.transform = `translateX(${ghostInitOffset + dx}px)`;
+        }
+
         applyLbTransform(dx);
-        // Show ghost of neighbour photo opacity by how far swiped
     } else {
         // ── PAN / DRAG ──
         if (lbZoom > 1) {
@@ -1742,15 +1911,8 @@ lbBody.addEventListener('touchend', e => {
         // ── TAP or DOUBLE TAP ──
         const now = Date.now();
         if (now - lbLastTap < 300) {
-            // Double tap → toggle zoom
-            if (lbZoom > 1) {
-                resetLbTransform(true);
-            } else {
-                lbZoom = 2.5; lbPanX = 0; lbPanY = 0;
-                imgEl.classList.add('snap-back');
-                setTimeout(() => imgEl.classList.remove('snap-back'), 350);
-                applyLbTransform();
-            }
+            // Double tap → Instagram like + add to cart
+            triggerLightboxDoubleTapLike();
         }
         lbLastTap = now;
         dragActive = false;
@@ -1762,20 +1924,40 @@ lbBody.addEventListener('touchend', e => {
         // ── SWIPE NAVIGATION ──
         const threshold = window.innerWidth * 0.25;
         if (Math.abs(dx) > threshold) {
-            const dir = dx < 0 ? 1 : -1;
+            const dir   = dx < 0 ? 1 : -1;
             const exitX = dir < 0 ? -window.innerWidth : window.innerWidth;
-            imgEl.style.transition = 'transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.25s';
-            imgEl.style.transform  = `translateX(${exitX}px) scale(${lbZoom})`;
-            imgEl.style.opacity = '0';
+
+            // Slide current photo out
+            imgEl.style.transition = 'transform 0.26s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.26s';
+            imgEl.style.transform  = `translateX(${exitX}px) scale(1)`;
+            imgEl.style.opacity    = '0';
+
+            // Slide ghost (incoming photo) to centre
+            if (ghostEl && ghostReady) {
+                ghostEl.style.transition = 'transform 0.26s cubic-bezier(0.25,0.46,0.45,0.94)';
+                ghostEl.style.transform  = 'translateX(0)';
+            }
+
             setTimeout(() => {
                 imgEl.style.transition = '';
+                if (ghostEl) { ghostEl.style.display = 'none'; ghostEl.style.transition = ''; ghostEl.style.transform = ''; }
+                ghostReady = false;
                 changePhoto(dir);
-            }, 220);
+            }, 240);
         } else {
-            // Snap back
+            // Snap back current photo
             imgEl.classList.add('snap-back');
             applyLbTransform(0);
             setTimeout(() => imgEl.classList.remove('snap-back'), 350);
+            // Snap ghost back offscreen
+            if (ghostEl && ghostReady) {
+                ghostEl.style.transition = 'transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94)';
+                ghostEl.style.transform  = `translateX(${ghostInitOffset}px)`;
+                setTimeout(() => {
+                    if (ghostEl) { ghostEl.style.display = 'none'; ghostEl.style.transition = ''; ghostEl.style.transform = ''; }
+                    ghostReady = false;
+                }, 310);
+            }
         }
     } else if (lbZoom <= 1) {
         // ── VERTICAL SWIPE → close ──
@@ -1789,6 +1971,36 @@ lbBody.addEventListener('touchend', e => {
     }
     dragActive = false; swipeOffset = 0;
 }, { passive: true });
+
+// ── LIGHTBOX DOUBLE-TAP LIKE ──
+function triggerLightboxDoubleTapLike() {
+    const item = filteredData[currentIdx];
+    if (!item) return;
+
+    const wasLiked = likedSet.has(item.fullUrl);
+    likedSet.add(item.fullUrl);
+    selectedFiles.add(item.fullUrl);
+    saveLikes(); saveCart(); updateCartUI();
+    updateLbLikeIcon();
+
+    // Update gallery card
+    const el = document.getElementById('pi-' + currentIdx);
+    if (el) {
+        el.classList.add('selected', 'liked-item');
+        if (!el.querySelector('.heart-overlay')) {
+            const ho = document.createElement('div');
+            ho.className = 'heart-overlay';
+            ho.innerHTML = '<i class="fas fa-heart"></i>';
+            el.appendChild(ho);
+        }
+    }
+
+    // Big Instagram heart in center of lightbox
+    const heart = document.createElement('i');
+    heart.className = 'fas fa-heart lb-doubletap-heart';
+    lbBody.appendChild(heart);
+    setTimeout(() => heart.remove(), 920);
+}
 
 // Mouse drag when zoomed (desktop)
 let mouseDragActive = false, mouseDragSX, mouseDragSY;
@@ -1821,24 +2033,89 @@ lbBody.addEventListener('wheel', e => {
 }, { passive: false });
 
 // ════════════════════════════════════════════════════════
-//  SLIDESHOW
+//  SLIDESHOW  — speed picker + pause/resume
 // ════════════════════════════════════════════════════════
-let ssInterval = null;
 let ssTimeout  = null;
-const SS_DELAY = 3500; // ms per photo
 
+// Key to save paused slideshow position
+function ssPauseKey() { return `sds_ss_${currentEvent}_${currentBatchId}`; }
+
+// Called from gallery header "Slideshow" button
 function startSlideshow() {
     openLightbox(0);
-    setTimeout(() => runSlideshow(), 400);
+    setTimeout(() => openSsModal(), 300);
+}
+
+// Open speed picker modal
+function openSsModal() {
+    stopSlideshow(false); // stop any running SS without clearing pause key
+    const modal = document.getElementById('ss-speed-modal');
+    modal.classList.add('open');
+
+    // Highlight selected speed btn
+    modal.querySelectorAll('.ss-speed-btn').forEach(b => {
+        b.classList.toggle('sel', parseInt(b.dataset.speed) === ssSpeed);
+    });
+
+    // Check for paused state
+    const saved = localStorage.getItem(ssPauseKey());
+    const resumeRow  = document.getElementById('ss-resume-row');
+    const resumeNumEl = document.getElementById('ss-resume-num');
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        ssPausedIdx = parsed.idx;
+        if (parsed.speed) { ssSpeed = parsed.speed; }
+        resumeRow.classList.add('show');
+        resumeNumEl.textContent = `${ssPausedIdx + 1} / ${filteredData.length}`;
+        // Update speed highlight again
+        modal.querySelectorAll('.ss-speed-btn').forEach(b => {
+            b.classList.toggle('sel', parseInt(b.dataset.speed) === ssSpeed);
+        });
+    } else {
+        ssPausedIdx = null;
+        resumeRow.classList.remove('show');
+    }
+}
+
+function closeSsModal() {
+    document.getElementById('ss-speed-modal').classList.remove('open');
+}
+
+function selectSsSpeed(btn) {
+    ssSpeed = parseInt(btn.dataset.speed);
+    document.querySelectorAll('.ss-speed-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+}
+
+function resumeSlideshow() {
+    closeSsModal();
+    if (ssPausedIdx !== null) {
+        currentIdx = ssPausedIdx;
+        updateLb();
+    }
+    localStorage.removeItem(ssPauseKey());
+    ssPausedIdx = null;
+    setTimeout(() => runSlideshow(), 300);
+}
+
+function startSlideshowFromPicker() {
+    closeSsModal();
+    localStorage.removeItem(ssPauseKey());
+    ssPausedIdx = null;
+    currentIdx = 0;
+    updateLb();
+    setTimeout(() => runSlideshow(), 300);
 }
 
 function runSlideshow() {
-    const bar = document.getElementById('slideshow-bar');
+    const bar  = document.getElementById('slideshow-bar');
     const prog = document.getElementById('slideshow-progress');
     const ctr  = document.getElementById('slideshow-counter');
-    bar.style.display = 'block';
-    ctr.style.display = 'block';
+    bar.style.display  = 'block';
+    ctr.style.display  = 'block';
     document.getElementById('lb-ss-icon').className = 'fas fa-pause-circle';
+    document.getElementById('lightbox').classList.add('ss-active');
+    ssPaused = false;
 
     prog.style.transition = 'none';
     prog.style.width = '0%';
@@ -1848,7 +2125,7 @@ function runSlideshow() {
         prog.style.transition = 'none';
         prog.style.width = '0%';
         requestAnimationFrame(() => requestAnimationFrame(() => {
-            prog.style.transition = `width ${SS_DELAY}ms linear`;
+            prog.style.transition = `width ${ssSpeed}ms linear`;
             prog.style.width = '100%';
         }));
         ssTimeout = setTimeout(() => {
@@ -1858,24 +2135,39 @@ function runSlideshow() {
                 changePhoto(1);
                 tick();
             }
-        }, SS_DELAY);
+        }, ssSpeed);
     }
     tick();
 }
 
-function stopSlideshow() {
+function stopSlideshow(clearPause = true) {
     clearTimeout(ssTimeout); ssTimeout = null;
+    ssPaused = true;
     const bar  = document.getElementById('slideshow-bar');
     const ctr  = document.getElementById('slideshow-counter');
     const prog = document.getElementById('slideshow-progress');
-    bar.style.display = 'none'; ctr.style.display = 'none';
-    prog.style.width = '0%';
+    if (bar)  bar.style.display  = 'none';
+    if (ctr)  ctr.style.display  = 'none';
+    if (prog) prog.style.width = '0%';
     document.getElementById('lb-ss-icon').className = 'fas fa-play-circle';
+    document.getElementById('lightbox').classList.remove('ss-active');
+
+    // Save pause position unless explicitly clearing
+    if (!clearPause && currentBatchId) {
+        localStorage.setItem(ssPauseKey(), JSON.stringify({ idx: currentIdx, speed: ssSpeed }));
+    }
 }
 
 function toggleSlideshow() {
-    if (ssTimeout !== null) stopSlideshow();
-    else runSlideshow();
+    if (ssTimeout !== null) {
+        // Pause → save position
+        const idx = currentIdx;
+        stopSlideshow(false);
+        if (currentBatchId) localStorage.setItem(ssPauseKey(), JSON.stringify({ idx, speed: ssSpeed }));
+    } else {
+        // Resume or open picker
+        openSsModal();
+    }
 }
 
 // ════════════════════════════════════════════════════════
