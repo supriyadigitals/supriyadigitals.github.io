@@ -49,19 +49,18 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #main-loader-text { font-weight: 700; font-size: 1rem; color: var(--text); }
 
-        /* ── CACHE PROGRESS SCREEN ── */
-        #cache-screen {
-            position: fixed; inset: 0; background: #fff;
+        /* ── FOLDER OPEN TRANSITION ── */
+        #folder-open-overlay {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.96);
             z-index: 9998; display: none; flex-direction: column;
             align-items: center; justify-content: center; padding: 30px; text-align: center;
         }
-        .cache-title { font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-        .cache-sub { font-size: 0.85rem; color: var(--muted); max-width: 360px; line-height: 1.6; }
-        .cache-bar-wrap { width: 100%; max-width: 380px; height: 6px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin: 20px 0 8px; }
-        .cache-bar-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.2s linear; }
-        .cache-pct { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
-        .cache-stats { font-size: 0.8rem; color: var(--muted); font-weight: 600; margin-top: 4px; }
-        .btn-continue { display: none; margin-top: 20px; padding: 12px 32px; background: var(--dark); color: #fff; border: none; border-radius: 4px; font-family: var(--sans); font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        .folder-open-spinner {
+            width: 44px; height: 44px; border: 3px solid #f0f0f0;
+            border-top-color: var(--gold); border-radius: 50%;
+            animation: spin 0.9s linear infinite; margin-bottom: 14px;
+        }
+        .folder-open-text { font-size: 0.85rem; font-weight: 600; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
 
         /* ── SKELETON ── */
         .skeleton {
@@ -116,24 +115,25 @@
         }
         #search-result-count { font-size: 0.8rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
 
-        /* ── PILL MENU ── */
+        /* ── PILL MENU (Fixed to act as universal folder bar) ── */
         #pill-menu {
             background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
-            padding: 10px 16px; border-bottom: 1px solid var(--border);
-            display: none; overflow-x: auto; white-space: nowrap; gap: 8px;
-            position: sticky; top: 57px; z-index: 180; scroll-behavior: smooth;
+            padding: 12px 20px; border-bottom: 1px solid var(--border);
+            display: none; overflow-x: auto; white-space: nowrap; gap: 10px;
+            position: sticky; top: 58px; z-index: 180; scroll-behavior: smooth;
         }
         #pill-menu::-webkit-scrollbar { display: none; }
         .pill {
-            display: inline-block; padding: 6px 18px;
-            background: #f3f4f6; color: var(--muted); border-radius: 20px;
-            font-size: 0.8rem; font-weight: 600; cursor: pointer;
-            transition: 0.25s; border: 1px solid transparent; margin-right: 6px;
+            display: inline-flex; align-items: center; padding: 8px 20px;
+            background: #f3f4f6; color: var(--muted); border-radius: 24px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            transition: 0.2s; border: 1px solid transparent; flex-shrink: 0;
         }
-        .pill.active { background: var(--gold); color: var(--dark); }
+        .pill:hover { background: #e5e7eb; color: var(--text); }
+        .pill.active { background: var(--dark); color: var(--gold); border-color: var(--dark); }
 
         /* ── EVENT CONTENT (dashboard) ── */
-        #event-content { display: none; }
+        #event-content { display: none; padding: 0; }
 
         /* ── MEDIA GRID (folder cards on dashboard) ── */
         .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; padding: 20px; }
@@ -424,6 +424,46 @@
         .lb-nav:hover { background: var(--gold); color: var(--dark); }
         .lb-prev { left: 16px; } .lb-next { right: 16px; }
 
+        /* ── SITE FOOTER ── */
+        #site-footer {
+            background: #1a1a2e;
+            color: rgba(255,255,255,0.75);
+            text-align: center;
+            padding: 36px 20px 28px;
+            margin-top: 40px;
+            font-family: var(--sans);
+            display: none; /* hidden by default, shown only inside gallery */
+        }
+        #site-footer .footer-logo {
+            font-size: 1.3rem; font-weight: 800; letter-spacing: 0.04em;
+            color: #fff; margin-bottom: 4px;
+        }
+        #site-footer .footer-tagline {
+            font-size: 0.78rem; color: rgba(255,255,255,0.45);
+            letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px;
+        }
+        #site-footer .footer-socials {
+            display: flex; justify-content: center; gap: 16px; margin-bottom: 22px;
+        }
+        #site-footer .footer-socials a {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.1rem; text-decoration: none;
+            transition: background 0.2s, transform 0.2s;
+        }
+        #site-footer .footer-socials a:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
+        #site-footer .footer-socials a.wa  { background: #25d366; }
+        #site-footer .footer-socials a.ig  { background: linear-gradient(135deg,#f58529,#dd2a7b,#8134af); }
+        #site-footer .footer-socials a.yt  { background: #ff0000; }
+        #site-footer .footer-divider {
+            border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 0 auto 16px; max-width: 240px;
+        }
+        #site-footer .footer-powered {
+            font-size: 0.72rem; color: rgba(255,255,255,0.3); letter-spacing: 0.08em;
+        }
+        #site-footer .footer-powered span { color: rgba(255,255,255,0.55); font-weight: 700; }
+
         /* ── LIGHTBOX FOOTER ── */
         .lb-footer {
             position: absolute; bottom: 8px; left: 0; right: 0;
@@ -441,8 +481,6 @@
             position: absolute; bottom: 8px; left: 8px;
             color: #ef4444; font-size: 0.9rem; text-shadow: 0 1px 4px rgba(0,0,0,0.4);
         }
-        /* ── FLYING HEART ── */
-        /* flying-check removed — replaced by flying-heart-gallery */
 
         /* ── VIDEO WRAPPER (for video cards on dashboard) ── */
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
@@ -496,9 +534,133 @@
         .ss-close-btn   { position: absolute; top: 18px; right: 18px; background: none; border: none; color: rgba(255,255,255,0.55); font-size: 1.5rem; cursor: pointer; }
 
         /* ── GALLERY PAGINATION ── */
-        #gallery-sentinel { height: 60px; display: flex; align-items: center; justify-content: center; }
-        .pg-loader { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
-        .pg-loader i { color: var(--gold); animation: spin 0.9s linear infinite; }
+        #gallery-sentinel { height: 80px; display: flex; align-items: center; justify-content: center; }
+        .pg-loader {
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .pg-loader-ring {
+            width: 32px; height: 32px;
+            border: 2.5px solid rgba(0,0,0,0.08);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .pg-loader-text {
+            font-family: var(--sans); font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+        }
+
+        /* ── FULL-SCREEN PAGE TRANSITION LOADER ── */
+        #page-transition {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(13,13,13,0.92);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        #page-transition.active { opacity: 1; pointer-events: all; }
+        .pt-ring {
+            width: 54px; height: 54px;
+            border: 3px solid rgba(255,255,255,0.12);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            margin-bottom: 18px;
+        }
+        .pt-text {
+            font-family: var(--sans); font-size: 0.8rem; font-weight: 600;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* ── HERO DASHBOARD (replaces flat card grid) ── */
+        .event-hero {
+            position: relative; width: 100%; height: 100vh; min-height: 500px;
+            background: var(--dark); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .event-hero-bg {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            transform: scale(1.04);
+            transition: transform 6s ease;
+        }
+        .event-hero.loaded .event-hero-bg { transform: scale(1); }
+        .event-hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom,
+                rgba(0,0,0,0.3) 0%,
+                rgba(0,0,0,0.5) 50%,
+                rgba(0,0,0,0.75) 100%);
+        }
+        .event-hero-content {
+            position: relative; z-index: 2;
+            text-align: center; padding: 20px;
+            animation: heroFadeUp 0.9s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes heroFadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .event-hero-tag {
+            font-family: var(--sans); font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 5px; text-transform: uppercase; color: var(--gold);
+            margin-bottom: 16px;
+        }
+        .event-hero-title {
+            font-family: var(--serif); font-size: clamp(2.2rem, 6vw, 4.5rem);
+            font-weight: 700; color: #fff; line-height: 1.15; margin-bottom: 12px;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+        .event-hero-date {
+            font-size: 0.8rem; letter-spacing: 3px; color: rgba(255,255,255,0.5);
+            text-transform: uppercase; margin-bottom: 32px;
+        }
+        .event-hero-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: transparent; color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.7);
+            padding: 13px 36px; border-radius: 2px;
+            font-family: var(--sans); font-size: 0.78rem; font-weight: 600;
+            letter-spacing: 3px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.25s;
+        }
+        .event-hero-btn:hover {
+            background: var(--gold); border-color: var(--gold); color: var(--dark);
+        }
+        .event-hero-socials {
+            margin-top: 28px;
+            display: flex; justify-content: center; gap: 18px;
+        }
+        .event-hero-socials a {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.35);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.75); font-size: 0.95rem;
+            text-decoration: none; transition: 0.2s;
+        }
+        .event-hero-socials a:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* Multi-folder grid (inside hero) */
+        .event-folder-strip {
+            position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+            display: flex; gap: 0; overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .event-folder-strip::-webkit-scrollbar { display: none; }
+        .event-folder-tab {
+            flex-shrink: 0; padding: 14px 24px;
+            background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+            color: rgba(255,255,255,0.7); font-family: var(--sans);
+            font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px;
+            cursor: pointer; border-top: 2px solid transparent;
+            transition: 0.2s; white-space: nowrap;
+        }
+        .event-folder-tab:hover, .event-folder-tab.active {
+            color: #fff; border-top-color: var(--gold);
+            background: rgba(0,0,0,0.75);
+        }
         #lightbox.ss-active .lb-counter { display: none !important; }
     </style>
 </head>
@@ -525,15 +687,16 @@
     <div id="main-loader-text">Connecting to Studio</div>
 </div>
 
-<!-- Cache Progress Screen -->
-<div id="cache-screen">
-    <i class="fas fa-microchip" style="font-size:2.5rem;color:var(--gold);margin-bottom:14px;"></i>
-    <div class="cache-title">Preparing Your Gallery</div>
-    <p class="cache-sub">Optimising images for the best viewing experience. Please wait a moment.</p>
-    <div class="cache-bar-wrap"><div class="cache-bar-fill" id="cache-fill"></div></div>
-    <div class="cache-pct" id="cache-pct">0% Ready</div>
-    <div class="cache-stats" id="cache-stats">0 / 0 images</div>
-    <button class="btn-continue" id="btn-continue" onclick="finishCacheLoad()">Continue →</button>
+<!-- Page Transition Loader -->
+<div id="page-transition">
+    <div class="pt-ring"></div>
+    <div class="pt-text" id="pt-text">Opening Gallery</div>
+</div>
+
+<!-- Folder Open Overlay (lightweight) -->
+<div id="folder-open-overlay">
+    <div class="folder-open-spinner"></div>
+    <div class="folder-open-text">Opening Gallery</div>
 </div>
 
 <!-- Download Manager -->
@@ -657,6 +820,7 @@
         <div class="lb-filename" id="lb-filename">photo.jpg</div>
         <div class="lb-actions-right">
             <button class="lb-icon lb-heart-btn" id="lb-heart-btn" onclick="toggleLike()" title="Like"><i class="far fa-heart" id="lb-heart-icon"></i></button>
+            <button class="lb-icon" id="lb-fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen"><i class="fas fa-expand" id="lb-fs-icon"></i></button>
             <button class="lb-icon" id="lb-share-btn" onclick="sharePhoto()" title="Share"><i class="fas fa-share-alt"></i></button>
             <button class="lb-icon" id="lb-slideshow-btn" onclick="toggleSlideshow()" title="Slideshow"><i class="fas fa-play-circle" id="lb-ss-icon"></i></button>
             <div class="dropdown" id="lb-dl-btn" style="display:none;">
@@ -712,13 +876,25 @@
 const API_BASE  = "https://supriyadigitals.store/api/";
 const WA_NUMBER = "919246789966";
 
+// ── Page transition helpers ──
+function showTransition(msg = 'Opening Gallery') {
+    const pt = document.getElementById('page-transition');
+    document.getElementById('pt-text').textContent = msg;
+    pt.classList.add('active');
+}
+function hideTransition() {
+    const pt = document.getElementById('page-transition');
+    pt.classList.remove('active');
+}
+
 // ════════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════════
 const params = new URLSearchParams(window.location.search);
+const currentEvent = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root';
 
 let allEventData   = [];   // all items for this event
-const likedSet = new Set(JSON.parse(localStorage.getItem('sds_likes') || '[]'));
+const likedSet = new Set(JSON.parse(localStorage.getItem('sds_likes_' + currentEvent) || '[]'));
 let galleryData    = [];   // items in currently open folder
 let filteredData   = [];   // galleryData filtered by search
 let selectedFiles  = new Set();
@@ -728,6 +904,11 @@ let isCartView     = false;
 let currentIdx     = 0;
 let currentBatchId = null;
 let pendingDlFiles = [];
+
+// Global collections to persist folder navigation menu
+let globalFolders = [];
+let globalVideos  = [];
+let globalAlbums  = [];
 
 // Resume state
 let resumeBatchId  = null;
@@ -741,26 +922,21 @@ let currentGalleryData = [];  // reference for appending
 
 // Slideshow speed & resume
 const SS_SPEEDS     = { 5000:'1×', 3000:'2×', 2000:'3×', 1000:'4×' };
-let ssSpeed         = 2000; // default 3× (2 s per photo)
+let ssSpeed         = 2000;
 let ssPaused        = false;
 let ssPausedIdx     = null;
 
 // Swipe ghost state
-let ghostEl         = null; // set after DOM ready
+let ghostEl         = null;
 let ghostReady      = false;
 let ghostInitOffset = 0;
-
-// Cache worker state
-let cacheMissing   = [];
-let cacheTotal     = 0;
-let cacheDone      = 0;
-const MAX_WORKERS  = 4;
-let activeWorkers  = 0;
 
 // Tracking
 let deviceId = localStorage.getItem('sds_device');
 if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2,9); localStorage.setItem('sds_device', deviceId); }
-const currentEvent = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root';
+
+// SINGLE EVENT COVER VARIABLE
+let eventCoverPath = null;
 
 // ════════════════════════════════════════════════════════
 //  TRACKING
@@ -802,12 +978,26 @@ async function init() {
         }
 
         allEventData = data.data;
+
+        // FETCH SINGLE EVENT COVER INSTEAD OF MULTIPLE BATCH COVERS
+        if (currentEvent !== 'Root') {
+            try {
+                const coverRes = await fetch(API_BASE + 'batch_cover.php?event_name=' + encodeURIComponent(currentEvent));
+                const coverData = await coverRes.json();
+                if (coverData.success && coverData.cover) {
+                    eventCoverPath = coverData.cover;
+                }
+            } catch(e) { console.error("Cover fetch failed"); }
+        }
+
         document.getElementById('main-loader').style.display = 'none';
+
+        // Initialize folder navigation layout completely once
+        buildFolderNavigation();
 
         if (evt) {
             renderDashboard();
         } else {
-            // No event specified — find first work batch and open it
             const first = allEventData.find(i => i.type === 'work' || i.type === 'link');
             if (first) openFolder(first.batch_id);
             else renderDashboard();
@@ -819,13 +1009,70 @@ async function init() {
 }
 
 // ════════════════════════════════════════════════════════
-//  DASHBOARD RENDER
+//  BUILD GLOBAL FOLDER NAVIGATION
+// ════════════════════════════════════════════════════════
+function buildFolderNavigation() {
+    const seenBatches = new Set();
+    const sorted = [...allEventData].sort((a,b) => (parseInt(a.order_index)||999999) - (parseInt(b.order_index)||999999));
+    
+    globalFolders = [];
+    globalVideos = [];
+    globalAlbums = [];
+
+    sorted.forEach(item => {
+        if ((item.type === 'work' || item.type === 'link') && item.batch_id) {
+            if (!seenBatches.has(item.batch_id)) {
+                seenBatches.add(item.batch_id);
+                const count = sorted.filter(i => i.batch_id === item.batch_id).length;
+                const parts = item.file_path.split('/');
+                const folderName = parts.length > 1 ? parts[parts.length - 2] : (item.title || 'Gallery');
+                
+                globalFolders.push({ batchId: item.batch_id, name: folderName, count: count });
+            }
+        } else if (item.type === 'teaser' || item.type === 'live') {
+            globalVideos.push(item);
+        } else if (item.type === 'album') {
+            globalAlbums.push(item);
+        }
+    });
+
+    const multiFolder = globalFolders.length > 1 || globalVideos.length > 0 || globalAlbums.length > 0;
+    
+    // Construct the pill menu HTML
+    let pillHtml = '';
+    if (multiFolder) {
+        globalFolders.forEach(f => {
+            pillHtml += `<div class="pill" onclick="openFolder('${escHtml(f.batchId)}')">
+                <i class="fas fa-images" style="margin-right:6px;opacity:0.6;"></i>${escHtml(f.name)}
+                <span style="opacity:0.5;font-weight:400;margin-left:6px;font-size:0.72rem;">${f.count}</span>
+            </div>`;
+        });
+        globalVideos.forEach(v => {
+            const ytId = extractYtId(v.file_path);
+            pillHtml += `<div class="pill" onclick="openVideoModal('${escHtml(ytId)}')">
+                <i class="fab fa-youtube" style="margin-right:6px;color:#ff4444;"></i>${escHtml(v.title || 'Video')}
+            </div>`;
+        });
+        globalAlbums.forEach(a => {
+            const target = a.pdf_link || a.file_path;
+            pillHtml += `<div class="pill" onclick="window.open('${escHtml(target)}','_blank')">
+                <i class="fas fa-book-reader" style="margin-right:6px;"></i>${escHtml(a.title || 'Album')}
+            </div>`;
+        });
+    }
+    
+    document.getElementById('pill-menu').innerHTML = pillHtml;
+}
+
+// ════════════════════════════════════════════════════════
+//  DASHBOARD RENDER — Single High-Res Hero Cover
 // ════════════════════════════════════════════════════════
 function renderDashboard() {
     isCartView = false;
     if (isSelectMode) toggleSelectMode();
 
-    // Hide gallery, show dashboard
+    hideTransition();
+
     document.getElementById('gallery-wrap').style.display  = 'none';
     document.getElementById('event-content').style.display = 'block';
     document.getElementById('search-bar').style.display    = 'none';
@@ -836,90 +1083,82 @@ function renderDashboard() {
     document.getElementById('btn-select').style.display       = 'none';
     document.getElementById('btn-dl-all').style.display       = 'none';
 
-    const evtName = params.get('event') ? decodeURIComponent(params.get('event')) : '';
-    let html = '';
+    const evtName = params.get('event') ? decodeURIComponent(params.get('event')) : 'Gallery';
 
-    if (evtName) {
-        html += `<div style="text-align:center;padding:32px 20px 0;">
-            <h2 style="font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--text);margin:0;">${escHtml(evtName)}</h2>
-            <div style="width:40px;height:2px;background:var(--gold);margin:14px auto 0;"></div>
-        </div>`;
+    // ── Build Single Hero Cover ──
+    let heroCoverUrl = '';
+
+    if (eventCoverPath) {
+        // Fetch High-Res image (Removed &thumb=1)
+        heroCoverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(eventCoverPath)}`;
+    } else {
+        // Fallback: Pick a random image from the event
+        const allPhotos = allEventData.filter(i => i.type === 'work' || i.type === 'link');
+        if (allPhotos.length > 0) {
+            const randomPhoto = allPhotos[Math.floor(Math.random() * allPhotos.length)];
+            heroCoverUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(randomPhoto.file_path)}`;
+        }
     }
 
-    // Build pill menu
-    let pillHtml = `<span class="pill active" onclick="renderDashboard()"><i class="fas fa-th-large mr-1"></i> All</span>`;
+    const multiFolder = globalFolders.length > 1 || globalVideos.length > 0 || globalAlbums.length > 0;
 
-    // Collect folders, videos, albums in order
-    const seenBatches = new Set();
-    const sorted = [...allEventData].sort((a,b) => (parseInt(a.order_index)||999999) - (parseInt(b.order_index)||999999));
-
-    let items = [];
-    sorted.forEach(item => {
-        if ((item.type === 'work' || item.type === 'link') && item.batch_id) {
-            if (!seenBatches.has(item.batch_id)) {
-                seenBatches.add(item.batch_id);
-                const count = sorted.filter(i => i.batch_id === item.batch_id).length;
-                const parts = item.file_path.split('/');
-                const folder = parts.length > 1 ? parts[parts.length - 2] : item.title;
-                items.push({ kind: 'folder', batchId: item.batch_id, name: folder, cover: item.file_path, count, order: parseInt(item.order_index)||999999 });
-                pillHtml += `<span class="pill" onclick="openFolder('${escHtml(item.batch_id)}')">${escHtml(folder)}</span>`;
-            }
-        } else if (item.type === 'teaser' || item.type === 'live') {
-            items.push({ kind: 'video', data: item, order: parseInt(item.order_index)||999999 });
-        } else if (item.type === 'album') {
-            items.push({ kind: 'album', data: item, order: parseInt(item.order_index)||999999 });
-        }
-    });
-
-    document.getElementById('pill-menu').innerHTML = pillHtml;
-    document.getElementById('pill-menu').style.display = 'flex';
-
-    // Render cards
-    html += `<div class="media-grid">`;
-    items.sort((a,b) => a.order - b.order).forEach(item => {
-        if (item.kind === 'folder') {
-            const thumb = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.cover)}&thumb=1`;
-            html += `<div class="media-card" onclick="openFolder('${escHtml(item.batchId)}')">
-                <div class="folder-cover" style="background-image:url('${escHtml(thumb)}');">
-                    <div class="folder-overlay"></div>
-                </div>
-                <div class="card-body">
-                    <div class="card-title"><i class="fas fa-folder-open" style="color:#d97706;margin-right:6px;"></i>${escHtml(item.name)}</div>
-                    <div class="card-sub">${item.count} Photos</div>
-                </div>
+    // Build folder tabs for Dashboard hero
+    let tabsHtml = '';
+    if (multiFolder) {
+        tabsHtml = `<div class="event-folder-strip">`;
+        globalFolders.forEach((f, i) => {
+            tabsHtml += `<div class="event-folder-tab${i===0?' active':''}" onclick="openFolder('${escHtml(f.batchId)}')">
+                <i class="fas fa-images" style="margin-right:6px;opacity:0.6;"></i>${escHtml(f.name)}
+                <span style="opacity:0.5;font-weight:400;margin-left:6px;font-size:0.72rem;">${f.count}</span>
             </div>`;
-        } else if (item.kind === 'video') {
-            const v = item.data;
+        });
+        globalVideos.forEach(v => {
             const ytId = extractYtId(v.file_path);
-            const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
-            const label = v.type === 'live' ? 'Live Event' : 'Cinematic Film';
-            html += `<div class="media-card" onclick="openVideoModal('${escHtml(ytId)}')">
-                <div class="folder-cover" style="background-image:url('${thumb}');">
-                    <div class="folder-overlay"></div>
-                    <div class="video-play-icon"><i class="fas fa-play-circle"></i></div>
-                </div>
-                <div class="card-body">
-                    <div class="card-title"><i class="fab fa-youtube" style="color:#ef4444;margin-right:6px;"></i>${escHtml(v.title || label)}</div>
-                    <div class="card-sub">Tap to play video</div>
-                </div>
+            tabsHtml += `<div class="event-folder-tab" onclick="openVideoModal('${escHtml(ytId)}')">
+                <i class="fab fa-youtube" style="margin-right:6px;color:#ff4444;"></i>${escHtml(v.title || 'Video')}
             </div>`;
-        } else if (item.kind === 'album') {
-            const a = item.data;
+        });
+        globalAlbums.forEach(a => {
             const target = a.pdf_link || a.file_path;
-            html += `<div class="media-card" onclick="window.open('${escHtml(target)}','_blank')">
-                <div class="folder-cover" style="background:linear-gradient(135deg,#1a1a1a,#333);display:flex;align-items:center;justify-content:center;">
-                    <i class="fas fa-book-reader" style="font-size:3rem;color:var(--gold);"></i>
-                </div>
-                <div class="card-body">
-                    <div class="card-title">${escHtml(a.title || 'Digital Album')}</div>
-                    <div class="card-sub"><i class="fas fa-external-link-alt mr-1"></i>View PDF Document</div>
-                </div>
+            tabsHtml += `<div class="event-folder-tab" onclick="window.open('${escHtml(target)}','_blank')">
+                <i class="fas fa-book-reader" style="margin-right:6px;"></i>${escHtml(a.title || 'Album')}
             </div>`;
-        }
-    });
+        });
+        tabsHtml += `</div>`;
+    }
 
-    html += `</div>`;
+    const ctaOnclick = globalFolders.length > 0 ? `openFolder('${escHtml(globalFolders[0].batchId)}')` : '';
+
+    // HTML Output
+    const html = `
+    <div class="event-hero" id="event-hero">
+        <div class="event-hero-bg" id="event-hero-bg"
+             style="background-image:url('${escHtml(heroCoverUrl)}');transition:background-image 0.1s,opacity 0.8s,transform 6s ease;"></div>
+        <div class="event-hero-overlay"></div>
+        <div class="event-hero-content">
+            <div class="event-hero-tag">Supriya Digitals · Your Memories</div>
+            <h1 class="event-hero-title">${escHtml(evtName)}</h1>
+            ${globalFolders.length > 0 && !multiFolder ? `<div class="event-hero-date">${globalFolders[0].count} Photos</div>` : ''}
+            ${ctaOnclick ? `<button class="event-hero-btn" onclick="${ctaOnclick}"><i class="fas fa-images"></i> View Gallery</button>` : ''}
+            <div class="event-hero-socials">
+                <a href="https://wa.me/message/5AOBSE5NCFTKO1" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://www.instagram.com/supriya_digitals?igsh=MTAxeXAybnRqbno3Zw==" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com/@supriyadigitals2000" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="tel:+919246789966" title="Call"><i class="fas fa-phone-alt"></i></a>
+            </div>
+        </div>
+        ${tabsHtml}
+    </div>`;
+
     document.getElementById('event-content').innerHTML = html;
+
+    // Ken Burns on load
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const hero = document.getElementById('event-hero');
+            if (hero) hero.classList.add('loaded');
+        }, 100);
+    });
 }
 
 // ════════════════════════════════════════════════════════
@@ -957,44 +1196,27 @@ function openFolder(batchId) {
 
     filteredData = [...galleryData];
 
-    // Show loader while cache check runs
-    document.getElementById('event-content').style.display  = 'none';
-    document.getElementById('gallery-wrap').style.display   = 'none';
-    document.getElementById('main-loader-text').textContent = 'Loading gallery...';
-    document.getElementById('main-loader').style.display    = 'flex';
+    document.getElementById('event-content').style.display = 'none';
+    document.getElementById('main-loader').style.display   = 'none';
+    finishCacheLoad();
 
-    // Update pill menu active state
-    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-
-    // Check cache
-    fetch(API_BASE + 'cache_manager.php?action=status&batch_id=' + batchId)
-        .then(r => r.json())
-        .then(data => {
-            cacheTotal   = data.total  || 0;
-            cacheDone    = data.cached || 0;
-            cacheMissing = data.missing || [];
-            document.getElementById('main-loader').style.display = 'none';
-
-            if (cacheMissing.length === 0) {
-                finishCacheLoad();
-            } else {
-                const cs = document.getElementById('cache-screen');
-                cs.style.display = 'flex';
-                updateCacheUI();
-                for (let i = 0; i < Math.min(MAX_WORKERS, cacheMissing.length); i++) runWorker();
-            }
-        })
-        .catch(() => {
-            document.getElementById('main-loader').style.display = 'none';
-            finishCacheLoad();
-        });
-
-    // Activate correct pill
+    // Reset and activate correct pill in the navigation menu
     document.querySelectorAll('.pill').forEach(p => {
-        if (p.getAttribute('onclick') && p.getAttribute('onclick').includes(batchId)) p.classList.add('active');
+        p.classList.remove('active');
+        if (p.getAttribute('onclick') && p.getAttribute('onclick').includes(batchId)) {
+            p.classList.add('active');
+            // Slight delay so DOM is rendered before scroll
+            setTimeout(() => p.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 10);
+        }
     });
 
-    document.getElementById('pill-menu').style.display = 'flex';
+    // Make the pill menu visible inside the gallery view if it has tabs
+    if (document.getElementById('pill-menu').innerHTML.trim() !== '') {
+        document.getElementById('pill-menu').style.display = 'flex';
+    } else {
+        document.getElementById('pill-menu').style.display = 'none';
+    }
+
     document.getElementById('btn-back-folders').style.display = 'block';
     document.getElementById('btn-back-cart').style.display    = 'none';
 
@@ -1003,45 +1225,29 @@ function openFolder(batchId) {
 }
 
 // ════════════════════════════════════════════════════════
-//  CACHE WORKER
+//  GALLERY OPEN
 // ════════════════════════════════════════════════════════
-function updateCacheUI() {
-    const pct = cacheTotal > 0 ? Math.round((cacheDone / cacheTotal) * 100) : 100;
-    document.getElementById('cache-fill').style.width = pct + '%';
-    document.getElementById('cache-pct').textContent  = pct + '% Ready';
-    document.getElementById('cache-stats').textContent = `${cacheDone} / ${cacheTotal} images`;
-    if (cacheDone >= 5 || pct >= 15) document.getElementById('btn-continue').style.display = 'block';
-}
-
-function runWorker() {
-    if (cacheMissing.length === 0) return;
-    activeWorkers++;
-    const url = cacheMissing.shift();
-    fetch(API_BASE + 'serve_image.php?file=' + encodeURIComponent(url) + '&thumb=1')
-        .then(() => { cacheDone++; updateCacheUI(); activeWorkers--; checkCacheDone(); runWorker(); })
-        .catch(() => { cacheDone++; updateCacheUI(); activeWorkers--; checkCacheDone(); runWorker(); });
-}
-
-function checkCacheDone() {
-    if (cacheMissing.length === 0 && activeWorkers === 0 && cacheDone >= cacheTotal) {
-        finishCacheLoad();
-    }
-}
-
 function finishCacheLoad() {
-    document.getElementById('cache-screen').style.display = 'none';
     document.getElementById('gallery-wrap').style.display = 'block';
     document.getElementById('search-bar').style.display   = 'flex';
+    document.getElementById('site-footer').style.display  = 'block';
 
     document.getElementById('btn-start').style.display  = 'block';
     document.getElementById('btn-select').style.display = 'block';
     if (canDownload > 0) document.getElementById('btn-dl-all').style.display = 'block';
 
+    hideTransition();
     renderGallery(filteredData);
+
+    if (_pendingResumeIdx !== null) {
+        const idx = _pendingResumeIdx;
+        _pendingResumeIdx = null;
+        setTimeout(() => _scrollToResumePhoto(idx), 300);
+    }
 }
 
 // ════════════════════════════════════════════════════════
-//  SEARCH FEATURE (NEW)
+//  SEARCH FEATURE
 // ════════════════════════════════════════════════════════
 function handleSearch(query) {
     const q = query.toLowerCase().trim();
@@ -1109,7 +1315,7 @@ function renderGallery(data) {
     const sentinel = document.createElement('div');
     sentinel.id = 'gallery-sentinel';
     if (renderedCount < data.length) {
-        sentinel.innerHTML = '<div class="pg-loader"><i class="fas fa-spinner"></i> Loading more...</div>';
+        sentinel.innerHTML = '<div class="pg-loader"><div class="pg-loader-ring"></div><div class="pg-loader-text">Loading Photos</div></div>';
     }
     wrap.appendChild(sentinel);
 
@@ -1413,7 +1619,6 @@ function saveCart() { localStorage.setItem(cartKey(), JSON.stringify([...selecte
 function resumeKey(batchId) { return `sds_resume_${currentEvent}_${batchId}`; }
 
 function checkResume(batchId) {
-    // Bug 4 Fix: read with the SAME key format used when saving
     const saved = parseInt(localStorage.getItem(resumeKey(batchId)));
     if (!isNaN(saved) && saved > 0) {
         resumeBatchId = batchId;
@@ -1426,10 +1631,50 @@ function checkResume(batchId) {
     }
 }
 
+let _pendingResumeIdx = null; // set when resume triggers an openFolder first
+
 function executeResume() {
-    dismissResume();
-    if (resumeIdx !== null && !isCartView) openLightbox(resumeIdx);
+    if (resumeIdx === null || isCartView) return;
+
+    const targetIdx     = resumeIdx;
+    const targetBatchId = resumeBatchId;
+
+    // Dismiss toast but do NOT clear the key yet
+    // (we clear it only after successfully navigating)
+    document.getElementById('resume-toast').classList.remove('show');
+
+    // If the correct folder is already open and rendered, go straight to it
+    if (currentBatchId === targetBatchId && filteredData.length > 0) {
+        _scrollToResumePhoto(targetIdx);
+        // Clear the resume key now that we've acted on it
+        if (resumeBatchId) localStorage.removeItem(resumeKey(resumeBatchId));
+        resumeBatchId = null; resumeIdx = null;
+        return;
+    }
+
+    // Otherwise open the folder first — _pendingResumeIdx will fire from finishCacheLoad
+    _pendingResumeIdx = targetIdx;
+    openFolder(targetBatchId);
+    // Key will be cleared in _scrollToResumePhoto after successful navigation
 }
+
+function _scrollToResumePhoto(idx) {
+    // Render enough pages so the element exists in DOM
+    while (renderedCount <= idx && renderedCount < filteredData.length) {
+        appendGalleryPage();
+    }
+    const el = document.getElementById('pi-' + idx);
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => openLightbox(idx), 420);
+    } else {
+        openLightbox(idx);
+    }
+    // Clear resume key after navigating
+    if (resumeBatchId) localStorage.removeItem(resumeKey(resumeBatchId));
+    resumeBatchId = null; resumeIdx = null;
+}
+
 function dismissResume() {
     document.getElementById('resume-toast').classList.remove('show');
     if (resumeBatchId) localStorage.removeItem(resumeKey(resumeBatchId));
@@ -1448,6 +1693,7 @@ function goToDashboard() {
     document.getElementById('btn-dl-all').style.display     = 'none';
     document.getElementById('btn-start').style.display      = 'none';
     document.getElementById('btn-select').style.display     = 'none';
+    document.getElementById('site-footer').style.display    = 'none';
     isCartView = false;
     renderDashboard();
 }
@@ -1784,6 +2030,25 @@ function closeLightbox() {
     imgEl.src = '';
     lbZoom = 1; lbPanX = 0; lbPanY = 0;
 }
+
+// ── FULLSCREEN TOGGLE ──
+function toggleFullscreen() {
+    const el = document.getElementById('lightbox');
+    const icon = document.getElementById('lb-fs-icon');
+    if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        if (icon) icon.className = 'fas fa-compress';
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        if (icon) icon.className = 'fas fa-expand';
+    }
+}
+document.addEventListener('fullscreenchange', () => {
+    const icon = document.getElementById('lb-fs-icon');
+    if (icon) icon.className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
+});
 
 function changePhoto(dir) {
     currentIdx = (currentIdx + dir + filteredData.length) % filteredData.length;
@@ -2260,7 +2525,7 @@ function toggleSlideshow() {
 // ════════════════════════════════════════════════════════
 //  HEART / LIKE
 // ════════════════════════════════════════════════════════
-function saveLikes() { localStorage.setItem('sds_likes', JSON.stringify([...likedSet])); }
+function saveLikes() { localStorage.setItem('sds_likes_' + currentEvent, JSON.stringify([...likedSet])); }
 
 function toggleLike() {
     const item = filteredData[currentIdx];
@@ -2462,5 +2727,32 @@ function escHtml(s) {
 // ════════════════════════════════════════════════════════
 init();
 </script>
+<!-- ══ SITE FOOTER ══ -->
+<footer id="site-footer">
+    <div class="footer-logo">Supriya Digitals</div>
+    <div class="footer-tagline">Photography &amp; Videography</div>
+    <div style="font-size:0.8rem; color:rgba(255,255,255,0.55); margin-bottom:6px;">
+        <i class="fas fa-map-marker-alt" style="color:var(--gold);margin-right:6px;"></i>
+        Supriya Digital Studio, 8-272, Chinna Ramalayam, Bhargavpet, Mangalagiri, AP 522503
+    </div>
+    <div style="font-size:0.8rem; color:rgba(255,255,255,0.55); margin-bottom:16px;">
+        <i class="fas fa-envelope" style="color:var(--gold);margin-right:6px;"></i>
+        <a href="mailto:Supriyadigitals73@gmail.com" style="color:rgba(255,255,255,0.55); text-decoration:none;">Supriyadigitals73@gmail.com</a>
+    </div>
+    <div class="footer-socials">
+        <a href="https://wa.me/message/5AOBSE5NCFTKO1" target="_blank" rel="noopener" class="wa" title="WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="https://www.instagram.com/supriya_digitals?igsh=MTAxeXAybnRqbno3Zw==" target="_blank" rel="noopener" class="ig" title="Instagram">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://youtube.com/@supriyadigitals2000" target="_blank" rel="noopener" class="yt" title="YouTube">
+            <i class="fab fa-youtube"></i>
+        </a>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-powered">POWERED BY <span>FOTO OWL</span></div>
+</footer>
+
 </body>
 </html>
