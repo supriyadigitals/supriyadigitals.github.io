@@ -361,10 +361,23 @@
         .lb-icon:hover { opacity: 1; color: var(--gold); }
         .lb-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; touch-action: none; cursor: grab; user-select: none; }
         .lb-body.zoomed { cursor: grabbing; }
-        #lb-img { max-height: 82vh; max-width: 94vw; object-fit: contain; will-change: transform; transition: opacity 0.2s; cursor: inherit; pointer-events: none; display: block; }
-        #lb-img.swiping { transition: transform 0.05s linear; }
-        #lb-img.snap-back { transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        #lb-img.snap-next { transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+
+        /* ── Instagram swipe strip: current + ghost sit in a horizontal track ── */
+        #lb-strip {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            will-change: transform;
+        }
+        #lb-strip.animate {
+            transition: transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        #lb-img {
+            position: relative; z-index: 2;
+            max-height: 82vh; max-width: 94vw; object-fit: contain;
+            will-change: transform; cursor: inherit; pointer-events: none; display: block;
+            flex-shrink: 0;
+            transition: opacity 0.22s;
+        }
         /* ── SLIDESHOW OVERLAY ── */
         #slideshow-bar {
             position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
@@ -446,9 +459,11 @@
 
         /* ── GHOST IMAGE FOR SWIPE (lightbox) ── */
         #lb-img-ghost {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto;
+            position: absolute; top: 50%; margin: auto;
             max-height: 82vh; max-width: 94vw; object-fit: contain;
             pointer-events: none; display: none;
+            transform: translateY(-50%);
+            flex-shrink: 0;
         }
 
         /* ── SLIDESHOW SPEED PICKER ── */
@@ -656,8 +671,10 @@
     </div>
     <div class="lb-body" id="lb-body">
         <div class="lb-nav lb-prev" id="lb-prev" onclick="changePhoto(-1)"><i class="fas fa-chevron-left"></i></div>
-        <img id="lb-img" src="" style="opacity:0;">
-        <img id="lb-img-ghost" src="">
+        <div id="lb-strip">
+            <img id="lb-img" src="" style="opacity:0;">
+            <img id="lb-img-ghost" src="">
+        </div>
         <div class="lb-nav lb-next" id="lb-next" onclick="changePhoto(1)"><i class="fas fa-chevron-right"></i></div>
     </div>
     <div class="lb-footer"><div class="lb-counter" id="lb-counter">1 / 1</div></div>
@@ -1701,6 +1718,8 @@ function hideDlManager() {
 function openLightbox(i) {
     currentIdx = i;
     lbZoom = 1; lbPanX = 0; lbPanY = 0;
+    if (stripEl) { stripEl.classList.remove('animate'); stripEl.style.transform = ''; }
+    hideGhost();
     document.getElementById('lightbox').classList.add('open');
     updateLb();
 }
@@ -1768,8 +1787,13 @@ function closeLightbox() {
 function changePhoto(dir) {
     currentIdx = (currentIdx + dir + filteredData.length) % filteredData.length;
     lbZoom = 1; lbPanX = 0; lbPanY = 0;
+    // Reset strip and image transforms cleanly
+    stripEl.classList.remove('animate');
+    stripEl.style.transform = '';
+    stripSwipeX = 0;
     imgEl.style.transform = '';
     imgEl.style.opacity   = '';
+    document.getElementById('lightbox').style.background = '';
     updateLb();
 }
 
@@ -1801,6 +1825,7 @@ window.addEventListener('keydown', e => {
 // ════════════════════════════════════════════════════════
 const lbBody = document.getElementById('lb-body');
 const imgEl  = document.getElementById('lb-img');
+const stripEl = document.getElementById('lb-strip');
 ghostEl      = document.getElementById('lb-img-ghost');
 
 let lbZoom = 1, lbPanX = 0, lbPanY = 0;
@@ -1814,25 +1839,53 @@ let lbLastTap = 0;
 let dragActive = false;
 let swipeOffset = 0;
 
-function applyLbTransform(extraX = 0) {
-    imgEl.style.transform = `translate(${lbPanX + extraX}px, ${lbPanY}px) scale(${lbZoom})`;
+// ── Strip offset for pan/zoom (separate from swipe) ──
+let stripSwipeX = 0; // how far the strip has been dragged horizontally
+let ghostDir    = 0; // +1 = ghost is next (right), -1 = ghost is prev (left)
+const VW = () => window.innerWidth;
+const GHOST_GAP = 16; // px gap between current and ghost photo
+
+function _positionGhost() {
+    if (!ghostEl || !ghostReady) return;
+    // Ghost sits one screen-width + gap away in the swipe direction
+    const offset = ghostDir * (VW() + GHOST_GAP);
+    ghostEl.style.left = offset + 'px';
+}
+
+function applyLbTransform() {
+    // Apply zoom+pan to the image itself (used when zoomed in)
+    imgEl.style.transform = `translate(${lbPanX}px, ${lbPanY}px) scale(${lbZoom})`;
     lbBody.classList.toggle('zoomed', lbZoom > 1);
 }
 
-function resetLbTransform(animate = false) {
+function setStripX(x, animated = false) {
+    stripSwipeX = x;
+    stripEl.classList.toggle('animate', animated);
+    stripEl.style.transform = `translateX(${x}px)`;
+}
+
+function resetLbTransform(animated = false) {
     lbPanX = 0; lbPanY = 0; lbZoom = 1;
-    imgEl.classList.toggle('snap-back', animate);
-    if (animate) setTimeout(() => imgEl.classList.remove('snap-back'), 350);
     applyLbTransform();
+    setStripX(0, animated);
     imgEl.style.opacity = '1';
 }
 
+function hideGhost() {
+    ghostReady = false;
+    ghostDir   = 0;
+    if (ghostEl) {
+        ghostEl.style.display = 'none';
+        ghostEl.src = '';
+        ghostEl.style.left = '';
+    }
+}
+
 // Prevent ALL default touch behavior inside the lightbox (stops page zoom)
-lbBody.addEventListener('touchstart', e => { e.stopPropagation(); }, { passive: true });
 lbBody.addEventListener('touchmove', e => { e.preventDefault(); e.stopPropagation(); }, { passive: false });
-lbBody.addEventListener('touchend', e => { e.stopPropagation(); }, { passive: true });
 
 lbBody.addEventListener('touchstart', e => {
+    e.stopPropagation();
     if (e.touches.length === 2) {
         pinchDist0 = Math.hypot(
             e.touches[0].pageX - e.touches[1].pageX,
@@ -1840,6 +1893,8 @@ lbBody.addEventListener('touchstart', e => {
         );
         pinchZoom0 = lbZoom;
         touchMoveStarted = false;
+        hideGhost();
+        setStripX(0);
     } else if (e.touches.length === 1) {
         touchStartX  = e.touches[0].pageX;
         touchStartY  = e.touches[0].pageY;
@@ -1850,8 +1905,8 @@ lbBody.addEventListener('touchstart', e => {
         touchIsHoriz = false;
         dragActive   = false;
         swipeOffset  = 0;
-        ghostReady   = false;
-        if (ghostEl) { ghostEl.style.display = 'none'; ghostEl.style.transition = ''; ghostEl.style.transform = ''; }
+        // Cancel any in-progress strip animation
+        stripEl.classList.remove('animate');
     }
 }, { passive: true });
 
@@ -1875,7 +1930,7 @@ lbBody.addEventListener('touchmove', e => {
     const dy = cy - touchStartY;
 
     if (!touchMoveStarted) {
-        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
             touchMoveStarted = true;
             touchIsHoriz = Math.abs(dx) > Math.abs(dy);
             dragActive = true;
@@ -1883,45 +1938,43 @@ lbBody.addEventListener('touchmove', e => {
     }
 
     if (touchIsHoriz && lbZoom <= 1) {
-        // ── HORIZONTAL SWIPE → navigate with ghost preview ──
+        // ── HORIZONTAL SWIPE — move entire strip (Instagram style) ──
         swipeOffset = dx;
-        imgEl.classList.add('swiping');
 
-        // Load & show ghost neighbour on first move
+        // Lazy-load ghost on first horizontal move
         if (!ghostReady) {
-            const neighborDir = dx < 0 ? 1 : -1;
-            const neighborIdx = (currentIdx + neighborDir + filteredData.length) % filteredData.length;
-            const neighbor    = filteredData[neighborIdx];
+            ghostDir = dx < 0 ? 1 : -1; // +1=next, -1=prev
+            const nIdx = (currentIdx + ghostDir + filteredData.length) % filteredData.length;
+            const neighbor = filteredData[nIdx];
             if (neighbor && ghostEl) {
-                ghostEl.src             = neighbor.thumbUrl;
-                ghostEl.style.display   = 'block';
-                ghostEl.style.transition = '';
-                // Position: next photo starts from right (+vw), prev from left (-vw)
-                ghostInitOffset = dx < 0 ? window.innerWidth : -window.innerWidth;
+                ghostEl.src           = neighbor.thumbUrl;
+                ghostEl.style.display = 'block';
                 ghostReady = true;
+                _positionGhost();
             }
         }
-        if (ghostEl && ghostReady) {
-            ghostEl.style.transform = `translateX(${ghostInitOffset + dx}px)`;
-        }
 
-        applyLbTransform(dx);
-    } else {
-        // ── PAN / DRAG ──
-        if (lbZoom > 1) {
-            lbPanX += (cx - touchLastX);
-            lbPanY += (cy - touchLastY);
-            // Clamp panning
-            const maxPanX = (lbZoom - 1) * (imgEl.offsetWidth  / 2);
-            const maxPanY = (lbZoom - 1) * (imgEl.offsetHeight / 2);
-            lbPanX = Math.max(-maxPanX, Math.min(maxPanX, lbPanX));
-            lbPanY = Math.max(-maxPanY, Math.min(maxPanY, lbPanY));
-        } else {
-            lbPanX = dx; lbPanY = dy;
-            // Fade out on vertical drag for close gesture
-            imgEl.style.opacity = Math.max(0.2, 1 - Math.abs(dy) / 350);
-        }
+        // Add rubber-band resistance at edges (only 1 photo total — no wrap)
+        const resist = filteredData.length <= 1 ? 0.1 : 1;
+        setStripX(dx * resist);
+
+    } else if (lbZoom > 1) {
+        // ── PAN while zoomed ──
+        lbPanX += (cx - touchLastX);
+        lbPanY += (cy - touchLastY);
+        const maxPanX = (lbZoom - 1) * (imgEl.offsetWidth  / 2);
+        const maxPanY = (lbZoom - 1) * (imgEl.offsetHeight / 2);
+        lbPanX = Math.max(-maxPanX, Math.min(maxPanX, lbPanX));
+        lbPanY = Math.max(-maxPanY, Math.min(maxPanY, lbPanY));
         applyLbTransform();
+    } else {
+        // ── VERTICAL SWIPE → dismiss ──
+        lbPanY = dy;
+        applyLbTransform();
+        // Fade background as photo moves away
+        const fade = Math.max(0.15, 1 - Math.abs(dy) / 320);
+        imgEl.style.opacity = fade;
+        document.getElementById('lightbox').style.background = `rgba(0,0,0,${0.94 * fade})`;
     }
 
     touchLastX = cx;
@@ -1929,18 +1982,18 @@ lbBody.addEventListener('touchmove', e => {
 }, { passive: false });
 
 lbBody.addEventListener('touchend', e => {
+    e.stopPropagation();
     pinchDist0 = null;
-    imgEl.classList.remove('swiping');
 
-    const dx = touchLastX - touchStartX;
-    const dy = touchLastY - touchStartY;
+    const dx      = touchLastX - touchStartX;
+    const dy      = touchLastY - touchStartY;
     const elapsed = Date.now() - touchStartTime;
+    const vx      = dx / Math.max(elapsed, 1); // px/ms velocity
 
     if (!touchMoveStarted) {
         // ── TAP or DOUBLE TAP ──
         const now = Date.now();
-        if (now - lbLastTap < 300) {
-            // Double tap → Instagram like + add to cart
+        if (now - lbLastTap < 280) {
             triggerLightboxDoubleTapLike();
         }
         lbLastTap = now;
@@ -1950,53 +2003,44 @@ lbBody.addEventListener('touchend', e => {
     lbLastTap = 0;
 
     if (touchIsHoriz && lbZoom <= 1) {
-        // ── SWIPE NAVIGATION ──
-        const threshold = window.innerWidth * 0.25;
-        if (Math.abs(dx) > threshold) {
+        // ── COMMIT or CANCEL swipe ──
+        // Commit if dragged >25% of screen OR fast flick (>0.3 px/ms)
+        const shouldCommit = (Math.abs(dx) > VW() * 0.25 || Math.abs(vx) > 0.3) && ghostReady && filteredData.length > 1;
+
+        if (shouldCommit) {
             const dir   = dx < 0 ? 1 : -1;
-            const exitX = dir < 0 ? -window.innerWidth : window.innerWidth;
+            const exitX = dir * -VW(); // where current photo exits to
 
-            // Slide current photo out
-            imgEl.style.transition = 'transform 0.26s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.26s';
-            imgEl.style.transform  = `translateX(${exitX}px) scale(1)`;
-            imgEl.style.opacity    = '0';
-
-            // Slide ghost (incoming photo) to centre
-            if (ghostEl && ghostReady) {
-                ghostEl.style.transition = 'transform 0.26s cubic-bezier(0.25,0.46,0.45,0.94)';
-                ghostEl.style.transform  = 'translateX(0)';
-            }
+            // Animate strip to final position
+            setStripX(exitX, true);
 
             setTimeout(() => {
-                imgEl.style.transition = '';
-                if (ghostEl) { ghostEl.style.display = 'none'; ghostEl.style.transition = ''; ghostEl.style.transform = ''; }
-                ghostReady = false;
+                stripEl.classList.remove('animate');
+                stripEl.style.transform = '';
+                hideGhost();
                 changePhoto(dir);
-            }, 240);
+            }, 320);
         } else {
-            // Snap back current photo
-            imgEl.classList.add('snap-back');
-            applyLbTransform(0);
-            setTimeout(() => imgEl.classList.remove('snap-back'), 350);
-            // Snap ghost back offscreen
-            if (ghostEl && ghostReady) {
-                ghostEl.style.transition = 'transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94)';
-                ghostEl.style.transform  = `translateX(${ghostInitOffset}px)`;
-                setTimeout(() => {
-                    if (ghostEl) { ghostEl.style.display = 'none'; ghostEl.style.transition = ''; ghostEl.style.transform = ''; }
-                    ghostReady = false;
-                }, 310);
-            }
+            // Rubber-band snap back
+            setStripX(0, true);
+            setTimeout(() => {
+                stripEl.classList.remove('animate');
+                hideGhost();
+            }, 340);
         }
+
     } else if (lbZoom <= 1) {
         // ── VERTICAL SWIPE → close ──
-        if (Math.abs(dy) > 110) {
+        document.getElementById('lightbox').style.background = '';
+        if (Math.abs(dy) > 100) {
             closeLightbox();
         } else {
-            resetLbTransform(true);
+            lbPanX = 0; lbPanY = 0;
+            applyLbTransform();
+            imgEl.style.opacity = '1';
         }
     } else {
-        // zoomed — just keep current pan position
+        // zoomed — keep pan position
     }
     dragActive = false; swipeOffset = 0;
 }, { passive: true });
