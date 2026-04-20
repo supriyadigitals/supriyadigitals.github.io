@@ -483,8 +483,8 @@
         <p class="portal-sub">Enter your event name to access your private photo collection</p>
         <div class="d-flex justify-content-center">
             <form class="portal-form" onsubmit="openPortal(event)">
-                <input class="portal-input" type="text" id="portalInput" placeholder="e.g. Ravi & Priya Wedding..." required>
-                <button class="portal-btn" type="submit"><i class="fas fa-search mr-2"></i>Open</button>
+                <input class="portal-input" type="text" id="portalInput" placeholder="Enter your name or event name…" required autocomplete="off" autocorrect="off" spellcheck="false">
+                <button class="portal-btn" type="submit" id="portal-submit-btn"><i class="fas fa-search mr-2"></i>Open Gallery</button>
             </form>
         </div>
     </div>
@@ -790,7 +790,7 @@
                     <div class="contact-icon"><i class="fas fa-envelope"></i></div>
                     <div>
                         <div class="contact-label">Email</div>
-                        <div class="contact-value"><a href="mailto:supriyadigitals73@gmail.com" style="color:#ccc;">supriyadigitals73@gmail.com</a></div>
+                        <div class="contact-value"><a href="mailto:info@supriyadigitals.com" style="color:#ccc;">info@supriyadigitals.com</a></div>
                     </div>
                 </div>
                 <div class="contact-info-item">
@@ -945,6 +945,61 @@ function ping() {
 }
 ping(); setInterval(ping, 10000);
 
+// ── LOAD MAIN PAGE SETTINGS (from admin panel) ──────────────────
+(async function applyPageSettings() {
+    try {
+        const res  = await fetch(API_BASE + 'page_settings.php');
+        const data = await res.json();
+        if (!data.success || !data.settings) return;
+        const s = data.settings;
+
+        const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerHTML = val; };
+        const setTxt = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+        const setHref = (sel, val) => { const el = document.querySelector(sel); if (el && val) el.href = val; };
+        const setAll = (sel, val, attr='textContent') => { document.querySelectorAll(sel).forEach(el => { if (val) el[attr] = val; }); };
+
+        // Hero
+        if (s.hero_tag)      { const el = document.querySelector('.hero-tag'); if (el) el.textContent = s.hero_tag; }
+        if (s.hero_title)    { const el = document.getElementById('hero-title'); if (el) el.textContent = s.hero_title; }
+        if (s.hero_subtitle) { const el = document.getElementById('hero-sub'); if (el) el.textContent = s.hero_subtitle; }
+
+        // About
+        if (s.about_title) { const el = document.querySelector('.about-title'); if (el) el.textContent = s.about_title; }
+        if (s.about_text)  { const el = document.querySelector('#about p[style*="muted"]'); if (el) el.textContent = s.about_text; }
+
+        // Stats counters (just update targets, animation picks them up)
+        if (s.stat_years)   { const el = document.getElementById('cnt-years');   if (el) el.dataset.target = s.stat_years; }
+        if (s.stat_clients) { const el = document.getElementById('cnt-clients'); if (el) el.dataset.target = s.stat_clients; }
+
+        // Contact info
+        if (s.phone)   {
+            document.querySelectorAll('a[href^="tel:"]').forEach(el => { el.href = 'tel:' + s.phone.replace(/\s/g,''); el.textContent = s.phone; });
+            const cv = document.querySelector('.contact-value a[href^="tel:"]');
+        }
+        if (s.email)   { document.querySelectorAll('a[href^="mailto:"]').forEach(el => { el.href = 'mailto:' + s.email; el.textContent = s.email; }); }
+        if (s.address) { const el = document.querySelector('.contact-value:first-of-type'); /* keep as-is — address layout is complex */ }
+        if (s.hours)   { /* hours split by comma */ }
+
+        // Footer text
+        if (s.footer_text) { const el = document.querySelector('.footer-text'); if (el) el.textContent = s.footer_text; }
+
+        // WhatsApp float button
+        if (s.wa_number) {
+            const waBtn = document.querySelector('.wa-float');
+            if (waBtn) waBtn.href = `https://wa.me/${s.wa_number}?text=Hello%20Supriya%20Digitals!%20I%20would%20like%20to%20book%20a%20session.`;
+        }
+
+        // Contact form Formspree action
+        if (s.formspree_id) {
+            const form = document.getElementById('contact-form');
+            if (form) form.action = `https://formspree.io/f/${s.formspree_id}`;
+        }
+
+    } catch(e) { /* settings load fails silently — static HTML remains */ }
+})();
+
+
+
 // ──────────────────────────────────────────────
 //  HERO SLIDER
 // ──────────────────────────────────────────────
@@ -1031,6 +1086,8 @@ function openPortal(e) {
     const val = document.getElementById('portalInput').value.trim();
     if (!val) return;
     trackAction('Searched Portal', val);
+    const btn = document.getElementById('portal-submit-btn');
+    if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Opening…'; btn.disabled = true; }
     window.location.href = `${VIEW_BASE}?event=${encodeURIComponent(val)}`;
 }
 
@@ -1147,9 +1204,11 @@ function renderAlbums(page) {
 
     grid.innerHTML = items.map(item => {
         const target   = item.pdf_link || item.file_path;
+        // Fix: fetch.php returns full URLs, so always pass through serve_image.php
+        // (it strips the domain prefix internally). This makes album covers always show.
         const thumbUrl = `${API_BASE}serve_image.php?file=${encodeURIComponent(item.file_path)}&thumb=1`;
-        const isLocal  = item.file_path && !item.file_path.startsWith('http');
-        const thumb    = isLocal
+        const hasCover = item.file_path && item.file_path !== item.pdf_link;
+        const thumb    = hasCover
             ? `<img class="album-thumb" src="${escHtml(thumbUrl)}" loading="lazy"
                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                <div class="album-thumb-placeholder" style="display:none;"><i class="fas fa-book-open" style="font-size:2.5rem;color:var(--gold);"></i></div>`
