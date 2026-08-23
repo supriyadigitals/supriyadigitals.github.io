@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/client-zip@2.4.5/index.js"></script>
 
     <style>
         /* ── VARIABLES ── */
@@ -329,6 +330,13 @@
         .dl-bar-wrap { height: 6px; background: #e5e7eb; border-radius: 10px; overflow: hidden; }
         .dl-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); width: 0%; transition: width 0.25s ease; border-radius: 10px; }
         .dl-status { font-size: 0.78rem; color: var(--muted); margin-top: 8px; font-weight: 600; display: flex; justify-content: space-between; }
+        #dl-stop-btn {
+            width: 100%; margin-top: 12px; padding: 9px;
+            background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;
+            border-radius: 7px; font-weight: 700; font-family: var(--sans);
+            font-size: 0.82rem; cursor: pointer; transition: 0.15s;
+        }
+        #dl-stop-btn:hover { background: #fecaca; }
 
         /* Mobile: move dl-manager to bottom */
         @media (max-width: 576px) {
@@ -748,6 +756,7 @@
     <div class="dl-title" id="dl-title"><i class="fas fa-file-archive" style="color:var(--gold);"></i> Preparing…</div>
     <div class="dl-bar-wrap"><div class="dl-bar-fill" id="dl-fill"></div></div>
     <div class="dl-status"><span id="dl-text">Starting…</span><span id="dl-pct"></span></div>
+    <button id="dl-stop-btn" onclick="stopCurrentDl()"><i class="fas fa-stop"></i> Stop Download</button>
 </div>
 
 <!-- Quality Selection -->
@@ -2552,7 +2561,7 @@ function triggerDlPrompt() {
     loadDlSizes();
 }
 
-// ---- Download size preview (shown in quality modal) --------------
+// ---- Download size preview (quality modal) ------------------------
 function fmtBytes(b) {
     if (!b || b <= 0) return '0 MB';
     if (b < 1048576) return Math.round(b/1024) + ' KB';
@@ -2580,7 +2589,7 @@ async function loadDlSizes() {
         const plan = await fetchDlPlan(pendingDlFiles);
         const n = plan.found;
         origEl.className = 'quality-size';
-        origEl.textContent = n + ' photos - about ' + fmtBytes(plan.total_bytes) + ' (' + plan.parts + ' part' + (plan.parts > 1 ? 's' : '') + ')';
+        origEl.textContent = n + ' photos - about ' + fmtBytes(plan.total_bytes) + ' - one single ZIP';
         webEl.className = 'quality-size';
         webEl.textContent = n + ' photos - about ' + fmtBytes(n * 340 * 1024) + ' (estimated)';
     } catch(e) {
@@ -2589,15 +2598,17 @@ async function loadDlSizes() {
     }
 }
 
-// ---- Resumable chunked download engine ---------------------------
-// The job list lives in localStorage. Each part is a small standalone
-// ZIP handed to the browser's NATIVE download manager, so a part that
-// is already transferring survives screen-off / tab death. If the page
-// itself dies between parts, the banner offers to continue from the
-// exact part where things stopped.
+// ---- Single-ZIP streaming engine ----------------------------------
+// ONE .zip file is created directly on the visitor's device. Each photo
+// is fetched as a small stream and piped straight into the file on disk
+// (client-zip), so RAM use stays flat no matter how many GB are pulled.
+// A Stop button aborts cleanly; progress is saved per-photo so a closed
+// page can resume with the remaining photos.
 const DL_JOB_KEY = 'sds_dljob';
 const DL_JOB_TTL = 48 * 60 * 60 * 1000;
-let dlJobActive  = false;
+let dlAbortCtl   = null;
+let dlFsHandle   = null;
+let dlStreaming  = false;
 
 function getDlJob()   { try { return JSON.parse(localStorage.getItem(DL_JOB_KEY)); } catch(e) { return null; } }
 function saveDlJob(j) { localStorage.setItem(DL_JOB_KEY, JSON.stringify(j)); }
@@ -2609,168 +2620,263 @@ function dlEventName() {
     return clean || 'Gallery';
 }
 
-function submitDlPart(job, p) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = API_BASE + 'stream_zip.php?mode=part&part=' + p + '&quality=' + job.q;
-    form.target = 'dl-frame';
-    const fi = document.createElement('input'); fi.type = 'hidden'; fi.name = 'files_json'; fi.value = JSON.stringify(job.files); form.appendChild(fi);
-    const ei = document.createElement('input'); ei.type = 'hidden'; ei.name = 'evt'; ei.value = (job.evt || 'Gallery'); form.appendChild(ei);
-    document.body.appendChild(form); form.submit(); document.body.removeChild(form);
-}
-
-function runDlJob() {
-    if (dlJobActive) return;
-    const first = getDlJob();
-    if (!first || first.next > first.total) { finishDlJob(!!first); return; }
-    dlJobActive = true;
-    document.getElementById('dl-title').innerHTML = '<i class="fas fa-file-archive" style="color:var(--gold);"></i> Downloading parts...';
-
-    const step = () => {
-        const j = getDlJob();
-        if (!j) { dlJobActive = false; return; }
-        if (j.next > j.total) { finishDlJob(true); return; }
-        const pct = Math.round(((j.next - 1) / j.total) * 100);
-        document.getElementById('dl-fill').style.width = Math.max(pct, 4) + '%';
-        document.getElementById('dl-text').textContent = 'Part ' + j.next + ' of ' + j.total;
-        document.getElementById('dl-pct').textContent = pct + '%';
-        submitDlPart(j, j.next);
-        setTimeout(() => {
-            const jj = getDlJob(); if (!jj) { dlJobActive = false; return; }
-            jj.next++; jj.lastTick = Date.now(); saveDlJob(jj);
-            step();
-        }, 5000);
-    };
-    step();
-}
-
-function finishDlJob(ok) {
-    clearDlJob(); dlJobActive = false;
-    document.getElementById('quality-overlay').style.display = 'none';
-    if (ok) {
-        document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);"></i> All parts downloaded!';
-        document.getElementById('dl-fill').style.width = '100%';
-        document.getElementById('dl-text').textContent = 'Check your Downloads folder - files are named Part 01, Part 02...';
-        document.getElementById('dl-pct').textContent = '100%';
-        track('download', 'Parts Complete');
-        setTimeout(hideDlManager, 7000);
+function setDlUI(pct, text, titleHtml) {
+    if (pct !== null) {
+        document.getElementById('dl-fill').style.width = Math.max(2, Math.min(100, pct)) + '%';
+        document.getElementById('dl-pct').textContent = Math.round(pct) + '%';
     }
+    document.getElementById('dl-text').textContent = text;
+    if (titleHtml) document.getElementById('dl-title').innerHTML = titleHtml;
 }
+function showStopBtn(v) { document.getElementById('dl-stop-btn').style.display = v ? 'block' : 'none'; }
 
-window.continueDlJob = function () { document.getElementById('dl-resume-toast').classList.remove('show'); runDlJob(); };
-window.cancelDlJob   = function () { document.getElementById('dl-resume-toast').classList.remove('show'); clearDlJob(); };
+window.stopCurrentDl = function () {
+    if (dlAbortCtl) { dlAbortCtl.userStopped = true; dlAbortCtl.abort(); }
+};
 
-function checkDlResume() {
-    const job = getDlJob();
-    if (!job || !job.files || job.next > job.total) { if (job && !job.files) clearDlJob(); return; }
-    if (Date.now() - (job.ts || 0) > DL_JOB_TTL) { clearDlJob(); return; }
-    const remaining = job.total - job.next + 1;
-    document.getElementById('dl-resume-title').textContent =
-        'Finish your ' + (job.q === 'web' ? 'web-quality' : 'original') + ' download?';
-    document.getElementById('dl-resume-sub').textContent =
-        '"' + (job.evt || 'Gallery') + '" - part ' + job.next + ' of ' + job.total + ' is next (' + remaining + ' to go)';
-    document.getElementById('dl-resume-toast').classList.add('show');
-    // Same-session stall (screen just came back on): pick up automatically
-    if (job.lastTick && Date.now() - job.lastTick < 120000) continueDlJob();
-}
-
-// Screen off freezes JS timers mid-job. When the page becomes visible
-// again, resume exactly where localStorage says we stopped.
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') checkDlResume();
-});
-if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', checkDlResume);
-else checkDlResume();
-
-async function executeWebDownload() {
-    document.getElementById('quality-overlay').style.display = 'none';
-    track('download', 'Web Quality ZIP');
-
-    // Small sets: instant in-browser zip, no server round-trip
-    if (pendingDlFiles.length <= 120) {
-        showDlManager('Preparing your photos...');
-        const zip = new JSZip();
-        const total = pendingDlFiles.length;
-        let completed = 0, failed = 0;
-        const BATCH_SIZE = 10;
-
-        for (let i = 0; i < total; i += BATCH_SIZE) {
-            const batch = pendingDlFiles.slice(i, i + BATCH_SIZE);
-            await Promise.all(batch.map(async (fileUrl) => {
-                try {
-                    const url = API_BASE + 'serve_image.php?file=' + encodeURIComponent(fileUrl) + '&thumb=1';
-                    const res = await fetch(url, { cache: 'no-store' });
-                    if (!res.ok) throw new Error('Failed');
-                    const blob = await res.blob();
-                    zip.file(fileUrl.split('/').pop(), blob);
-                } catch(e) { failed++; }
-                finally { completed++; }
-            }));
-            const pct = Math.round((completed / total) * 100);
-            document.getElementById('dl-fill').style.width = pct + '%';
-            document.getElementById('dl-text').textContent = completed + ' of ' + total + ' photos (' + pct + '%)';
-            document.getElementById('dl-pct').textContent = pct + '%';
-        }
-
-        document.getElementById('dl-title').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--gold);"></i> Finalising ZIP...';
-        try {
-            const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '.zip';
-            link.click();
-            setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-            document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);"></i> Download Complete!';
-            document.getElementById('dl-text').textContent = failed > 0
-                ? 'Saved. (' + failed + ' photo' + (failed > 1 ? 's' : '') + ' could not be fetched)'
-                : 'All photos saved to your device.';
-        } catch(e) {
-            document.getElementById('dl-title').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red);"></i> Error';
-            document.getElementById('dl-text').textContent = 'Memory limit reached. Try selecting fewer photos.';
-        }
-        setTimeout(hideDlManager, 6000);
-        return;
-    }
-
-    // Large sets: server-side resumable parts at web quality
-    showDlManager('Calculating parts...');
-    let plan;
-    try { plan = await fetchDlPlan(pendingDlFiles); }
-    catch(e) { hideDlManager(); alert('Could not calculate the download. Please try again.'); return; }
-    saveDlJob({ files: pendingDlFiles, evt: dlEventName(), next: 1, total: plan.parts, q: 'web', ts: Date.now(), lastTick: Date.now() });
-    track('download', 'Web Parts x' + plan.parts);
-    runDlJob();
-}
-
-async function executeOriginalDownload() {
-    document.getElementById('quality-overlay').style.display = 'none';
-    track('download', 'Original Quality ZIP');
-    showDlManager('Calculating download size...');
-    let plan;
+// Streams every photo, in order, straight into ONE zip on disk.
+async function streamZipToDisk(defs, opts) {
+    let writable = null;
+    dlAbortCtl = new AbortController();
     try {
-        plan = await fetchDlPlan(pendingDlFiles);
+        const handle = await window.showSaveFilePicker({
+            suggestedName: opts.zipName,
+            types: [{ description: 'ZIP archive', accept: { 'application/zip': ['.zip'] } }]
+        });
+        writable = await handle.createWritable();
+        dlStreaming = true;
+        showStopBtn(true);
+
+        async function* source() {
+            for (let idx = 0; idx < defs.length; idx++) {
+                const j = getDlJob();
+                if (j) { j.done = (getStartIdx() + idx); j.lastTick = Date.now(); saveDlJob(j); }
+                setDlUI(null, 'Fetching ' + (idx + 1) + ' / ' + defs.length + ': ' + defs[idx].name);
+                const res = await fetch(defs[idx].url, { signal: dlAbortCtl.signal });
+                if (!res.ok) throw new Error('Server error for ' + defs[idx].name);
+                yield { name: defs[idx].name, input: res, lastModified: new Date() };
+            }
+        }
+
+        let received = 0;
+        const counter = new TransformStream({
+            transform(chunk, ctrl) {
+                received += chunk.byteLength;
+                if (opts.totalBytes > 0) setDlUI((received / opts.totalBytes) * 100,
+                    fmtBytes(received) + ' of about ' + fmtBytes(opts.totalBytes));
+                ctrl.enqueue(chunk);
+            }
+        });
+
+        const dz = downloadZip(source());
+        const readable = dz.body || dz.readable;
+        await readable.pipeThrough(counter).pipeTo(writable);
+
+        showStopBtn(false);
+        finishStreamSuccess(defs.length);
+        clearDlJob();
+        return true;
+
     } catch(e) {
-        // Preview unavailable: legacy single-stream fallback
-        submitLegacyZip();
-        document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);"></i> Download Started';
-        document.getElementById('dl-fill').style.width = '100%';
-        setTimeout(hideDlManager, 6000);
-        return;
+        showStopBtn(false);
+        const stopped = (dlAbortCtl && dlAbortCtl.userStopped) || e.name === 'AbortError';
+        try { if (writable && writable.abort) await writable.abort(); } catch(_) {}
+        if (stopped) {
+            const j = getDlJob();
+            document.getElementById('dl-title').innerHTML =
+                '<i class="fas fa-stop-circle" style="color:#d97706;"></i> Download stopped';
+            document.getElementById('dl-text').textContent = (j && j.done > 0)
+                ? 'Progress saved. Press Continue to pack the rest into a new ZIP.'
+                : 'No files were saved.';
+            setTimeout(hideDlManager, 4500);
+        } else {
+            clearDlJob();
+            document.getElementById('dl-title').innerHTML =
+                '<i class="fas fa-times-circle" style="color:var(--red);"></i> Download failed';
+            document.getElementById('dl-text').textContent = 'Check your connection and try again.';
+            setTimeout(hideDlManager, 5000);
+        }
+        return true;
+    } finally {
+        dlStreaming = false; dlAbortCtl = null;
     }
-    document.getElementById('dl-fill').style.width = '4%';
-    document.getElementById('dl-text').textContent = fmtBytes(plan.total_bytes) + ' in ' + plan.parts + ' part' + (plan.parts > 1 ? 's' : '');
-    document.getElementById('dl-pct').textContent = '';
-    saveDlJob({ files: pendingDlFiles, evt: dlEventName(), next: 1, total: plan.parts, q: 'orig', ts: Date.now(), lastTick: Date.now() });
-    track('download', 'Orig Parts x' + plan.parts);
-    setTimeout(runDlJob, 400);
 }
 
+function finishStreamSuccess(count) {
+    document.getElementById('dl-title').innerHTML =
+        '<i class="fas fa-check-circle" style="color:var(--green);"></i> ZIP saved!';
+    document.getElementById('dl-fill').style.width = '100%';
+    document.getElementById('dl-text').textContent = count + ' photos packed into one ZIP on your device.';
+    document.getElementById('dl-pct').textContent = '100%';
+    track('download', 'Single-ZIP Complete x' + count);
+    setTimeout(hideDlManager, 7000);
+}
+
+// Fallback for browsers without File System Access (e.g. iPhone Safari):
+// one monolithic server-side zip via the native download manager.
 function submitLegacyZip() {
     const form = document.createElement('form');
     form.method = 'POST'; form.action = API_BASE + 'stream_zip.php'; form.target = 'dl-frame';
     const i = document.createElement('input'); i.type = 'hidden'; i.name = 'files_json'; i.value = JSON.stringify(pendingDlFiles);
     form.appendChild(i); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
+    document.getElementById('dl-title').innerHTML =
+        '<i class="fas fa-check-circle" style="color:var(--green);"></i> Download Started';
+    document.getElementById('dl-fill').style.width = '100%';
+    document.getElementById('dl-text').textContent = 'One ZIP is downloading via your browser.';
+    setTimeout(hideDlManager, 6000);
 }
+
+function buildDlDefs(urls, quality) {
+    return urls.map(u => ({
+        name: decodeURIComponent(u.split('/').pop().split('?')[0]),
+        url: quality === 'web'
+            ? API_BASE + 'serve_image.php?file=' + encodeURIComponent(u) + '&thumb=1'
+            : API_BASE + 'download_full.php?file=' + encodeURIComponent(u)
+    }));
+}
+
+function jobStartIdx() { const j = getDlJob(); return (j && j.done) ? j.done : 0; }
+function getStartIdx() { return jobStartIdx(); }
+
+async function executeOriginalDownload() {
+    document.getElementById('quality-overlay').style.display = 'none';
+    track('download', 'Original Single-ZIP');
+    showDlManager('Calculating download size...');
+    let plan = null;
+    try { plan = await fetchDlPlan(pendingDlFiles); } catch(e) {}
+
+    if ('showSaveFilePicker' in window) {
+        const done0 = jobStartIdx();
+        const defs = buildDlDefs(pendingDlFiles, 'orig');
+        saveDlJob({ mode: 'fs', files: defs, done: done0, evt: dlEventName(), q: 'orig',
+                    totalBytes: plan ? Math.round(plan.total_bytes * (defs.length - done0) / defs.length) : 0,
+                    ts: Date.now(), lastTick: Date.now() });
+        const suffix = done0 > 0 ? '_continued' : '';
+        await streamZipToDisk(defs.slice(done0), {
+            zipName: 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '_Originals' + suffix + '.zip',
+            totalBytes: plan ? Math.round(plan.total_bytes * (defs.length - done0) / defs.length) : 0,
+            q: 'orig'
+        });
+    } else {
+        clearDlJob();
+        submitLegacyZip();
+    }
+}
+
+async function executeWebDownload() {
+    document.getElementById('quality-overlay').style.display = 'none';
+
+    // Small sets on old browsers stay instant in-browser
+    if (pendingDlFiles.length <= 120 && !('showSaveFilePicker' in window)) {
+        track('download', 'Web JSZip');
+        await jsZipSmallSet();
+        return;
+    }
+
+    track('download', 'Web Single-ZIP');
+    showDlManager('Preparing...');
+    if ('showSaveFilePicker' in window) {
+        const done0 = jobStartIdx();
+        const estTotal = pendingDlFiles.length * 340 * 1024;
+        const defs = buildDlDefs(pendingDlFiles, 'web');
+        saveDlJob({ mode: 'fs', files: defs, done: done0, evt: dlEventName(), q: 'web',
+                    totalBytes: Math.round(estTotal * (defs.length - done0) / defs.length),
+                    ts: Date.now(), lastTick: Date.now() });
+        const suffix = done0 > 0 ? '_continued' : '';
+        await streamZipToDisk(defs.slice(done0), {
+            zipName: 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '_Web' + suffix + '.zip',
+            totalBytes: Math.round(estTotal * (defs.length - done0) / defs.length),
+            q: 'web'
+        });
+    } else {
+        clearDlJob();
+        await jsZipSmallSet();
+    }
+}
+
+async function jsZipSmallSet() {
+    showDlManager('Preparing your photos...');
+    const zip = new JSZip();
+    const total = pendingDlFiles.length;
+    let completed = 0, failed = 0;
+    const BATCH_SIZE = 10;
+    for (let i = 0; i < total; i += BATCH_SIZE) {
+        const batch = pendingDlFiles.slice(i, i + BATCH_SIZE);
+        await Promise.all(batch.map(async (fileUrl) => {
+            try {
+                const res = await fetch(API_BASE + 'serve_image.php?file=' + encodeURIComponent(fileUrl) + '&thumb=1', { cache: 'no-store' });
+                if (!res.ok) throw new Error('Failed');
+                zip.file(fileUrl.split('/').pop(), await res.blob());
+            } catch(e) { failed++; }
+            finally {
+                completed++;
+                setDlUI(Math.round((completed / total) * 100), completed + ' of ' + total + ' photos');
+            }
+        }));
+    }
+    setDlUI(null, '', '<i class="fas fa-spinner fa-spin" style="color:var(--gold);display:inline;"></i> Finalising ZIP...');
+    try {
+        const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '_Web.zip';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 5000);
+        document.getElementById('dl-title').innerHTML =
+            '<i class="fas fa-check-circle" style="color:var(--green);"></i> Download Complete!';
+        document.getElementById('dl-text').textContent = failed > 0
+            ? 'Saved. (' + failed + ' could not be fetched)' : 'All photos saved to your device.';
+    } catch(e) {
+        document.getElementById('dl-title').innerHTML =
+            '<i class="fas fa-times-circle" style="color:var(--red);"></i> Error';
+        document.getElementById('dl-text').textContent = 'Not enough memory. Try fewer photos or use Chrome/Edge.';
+    }
+    setTimeout(hideDlManager, 6000);
+}
+
+// ---- Resume support ------------------------------------------------
+window.continueDlJob = async function () {
+    document.getElementById('dl-resume-toast').classList.remove('show');
+    const j = getDlJob();
+    if (!j || !j.files || j.done >= j.files.length) { clearDlJob(); return; }
+    showDlManager('Continuing download...');
+    const rest = j.files.slice(j.done);
+    const suffix = j.done > 0 ? '_continued' : '';
+    await streamZipToDisk(rest, {
+        zipName: 'Supriya_Digitals_' + (j.evt || 'Gallery').replace(/\s+/g, '_') +
+                 (j.q === 'web' ? '_Web' : '_Originals') + suffix + '.zip',
+        totalBytes: j.q === 'web' ? rest.length * 340 * 1024 :
+                    (j.totalBytes ? Math.round(j.totalBytes * rest.length / j.files.length) : 0),
+        q: j.q || 'orig'
+    });
+};
+
+window.cancelDlJob = function () {
+    document.getElementById('dl-resume-toast').classList.remove('show');
+    clearDlJob();
+};
+
+function checkDlResume() {
+    const j = getDlJob();
+    if (!j || !j.files || j.mode !== 'fs') { if (j && !j.files) clearDlJob(); return; }
+    if (j.done >= j.files.length) { clearDlJob(); return; }
+    if (Date.now() - (j.ts || 0) > DL_JOB_TTL) { clearDlJob(); return; }
+    if (dlStreaming) return;
+    const remaining = j.files.length - j.done;
+    document.getElementById('dl-resume-title').textContent =
+        'Finish your ' + (j.q === 'web' ? 'web-quality' : 'original') + ' download?';
+    document.getElementById('dl-resume-sub').textContent =
+        '"' + (j.evt || 'Gallery') + '" - ' + remaining + ' photo' + (remaining > 1 ? 's' : '') + ' still to pack into a ZIP';
+    document.getElementById('dl-resume-toast').classList.add('show');
+    // Screen just came back on within the same session: continue automatically
+    if (j.lastTick && Date.now() - j.lastTick < 120000) continueDlJob();
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') checkDlResume();
+});
+if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', checkDlResume);
+else checkDlResume();
 function dlSingle(type, e) {
     e.preventDefault();
     const item = filteredData[currentIdx];
