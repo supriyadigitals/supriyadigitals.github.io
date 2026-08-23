@@ -337,6 +337,8 @@
             font-size: 0.82rem; cursor: pointer; transition: 0.15s;
         }
         #dl-stop-btn:hover { background: #fecaca; }
+        @keyframes stopPulse { 50% { box-shadow: 0 0 0 5px rgba(220,38,38,0.18); } }
+        #dl-stop-btn { animation: stopPulse 1.6s ease-in-out infinite; }
 
         /* Mobile: move dl-manager to bottom */
         @media (max-width: 576px) {
@@ -2908,12 +2910,18 @@ function checkDlResume() {
     document.getElementById('dl-resume-sub').textContent =
         '"' + (j.evt || 'Gallery') + '" - ' + remaining + ' photo' + (remaining > 1 ? 's' : '') + ' still to pack into a ZIP';
     document.getElementById('dl-resume-toast').classList.add('show');
-    // Screen just came back on within the same session: continue automatically
-    if (j.lastTick && Date.now() - j.lastTick < 120000) continueDlJob();
+    try { sessionStorage.setItem('sds_dl_banner_seen', '1'); } catch(_) {}
 }
 
+// Screen coming back on should NEVER re-open dialogs or nag repeatedly:
+// the reminder appears at most once per browsing session.
 document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') checkDlResume();
+    if (document.visibilityState !== 'visible') return;
+    if (dlStreaming || dlAbortCtl) return;
+    if (sessionStorage.getItem('sds_dl_banner_seen')) return;
+    const j = getDlJob();
+    if (j && j.files && j.done < j.files.length &&
+        Date.now() - (j.ts || 0) <= DL_JOB_TTL) checkDlResume();
 });
 if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', checkDlResume);
 else checkDlResume();
