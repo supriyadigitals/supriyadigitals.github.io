@@ -2634,15 +2634,32 @@ window.stopCurrentDl = function () {
     if (dlAbortCtl) { dlAbortCtl.userStopped = true; dlAbortCtl.abort(); }
 };
 
+// Must be called while the click's user-gesture is still fresh,
+// i.e. BEFORE any await. Returns null when the user cancels.
+async function pickSaveFile(zipName) {
+    try {
+        return await window.showSaveFilePicker({
+            suggestedName: zipName,
+            types: [{ description: 'ZIP archive', accept: { 'application/zip': ['.zip'] } }]
+        });
+    } catch(e) {
+        // NotAllowedError/SecurityError = gesture expired or denied;
+        // AbortError = user pressed cancel in the dialog.
+        return null;
+    }
+}
+
+// True when the streaming zip library actually loaded.
+function zipEngineReady() { return typeof downloadZip === 'function'; }
+
 // Streams every photo, in order, straight into ONE zip on disk.
 async function streamZipToDisk(defs, opts) {
+    // opts.handle = FileSystemFileHandle picked BEFORE any await.
     let writable = null;
     dlAbortCtl = new AbortController();
     try {
-        const handle = await window.showSaveFilePicker({
-            suggestedName: opts.zipName,
-            types: [{ description: 'ZIP archive', accept: { 'application/zip': ['.zip'] } }]
-        });
+        const handle = opts.handle;
+        if (!handle || !zipEngineReady()) throw new Error('engine-unavailable');
         writable = await handle.createWritable();
         dlStreaming = true;
         showStopBtn(true);
@@ -2670,6 +2687,7 @@ async function streamZipToDisk(defs, opts) {
 
         const dz = downloadZip(source());
         const readable = dz.body || dz.readable;
+        if (!readable) throw new Error('zip-engine-output');
         await readable.pipeThrough(counter).pipeTo(writable);
 
         showStopBtn(false);
@@ -2679,8 +2697,8 @@ async function streamZipToDisk(defs, opts) {
 
     } catch(e) {
         showStopBtn(false);
-        const stopped = (dlAbortCtl && dlAbortCtl.userStopped) || e.name === 'AbortError';
         try { if (writable && writable.abort) await writable.abort(); } catch(_) {}
+        const stopped = (dlAbortCtl && dlAbortCtl.userStopped) || e.name === 'AbortError';
         if (stopped) {
             const j = getDlJob();
             document.getElementById('dl-title').innerHTML =
@@ -2689,14 +2707,18 @@ async function streamZipToDisk(defs, opts) {
                 ? 'Progress saved. Press Continue to pack the rest into a new ZIP.'
                 : 'No files were saved.';
             setTimeout(hideDlManager, 4500);
-        } else {
-            clearDlJob();
-            document.getElementById('dl-title').innerHTML =
-                '<i class="fas fa-times-circle" style="color:var(--red);"></i> Download failed';
-            document.getElementById('dl-text').textContent = 'Check your connection and try again.';
-            setTimeout(hideDlManager, 5000);
+            return true;
         }
-        return true;
+        // Real failure: show WHY, then fall back to the classic one-zip
+        // server download so the user is never stuck.
+        clearDlJob();
+        console.error('[download]', e);
+        document.getElementById('dl-title').innerHTML =
+            '<i class="fas fa-exclamation-circle" style="color:#d97706;"></i> Switching to standard download...';
+        document.getElementById('dl-text').textContent =
+            'Streaming not supported here - downloading one ZIP directly.';
+        setTimeout(submitLegacyZip, 900);
+        return false;
     } finally {
         dlStreaming = false; dlAbortCtl = null;
     }
@@ -2742,25 +2764,24 @@ async function executeOriginalDownload() {
     document.getElementById('quality-overlay').style.display = 'none';
     track('download', 'Original Single-ZIP');
     showDlManager('Calculating download size...');
+
+    if (!zipEngineReady()) { clearDlJob(); submitLegacyZip(); return; }
+    if (!('showSaveFilePicker' in window)) { clearDlJob(); submitLegacyZip(); return; }
+
+    // Ask where to save FIRST, while the tap's user-gesture is still fresh.
+    const zipName = 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '_Originals' + resumeSuffix() + '.zip';
+    const handle = await pickSaveFile(zipName);
+    if (!handle) { hideDlManager(); clearDlJobIfNoProgress(); return; }
+
     let plan = null;
     try { plan = await fetchDlPlan(pendingDlFiles); } catch(e) {}
 
-    if ('showSaveFilePicker' in window) {
-        const done0 = jobStartIdx();
-        const defs = buildDlDefs(pendingDlFiles, 'orig');
-        saveDlJob({ mode: 'fs', files: defs, done: done0, evt: dlEventName(), q: 'orig',
-                    totalBytes: plan ? Math.round(plan.total_bytes * (defs.length - done0) / defs.length) : 0,
-                    ts: Date.now(), lastTick: Date.now() });
-        const suffix = done0 > 0 ? '_continued' : '';
-        await streamZipToDisk(defs.slice(done0), {
-            zipName: 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '_Originals' + suffix + '.zip',
-            totalBytes: plan ? Math.round(plan.total_bytes * (defs.length - done0) / defs.length) : 0,
-            q: 'orig'
-        });
-    } else {
-        clearDlJob();
-        submitLegacyZip();
-    }
+    const done0  = jobStartIdx();
+    const defs   = buildDlDefs(pendingDlFiles, 'orig');
+    const bytes  = plan ? Math.round(plan.total_bytes * (defs.length - done0) / defs.length) : 0;
+    saveDlJob({ mode: 'fs', files: defs, done: done0, evt: dlEventName(), q: 'orig',
+                totalBytes: bytes, ts: Date.now(), lastTick: Date.now() });
+    await streamZipToDisk(defs.slice(done0), { handle: handle, totalBytes: bytes, q: 'orig' });
 }
 
 async function executeWebDownload() {
@@ -2774,24 +2795,29 @@ async function executeWebDownload() {
     }
 
     track('download', 'Web Single-ZIP');
-    showDlManager('Preparing...');
-    if ('showSaveFilePicker' in window) {
-        const done0 = jobStartIdx();
-        const estTotal = pendingDlFiles.length * 340 * 1024;
-        const defs = buildDlDefs(pendingDlFiles, 'web');
-        saveDlJob({ mode: 'fs', files: defs, done: done0, evt: dlEventName(), q: 'web',
-                    totalBytes: Math.round(estTotal * (defs.length - done0) / defs.length),
-                    ts: Date.now(), lastTick: Date.now() });
-        const suffix = done0 > 0 ? '_continued' : '';
-        await streamZipToDisk(defs.slice(done0), {
-            zipName: 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '_Web' + suffix + '.zip',
-            totalBytes: Math.round(estTotal * (defs.length - done0) / defs.length),
-            q: 'web'
-        });
-    } else {
-        clearDlJob();
+
+    if (!zipEngineReady() || !('showSaveFilePicker' in window) || pendingDlFiles.length <= 120) {
         await jsZipSmallSet();
+        return;
     }
+
+    const estTotal = pendingDlFiles.length * 340 * 1024;
+    showDlManager('Preparing...');
+    const zipName = 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '_Web' + resumeSuffix() + '.zip';
+    const handle = await pickSaveFile(zipName);
+    if (!handle) { hideDlManager(); clearDlJobIfNoProgress(); return; }
+
+    const done0 = jobStartIdx();
+    const defs  = buildDlDefs(pendingDlFiles, 'web');
+    const bytes = Math.round(estTotal * (defs.length - done0) / defs.length);
+    saveDlJob({ mode: 'fs', files: defs, done: done0, evt: dlEventName(), q: 'web',
+                totalBytes: bytes, ts: Date.now(), lastTick: Date.now() });
+    await streamZipToDisk(defs.slice(done0), { handle: handle, totalBytes: bytes, q: 'web' });
+}
+
+function clearDlJobIfNoProgress() {
+    const j = getDlJob();
+    if (!j || !j.done) clearDlJob();
 }
 
 async function jsZipSmallSet() {
@@ -2839,12 +2865,26 @@ window.continueDlJob = async function () {
     document.getElementById('dl-resume-toast').classList.remove('show');
     const j = getDlJob();
     if (!j || !j.files || j.done >= j.files.length) { clearDlJob(); return; }
+
+    // Engine or picker unavailable on this browser: classic single-zip
+    // download of everything that is still missing.
+    if (!zipEngineReady() || !('showSaveFilePicker' in window)) {
+        pendingDlFiles = j.files.slice(j.done).map(f => f.url);
+        clearDlJob();
+        showDlManager('Downloading remaining photos...');
+        submitLegacyZip();
+        return;
+    }
+
     showDlManager('Continuing download...');
     const rest = j.files.slice(j.done);
     const suffix = j.done > 0 ? '_continued' : '';
+    const zipName = 'Supriya_Digitals_' + (j.evt || 'Gallery').replace(/\s+/g, '_') +
+                    (j.q === 'web' ? '_Web' : '_Originals') + suffix + '.zip';
+    const handle = await pickSaveFile(zipName);
+    if (!handle) { hideDlManager(); return; }   // cancelled - job stays for next time
     await streamZipToDisk(rest, {
-        zipName: 'Supriya_Digitals_' + (j.evt || 'Gallery').replace(/\s+/g, '_') +
-                 (j.q === 'web' ? '_Web' : '_Originals') + suffix + '.zip',
+        handle: handle,
         totalBytes: j.q === 'web' ? rest.length * 340 * 1024 :
                     (j.totalBytes ? Math.round(j.totalBytes * rest.length / j.files.length) : 0),
         q: j.q || 'orig'
