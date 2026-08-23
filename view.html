@@ -378,6 +378,27 @@
 
         @media (max-width: 576px) { #resume-toast { left: 12px; right: 12px; min-width: 0; } }
 
+        /* ── DOWNLOAD SIZE PREVIEW (quality modal) ── */
+        .quality-size {
+            font-size: 0.74rem; font-weight: 700; margin-top: 4px;
+            color: var(--gold); letter-spacing: 0.02em;
+        }
+        .quality-size.loading { color: var(--muted); font-weight: 500; }
+
+        /* ── DOWNLOAD RESUME BANNER ── */
+        #dl-resume-toast {
+            position: fixed; bottom: 24px; right: 24px; z-index: 650;
+            background: var(--white); border-left: 4px solid var(--gold);
+            border-radius: 10px; box-shadow: var(--shadow-lg);
+            padding: 16px 18px; display: flex; align-items: center; gap: 14px;
+            min-width: 280px; max-width: 380px;
+            transform: translateY(120px); opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275), opacity 0.4s;
+            pointer-events: none;
+        }
+        #dl-resume-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        @media (max-width: 576px) { #dl-resume-toast { left: 12px; right: 12px; min-width: 0; } }
+
         /* ── LASSO ── */
         #lasso-box {
             position: absolute; background: rgba(212,175,55,0.12);
@@ -738,17 +759,33 @@
             <i class="fas fa-bolt"></i>
             <div>
                 <div class="quality-btn-title">Web Quality — Fast</div>
-                <div class="quality-btn-sub">Compressed for quick download. Great for sharing & social media.</div>
+                <div class="quality-btn-sub">Compressed for quick download. Great for sharing & social media.
+                    <div class="quality-size loading" id="dl-size-web"><i class="fas fa-circle-notch fa-spin"></i> Calculating size…</div>
+                </div>
             </div>
         </button>
         <button class="quality-btn" onclick="executeOriginalDownload()">
             <i class="fas fa-gem"></i>
             <div>
                 <div class="quality-btn-title">Original Quality — Full Resolution</div>
-                <div class="quality-btn-sub">Uncompressed originals. Best for printing and archiving.</div>
+                <div class="quality-btn-sub">Uncompressed originals. Best for printing and archiving.
+                    <div class="quality-size loading" id="dl-size-orig"><i class="fas fa-circle-notch fa-spin"></i> Calculating size…</div>
+                </div>
             </div>
         </button>
         <button class="btn-cancel-dl" onclick="document.getElementById('quality-overlay').style.display='none'">Cancel</button>
+    </div>
+</div>
+
+<!-- Download Resume Banner -->
+<div id="dl-resume-toast">
+    <div class="toast-content">
+        <h6 id="dl-resume-title">Finish your download?</h6>
+        <p id="dl-resume-sub">Part 1 of 1 remaining</p>
+    </div>
+    <div class="toast-actions">
+        <button class="toast-btn toast-btn-yes" onclick="continueDlJob()">Continue</button>
+        <button class="toast-btn toast-btn-no" onclick="cancelDlJob()">Dismiss</button>
     </div>
 </div>
 
@@ -959,7 +996,9 @@ function hideTransition() {
 //  STATE
 // ════════════════════════════════════════════════════════
 const params       = new URLSearchParams(window.location.search);
-const currentEvent = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root';
+// let (not const): after the exact-match load we canonicalise this to the
+// server's stored casing so cover lookups and logs match what the admin saved.
+let currentEvent   = params.get('event') ? decodeURIComponent(params.get('event')) : 'Root';
 
 let allEventData   = [];
 const likedSet     = new Set(JSON.parse(localStorage.getItem('sds_likes_' + currentEvent) || '[]'));
@@ -1061,17 +1100,39 @@ async function init() {
     try {
         const evt = params.get('event');
 
-        // SECURITY: Never load all events — require a specific event in the URL
+        // SECURITY: Never load all events — require a specific event in the URL.
+        // With no event in the URL, show ONLY an event-name search box.
         if (!evt) {
             document.getElementById('main-loader').innerHTML =
-                `<div style="text-align:center;padding:40px 20px;">
-                    <i class="fas fa-lock" style="font-size:3rem;color:var(--muted);margin-bottom:16px;display:block;opacity:0.35;"></i>
-                    <h4 style="font-weight:800;margin-bottom:8px;">No Gallery Selected</h4>
-                    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:20px;">
-                        Please use the link or code provided by Supriya Digitals Studio<br>to access your private gallery.
+                `<div style="text-align:center;padding:40px 20px;width:100%;max-width:520px;">
+                    <i class="fas fa-lock" style="font-size:2.6rem;color:var(--muted);margin-bottom:14px;display:block;opacity:0.35;"></i>
+                    <h4 style="font-weight:800;margin-bottom:6px;">Private Client Portal</h4>
+                    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:22px;">
+                        Enter your event name to open your gallery.<br>
+                        Capital or small letters both work — the name must match exactly.
                     </p>
-                    <a href="index.html" style="display:inline-block;background:var(--gold);color:var(--dark);font-weight:700;padding:10px 24px;border-radius:8px;text-decoration:none;">← Find My Gallery</a>
+                    <form id="portal-find-form" style="display:flex;gap:10px;width:100%;">
+                        <input id="portal-find-input" type="text"
+                            placeholder="Enter your event name..."
+                            autocomplete="off" autocorrect="off" spellcheck="false"
+                            style="flex:1;min-width:0;padding:12px 16px;border:1.5px solid var(--border,#e5e7eb);border-radius:10px;background:#fff;color:#111;font-size:1rem;outline:none;" />
+                        <button type="submit"
+                            style="padding:12px 22px;border:none;border-radius:10px;background:var(--gold);color:var(--dark);font-weight:800;font-size:0.95rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;">
+                            <i class="fas fa-search"></i> Find
+                        </button>
+                    </form>
+                    <a href="index.html" style="display:inline-block;margin-top:18px;color:var(--muted);font-size:0.8rem;text-decoration:none;">← Back to Main Site</a>
                 </div>`;
+
+            const findForm  = document.getElementById('portal-find-form');
+            const findInput = document.getElementById('portal-find-input');
+            findForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const val = findInput.value.trim();
+                if (!val) { findInput.focus(); return; }
+                window.location.href = '?event=' + encodeURIComponent(val);
+            });
+            findInput.focus();
             return;
         }
 
@@ -1091,6 +1152,18 @@ async function init() {
         }
 
         allEventData = data.data;
+
+        // Canonicalise the event name to the server's exact stored casing.
+        // The DB match was case-insensitive, but cover keys and logs are
+        // case-sensitive — so "wedding 2024" now behaves exactly like
+        // "Wedding 2024" for everything that follows.
+        currentEvent = (allEventData[0] && allEventData[0].title) ? allEventData[0].title : currentEvent;
+
+        // Reload hearts from the canonical key so likes saved on earlier
+        // visits (under the stored casing) still appear.
+        likedSet.clear();
+        JSON.parse(localStorage.getItem('sds_likes_' + currentEvent) || '[]')
+            .forEach(u => likedSet.add(u));
 
         if (currentEvent !== 'Root') {
             try {
@@ -1500,7 +1573,21 @@ function appendGalleryPage() {
 // ════════════════════════════════════════════════════════
 let lazyObserver = null;
 let activeLoads  = 0;
-const MAX_CONCURRENT = 3;
+
+// ── Network-aware tuning (declared first — used by constants below) ──
+const netInfo = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+const isSlowConnection = !!(netInfo && (
+    netInfo.saveData ||
+    netInfo.effectiveType === 'slow-2g' ||
+    netInfo.effectiveType === '2g'
+));
+
+// Parallel image loads: browsers pipeline 6 requests per origin easily,
+// so fast connections fill the screen ~2x sooner. Slow links stay gentle.
+const MAX_CONCURRENT = isSlowConnection ? 3
+                     : (netInfo && netInfo.effectiveType === '3g') ? 4
+                     : 6;
+
 const LOAD_QUEUE     = [];
 const queuedImages   = new Set();
 const visibleImages  = new Set();
@@ -1511,12 +1598,6 @@ let lazyScrollDir = 1;
 let lazyFastUntil = 0;
 let lazyStopTimer = null;
 
-const netInfo = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-const isSlowConnection = !!(netInfo && (
-    netInfo.saveData ||
-    netInfo.effectiveType === 'slow-2g' ||
-    netInfo.effectiveType === '2g'
-));
 const LAZY_MARGIN_PX = isSlowConnection ? 300 : 420;
 const LAZY_FAST_FORWARD_PX = isSlowConnection ? 520 : 760;
 const LAZY_FAST_BACK_PX = 0;
@@ -2466,86 +2547,230 @@ function promptDownloadAll()      { pendingDlFiles = galleryData.map(i => i.full
 function promptDownloadSelected() { if (!selectedFiles.size) return; pendingDlFiles = [...selectedFiles]; triggerDlPrompt(); }
 
 function triggerDlPrompt() {
-    if (canDownload === 2) executeOriginalDownload();
-    else document.getElementById('quality-overlay').style.display = 'flex';
+    if (canDownload === 2) { executeOriginalDownload(); return; }
+    document.getElementById('quality-overlay').style.display = 'flex';
+    loadDlSizes();
 }
+
+// ---- Download size preview (shown in quality modal) --------------
+function fmtBytes(b) {
+    if (!b || b <= 0) return '0 MB';
+    if (b < 1048576) return Math.round(b/1024) + ' KB';
+    if (b < 1073741824) return (b/1048576).toFixed(b < 104857600 ? 1 : 0) + ' MB';
+    return (b/1073741824).toFixed(2) + ' GB';
+}
+
+async function fetchDlPlan(files) {
+    const fd = new FormData();
+    fd.append('mode', 'size');
+    fd.append('files_json', JSON.stringify(files));
+    const r = await fetch(API_BASE + 'stream_zip.php', { method: 'POST', body: fd });
+    if (!r.ok) throw new Error('plan failed');
+    return r.json();
+}
+
+async function loadDlSizes() {
+    const webEl  = document.getElementById('dl-size-web');
+    const origEl = document.getElementById('dl-size-orig');
+    webEl.className  = 'quality-size loading';
+    origEl.className = 'quality-size loading';
+    webEl.innerHTML  = '<i class="fas fa-circle-notch fa-spin"></i> Calculating size...';
+    origEl.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Calculating size...';
+    try {
+        const plan = await fetchDlPlan(pendingDlFiles);
+        const n = plan.found;
+        origEl.className = 'quality-size';
+        origEl.textContent = n + ' photos - about ' + fmtBytes(plan.total_bytes) + ' (' + plan.parts + ' part' + (plan.parts > 1 ? 's' : '') + ')';
+        webEl.className = 'quality-size';
+        webEl.textContent = n + ' photos - about ' + fmtBytes(n * 340 * 1024) + ' (estimated)';
+    } catch(e) {
+        origEl.className = 'quality-size'; origEl.textContent = pendingDlFiles.length + ' photos';
+        webEl.className  = 'quality-size'; webEl.textContent  = pendingDlFiles.length + ' photos';
+    }
+}
+
+// ---- Resumable chunked download engine ---------------------------
+// The job list lives in localStorage. Each part is a small standalone
+// ZIP handed to the browser's NATIVE download manager, so a part that
+// is already transferring survives screen-off / tab death. If the page
+// itself dies between parts, the banner offers to continue from the
+// exact part where things stopped.
+const DL_JOB_KEY = 'sds_dljob';
+const DL_JOB_TTL = 48 * 60 * 60 * 1000;
+let dlJobActive  = false;
+
+function getDlJob()   { try { return JSON.parse(localStorage.getItem(DL_JOB_KEY)); } catch(e) { return null; } }
+function saveDlJob(j) { localStorage.setItem(DL_JOB_KEY, JSON.stringify(j)); }
+function clearDlJob() { localStorage.removeItem(DL_JOB_KEY); }
+
+function dlEventName() {
+    const raw = params.get('event') ? decodeURIComponent(params.get('event')) : 'Gallery';
+    const clean = raw.replace(/[^a-zA-Z0-9 _-]/g, '').trim();
+    return clean || 'Gallery';
+}
+
+function submitDlPart(job, p) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = API_BASE + 'stream_zip.php?mode=part&part=' + p + '&quality=' + job.q;
+    form.target = 'dl-frame';
+    const fi = document.createElement('input'); fi.type = 'hidden'; fi.name = 'files_json'; fi.value = JSON.stringify(job.files); form.appendChild(fi);
+    const ei = document.createElement('input'); ei.type = 'hidden'; ei.name = 'evt'; ei.value = (job.evt || 'Gallery'); form.appendChild(ei);
+    document.body.appendChild(form); form.submit(); document.body.removeChild(form);
+}
+
+function runDlJob() {
+    if (dlJobActive) return;
+    const first = getDlJob();
+    if (!first || first.next > first.total) { finishDlJob(!!first); return; }
+    dlJobActive = true;
+    document.getElementById('dl-title').innerHTML = '<i class="fas fa-file-archive" style="color:var(--gold);"></i> Downloading parts...';
+
+    const step = () => {
+        const j = getDlJob();
+        if (!j) { dlJobActive = false; return; }
+        if (j.next > j.total) { finishDlJob(true); return; }
+        const pct = Math.round(((j.next - 1) / j.total) * 100);
+        document.getElementById('dl-fill').style.width = Math.max(pct, 4) + '%';
+        document.getElementById('dl-text').textContent = 'Part ' + j.next + ' of ' + j.total;
+        document.getElementById('dl-pct').textContent = pct + '%';
+        submitDlPart(j, j.next);
+        setTimeout(() => {
+            const jj = getDlJob(); if (!jj) { dlJobActive = false; return; }
+            jj.next++; jj.lastTick = Date.now(); saveDlJob(jj);
+            step();
+        }, 5000);
+    };
+    step();
+}
+
+function finishDlJob(ok) {
+    clearDlJob(); dlJobActive = false;
+    document.getElementById('quality-overlay').style.display = 'none';
+    if (ok) {
+        document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);"></i> All parts downloaded!';
+        document.getElementById('dl-fill').style.width = '100%';
+        document.getElementById('dl-text').textContent = 'Check your Downloads folder - files are named Part 01, Part 02...';
+        document.getElementById('dl-pct').textContent = '100%';
+        track('download', 'Parts Complete');
+        setTimeout(hideDlManager, 7000);
+    }
+}
+
+window.continueDlJob = function () { document.getElementById('dl-resume-toast').classList.remove('show'); runDlJob(); };
+window.cancelDlJob   = function () { document.getElementById('dl-resume-toast').classList.remove('show'); clearDlJob(); };
+
+function checkDlResume() {
+    const job = getDlJob();
+    if (!job || !job.files || job.next > job.total) { if (job && !job.files) clearDlJob(); return; }
+    if (Date.now() - (job.ts || 0) > DL_JOB_TTL) { clearDlJob(); return; }
+    const remaining = job.total - job.next + 1;
+    document.getElementById('dl-resume-title').textContent =
+        'Finish your ' + (job.q === 'web' ? 'web-quality' : 'original') + ' download?';
+    document.getElementById('dl-resume-sub').textContent =
+        '"' + (job.evt || 'Gallery') + '" - part ' + job.next + ' of ' + job.total + ' is next (' + remaining + ' to go)';
+    document.getElementById('dl-resume-toast').classList.add('show');
+    // Same-session stall (screen just came back on): pick up automatically
+    if (job.lastTick && Date.now() - job.lastTick < 120000) continueDlJob();
+}
+
+// Screen off freezes JS timers mid-job. When the page becomes visible
+// again, resume exactly where localStorage says we stopped.
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') checkDlResume();
+});
+if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', checkDlResume);
+else checkDlResume();
 
 async function executeWebDownload() {
     document.getElementById('quality-overlay').style.display = 'none';
     track('download', 'Web Quality ZIP');
-    showDlManager('Preparing your photos…');
 
-    const zip   = new JSZip();
-    const total = pendingDlFiles.length;
-    let completed = 0, failed = 0;
-    const BATCH_SIZE = 10;
+    // Small sets: instant in-browser zip, no server round-trip
+    if (pendingDlFiles.length <= 120) {
+        showDlManager('Preparing your photos...');
+        const zip = new JSZip();
+        const total = pendingDlFiles.length;
+        let completed = 0, failed = 0;
+        const BATCH_SIZE = 10;
 
-    for (let i = 0; i < total; i += BATCH_SIZE) {
-        const batch = pendingDlFiles.slice(i, i + BATCH_SIZE);
-        await Promise.all(batch.map(async (fileUrl) => {
-            try {
-                const url = `${API_BASE}serve_image.php?file=${encodeURIComponent(fileUrl)}&thumb=1`;
-                const res = await fetch(url, { cache: 'no-store' });
-                if (!res.ok) throw new Error('Failed');
-                const blob = await res.blob();
-                zip.file(fileUrl.split('/').pop(), blob);
-            } catch(e) { failed++; }
-            finally { completed++; }
-        }));
+        for (let i = 0; i < total; i += BATCH_SIZE) {
+            const batch = pendingDlFiles.slice(i, i + BATCH_SIZE);
+            await Promise.all(batch.map(async (fileUrl) => {
+                try {
+                    const url = API_BASE + 'serve_image.php?file=' + encodeURIComponent(fileUrl) + '&thumb=1';
+                    const res = await fetch(url, { cache: 'no-store' });
+                    if (!res.ok) throw new Error('Failed');
+                    const blob = await res.blob();
+                    zip.file(fileUrl.split('/').pop(), blob);
+                } catch(e) { failed++; }
+                finally { completed++; }
+            }));
+            const pct = Math.round((completed / total) * 100);
+            document.getElementById('dl-fill').style.width = pct + '%';
+            document.getElementById('dl-text').textContent = completed + ' of ' + total + ' photos (' + pct + '%)';
+            document.getElementById('dl-pct').textContent = pct + '%';
+        }
 
-        const pct = Math.round((completed / total) * 100);
-        document.getElementById('dl-fill').style.width = pct + '%';
-        document.getElementById('dl-text').textContent = `${completed} of ${total} photos (${pct}%)`;
+        document.getElementById('dl-title').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--gold);"></i> Finalising ZIP...';
+        try {
+            const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Supriya_Digitals_' + dlEventName().replace(/\s+/g, '_') + '.zip';
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 5000);
+            document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);"></i> Download Complete!';
+            document.getElementById('dl-text').textContent = failed > 0
+                ? 'Saved. (' + failed + ' photo' + (failed > 1 ? 's' : '') + ' could not be fetched)'
+                : 'All photos saved to your device.';
+        } catch(e) {
+            document.getElementById('dl-title').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red);"></i> Error';
+            document.getElementById('dl-text').textContent = 'Memory limit reached. Try selecting fewer photos.';
+        }
+        setTimeout(hideDlManager, 6000);
+        return;
     }
 
-    document.getElementById('dl-title').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--gold);"></i> Finalising ZIP…';
-
-    try {
-        const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        const evtName = (params.get('event') ? decodeURIComponent(params.get('event')) : 'Gallery').replace(/[^a-zA-Z0-9]/g, '_');
-        link.download = `Supriya_Digitals_${evtName}.zip`;
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-
-        document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);"></i> Download Complete!';
-        document.getElementById('dl-text').textContent = failed > 0 ? `Saved. (${failed} photo${failed>1?'s':''} could not be fetched)` : 'All photos saved to your device.';
-    } catch(e) {
-        document.getElementById('dl-title').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red);"></i> Error';
-        document.getElementById('dl-text').textContent = 'Memory limit reached. Try downloading fewer photos at once.';
-    }
-
-    setTimeout(hideDlManager, 6000);
+    // Large sets: server-side resumable parts at web quality
+    showDlManager('Calculating parts...');
+    let plan;
+    try { plan = await fetchDlPlan(pendingDlFiles); }
+    catch(e) { hideDlManager(); alert('Could not calculate the download. Please try again.'); return; }
+    saveDlJob({ files: pendingDlFiles, evt: dlEventName(), next: 1, total: plan.parts, q: 'web', ts: Date.now(), lastTick: Date.now() });
+    track('download', 'Web Parts x' + plan.parts);
+    runDlJob();
 }
 
-function executeOriginalDownload() {
+async function executeOriginalDownload() {
     document.getElementById('quality-overlay').style.display = 'none';
     track('download', 'Original Quality ZIP');
-    showDlManager('Starting full-resolution download…');
-    document.getElementById('dl-fill').style.width = '100%';
-    document.getElementById('dl-text').textContent = pendingDlFiles.length > 100
-        ? 'Large download — this may take a few minutes. Please keep this page open.'
-        : 'Downloading in background. You can lock your screen.';
-
-    const form  = document.createElement('form');
-    form.method = 'POST';
-    form.action = API_BASE + 'stream_zip.php';
-    form.target = 'dl-frame';
-    const input = document.createElement('input');
-    input.type  = 'hidden'; input.name = 'files_json'; input.value = JSON.stringify(pendingDlFiles);
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
-
-    setTimeout(() => {
+    showDlManager('Calculating download size...');
+    let plan;
+    try {
+        plan = await fetchDlPlan(pendingDlFiles);
+    } catch(e) {
+        // Preview unavailable: legacy single-stream fallback
+        submitLegacyZip();
         document.getElementById('dl-title').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);"></i> Download Started';
-        if (pendingDlFiles.length <= 100) document.getElementById('dl-text').textContent = 'Check your device downloads folder.';
+        document.getElementById('dl-fill').style.width = '100%';
         setTimeout(hideDlManager, 6000);
-    }, 2500);
+        return;
+    }
+    document.getElementById('dl-fill').style.width = '4%';
+    document.getElementById('dl-text').textContent = fmtBytes(plan.total_bytes) + ' in ' + plan.parts + ' part' + (plan.parts > 1 ? 's' : '');
+    document.getElementById('dl-pct').textContent = '';
+    saveDlJob({ files: pendingDlFiles, evt: dlEventName(), next: 1, total: plan.parts, q: 'orig', ts: Date.now(), lastTick: Date.now() });
+    track('download', 'Orig Parts x' + plan.parts);
+    setTimeout(runDlJob, 400);
 }
 
+function submitLegacyZip() {
+    const form = document.createElement('form');
+    form.method = 'POST'; form.action = API_BASE + 'stream_zip.php'; form.target = 'dl-frame';
+    const i = document.createElement('input'); i.type = 'hidden'; i.name = 'files_json'; i.value = JSON.stringify(pendingDlFiles);
+    form.appendChild(i); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
+}
 function dlSingle(type, e) {
     e.preventDefault();
     const item = filteredData[currentIdx];
